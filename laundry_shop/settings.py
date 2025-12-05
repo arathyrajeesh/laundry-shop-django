@@ -9,7 +9,10 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 from pathlib import Path
 import cloudinary
 import cloudinary.uploader
@@ -23,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j6c)3*%f+@k6%&6f$072y0#^b#w#klycg4(^x)s($hk_j+voiz'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -131,16 +134,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER='brightandshine48@gmail.com'
-EMAIL_HOST_PASSWORD='rqnpwkstrnbjswgn'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Cloudinary configuration
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dqrdmggwb',
-    'API_KEY': '954891836379836',
-    'API_SECRET': 'LqtUI2BdJCDWC1q8QFdsH9T7qvo',
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
+
 
 # Configure Cloudinary
 cloudinary.config(
@@ -153,9 +157,8 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'
 
 # Razorpay configuration
-RAZORPAY_KEY_ID = 'rzp_test_Rl3ccDJoZIKC1y'
-RAZORPAY_KEY_SECRET = '681D2I8JNrLfR8BUuqIeY6Lf'
-
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
