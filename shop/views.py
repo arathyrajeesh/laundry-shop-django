@@ -286,7 +286,7 @@ def logout_user(request):
 
 @login_required
 def edit_profile(request):
-    profile = request.user.profile
+    profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
@@ -417,13 +417,14 @@ def settings_view(request):
     """Renders the Settings page and handles notification settings."""
     if request.method == 'POST':
         notifications_enabled = request.POST.get('notifications_enabled') == 'on'
-        profile = request.user.profile
+        profile, created = Profile.objects.get_or_create(user=request.user)
         profile.notifications_enabled = notifications_enabled
         profile.save()
         messages.success(request, 'Notification settings updated successfully!')
         return redirect('settings')
 
-    return render(request, 'setting.html', {'profile': request.user.profile})
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    return render(request, 'setting.html', {'profile': profile})
 
 @login_required
 def change_password(request):

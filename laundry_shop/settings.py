@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'shop',
 ]
 
@@ -129,6 +134,16 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER='brightandshine48@gmail.com'
 EMAIL_HOST_PASSWORD='rqnpwkstrnbjswgn'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Cloudinary configuration
+cloudinary.config(
+    cloud_name='dqrdmggwb',
+    api_key='954891836379836',
+    api_secret='your_api_secret'
+)
+
+# Use Cloudinary for media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

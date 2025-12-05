@@ -19,6 +19,7 @@ class Profile(models.Model):
 class LaundryShop(models.Model):
     name = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128, blank=True)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=15, blank=True)
     city = models.CharField(max_length=100, blank=True)
@@ -56,6 +57,7 @@ class Service(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='services')
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('branch', 'name')
