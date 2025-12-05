@@ -1,12 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=15, blank=True)
-    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile_image = CloudinaryField('image', blank=True, null=True)
     city = models.CharField(max_length=100, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -75,11 +76,17 @@ class Order(models.Model):
         ('Completed', 'Completed'),
     ]
 
+    PAYMENT_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Completed', 'Completed'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     cloth_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='Pending')
     pickup_date = models.DateTimeField(blank=True, null=True)
     delivery_date = models.DateTimeField(blank=True, null=True)
     delivery_name = models.CharField(max_length=100, blank=True)

@@ -136,14 +136,26 @@ EMAIL_HOST_PASSWORD='rqnpwkstrnbjswgn'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Cloudinary configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dqrdmggwb',
+    'API_KEY': '954891836379836',
+    'API_SECRET': 'LqtUI2BdJCDWC1q8QFdsH9T7qvo',
+}
+
+# Configure Cloudinary
 cloudinary.config(
-    cloud_name='dqrdmggwb',
-    api_key='954891836379836',
-    api_secret='your_api_secret'
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET']
 )
 
-# Use Cloudinary for media files
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'
+
+# Razorpay configuration
+RAZORPAY_KEY_ID = 'rzp_test_Rl3ccDJoZIKC1y'
+RAZORPAY_KEY_SECRET = '681D2I8JNrLfR8BUuqIeY6Lf'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

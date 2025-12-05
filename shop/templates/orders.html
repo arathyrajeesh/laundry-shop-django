@@ -58,14 +58,47 @@
             background: #ffc107; 
             color: #333; 
         }
-        .status-delivered { 
-            background: #28a745; 
-            color: white; 
+        .status-delivered {
+            background: #28a745;
+            color: white;
         }
-        .order-details p { 
-            font-size: 14px; 
-            color: #666; 
-            margin-bottom: 5px; 
+        .status-completed {
+            background: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+        .status-pending {
+            background: #ffc107;
+            color: #333;
+        }
+        .order-details p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .order-actions {
+            margin-top: 15px;
+            text-align: right;
+        }
+        .btn-payment {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        .btn-payment:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+        .completed-highlight {
+            border-left: 4px solid #28a745;
+            background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
         }
     </style>
 </head>
@@ -78,15 +111,17 @@
 
         {% if orders %}
             {% for order in orders %}
-            <div class="order-card">
+            <div class="order-card {% if order.cloth_status == 'Completed' %}completed-highlight{% endif %}">
                 <div class="order-header">
                     <span>Order #{{ order.id }}</span>
-                    <span class="order-status
-                        {% if order.cloth_status == 'Pending' %}status-processing
-                        {% elif order.cloth_status == 'Completed' %}status-delivered
-                        {% else %}status-processing{% endif %}">
-                        {{ order.get_cloth_status_display }}
-                    </span>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+                        <span class="order-status
+                            {% if order.cloth_status == 'Pending' %}status-pending
+                            {% elif order.cloth_status == 'Completed' %}status-completed
+                            {% else %}status-processing{% endif %}">
+                            {{ order.get_cloth_status_display }}
+                        </span>
+                    </div>
                 </div>
                 <div class="order-details">
                     <p><strong>Shop:</strong> {{ order.shop.name }}</p>
@@ -108,6 +143,7 @@
                         {% endif %}
                     </div>
                     {% endif %}
+
                 </div>
             </div>
             {% endfor %}

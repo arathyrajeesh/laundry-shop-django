@@ -105,6 +105,7 @@ def create_welcome_notifications(user):
             color='#3498db'
         )
 
+
 # --- Existing Views ---
 
 def index(request):
@@ -577,12 +578,14 @@ def help_view(request):
     return render(request, 'help.html')
 
 
+
 @login_required
 def my_orders(request):
     """Renders the My Orders page."""
     # Pass user orders data here
     user_orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'orders.html', {'orders': user_orders})
+
 
 @login_required
 def billing_payments(request):
@@ -856,6 +859,14 @@ def payment(request):
     order_items = request.session.get('order_items', [])
     total_amount = request.session.get('total_amount', order.amount)
 
+    # If no order_items in session (for existing orders), create a dummy item
+    if not order_items:
+        order_items = [{
+            'service': {'name': 'Laundry Service'},
+            'quantity': 1,
+            'total': total_amount
+        }]
+
     # Create Razorpay order here instead of in create_order
     total_amount = request.session.get('total_amount', 0)
 
@@ -948,6 +959,7 @@ def payment_success(request):
         if order_id:
             order = get_object_or_404(Order, id=order_id, user=request.user)
             order.cloth_status = 'Washing'  # Move to next status
+            order.payment_status = 'Completed'  # Mark payment as completed
             order.save()
 
             # Send payment success email
@@ -1009,9 +1021,55 @@ Shine & Bright Team
 def payment_failed(request):
     """Handle failed payment."""
     order_id = request.session.get('order_id')
+    order = None
     if order_id:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+
+        # Send payment failure email
+        payment_failure_message = f"""
+Hi {order.user.get_full_name() or order.user.username},
+
+We regret to inform you that your payment for Order #{order.id} could not be processed at this time.
+
+Order Details:
+- Order ID: #{order.id}
+- Shop: {order.shop.name}
+- Amount: ₹{order.amount}
+
+Possible reasons for payment failure:
+- Insufficient funds in your account
+- Payment gateway issues
+- Network connectivity problems
+- Card/payment method declined
+
+You can try placing your order again or contact our support team for assistance.
+
+For your security, please ensure:
+- Your payment method has sufficient funds
+- Your internet connection is stable
+- Your payment details are entered correctly
+
+Thank you for choosing Shine & Bright!
+
+Best regards,
+Shine & Bright Team
+🧺✨
+"""
+
+        try:
+            send_mail(
+                subject=f"Payment Failed - Order #{order.id}",
+                message=payment_failure_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[order.user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            # Log the error but don't fail the payment failure process
+            print(f"Failed to send payment failure email: {e}")
+
         # Delete the order since payment failed
-        Order.objects.filter(id=order_id, user=request.user).delete()
+        order.delete()
 
     # Clear session
     request.session.pop('order_items', None)
