@@ -12,7 +12,7 @@ from .models import Profile, Order, LaundryShop ,Service,Branch, Notification
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Sum
 from django.db import IntegrityError
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, JsonResponse # Added for placeholder views
@@ -22,6 +22,130 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 import uuid
 from django.http import HttpResponseRedirect
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from io import BytesIO
+
+def generate_payment_receipt_pdf(order, order_items):
+    """Generate a PDF payment receipt for the order."""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    # Custom styles
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Heading1'],
+        fontSize=20,
+        spaceAfter=30,
+        alignment=1,  # Center alignment
+    )
+
+    heading_style = ParagraphStyle(
+        'Heading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=10,
+    )
+
+    normal_style = styles['Normal']
+
+    story = []
+
+    # Title
+    story.append(Paragraph("Shine & Bright Laundry Services", title_style))
+    story.append(Paragraph("Payment Receipt", heading_style))
+    story.append(Spacer(1, 12))
+
+    # Order details
+    story.append(Paragraph(f"<b>Order ID:</b> #{order.id}", normal_style))
+    story.append(Paragraph(f"<b>Customer:</b> {order.user.get_full_name() or order.user.username}", normal_style))
+    story.append(Paragraph(f"<b>Email:</b> {order.user.email}", normal_style))
+    story.append(Paragraph(f"<b>Shop:</b> {order.shop.name}", normal_style))
+    if order.branch:
+        story.append(Paragraph(f"<b>Branch:</b> {order.branch.name}", normal_style))
+    story.append(Paragraph(f"<b>Order Date:</b> {order.created_at.strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+    story.append(Paragraph(f"<b>Payment Date:</b> {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+    story.append(Spacer(1, 12))
+
+    # Delivery details
+    if order.delivery_name or order.delivery_address or order.delivery_phone:
+        story.append(Paragraph("<b>Delivery Details:</b>", heading_style))
+        if order.delivery_name:
+            story.append(Paragraph(f"Name: {order.delivery_name}", normal_style))
+        if order.delivery_address:
+            story.append(Paragraph(f"Address: {order.delivery_address}", normal_style))
+        if order.delivery_phone:
+            story.append(Paragraph(f"Phone: {order.delivery_phone}", normal_style))
+        if order.special_instructions:
+            story.append(Paragraph(f"Instructions: {order.special_instructions}", normal_style))
+        story.append(Spacer(1, 12))
+
+    # Order items table
+    story.append(Paragraph("<b>Order Items:</b>", heading_style))
+
+    # Table data
+    table_data = [['Service', 'Quantity', 'Price', 'Total']]
+    for item in order_items:
+        table_data.append([
+            item.get('service', {}).get('name', item.get('service_name', 'Service')),
+            str(item.get('quantity', 1)),
+            f"₹{item.get('price', item.get('total', order.amount)):.2f}",
+            f"₹{item.get('total', order.amount):.2f}"
+        ])
+
+    # Add total row
+    table_data.append(['', '', '<b>Total</b>', f"<b>₹{order.amount:.2f}</b>"])
+
+    # Create table
+    table = Table(table_data, colWidths=[3*inch, 1*inch, 1*inch, 1*inch])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+    ]))
+
+    story.append(table)
+    story.append(Spacer(1, 20))
+
+    # Payment status
+    story.append(Paragraph("<b>Payment Status: Completed</b>", ParagraphStyle(
+        'PaymentStatus',
+        parent=styles['Normal'],
+        fontSize=12,
+        textColor=colors.green,
+        alignment=1,
+    )))
+    story.append(Spacer(1, 20))
+
+    # Footer
+    story.append(Paragraph("Thank you for choosing Shine & Bright Laundry Services!", ParagraphStyle(
+        'Footer',
+        parent=styles['Normal'],
+        fontSize=10,
+        alignment=1,
+        spaceBefore=20,
+    )))
+    story.append(Paragraph("🧺✨", ParagraphStyle(
+        'Emoji',
+        parent=styles['Normal'],
+        fontSize=14,
+        alignment=1,
+    )))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
 
 # --- DUMMY DATA (FOR VIEWS) ---
 
@@ -962,7 +1086,19 @@ def payment_success(request):
             order.payment_status = 'Completed'  # Mark payment as completed
             order.save()
 
-            # Send payment success email
+            # Generate PDF receipt
+            order_items = request.session.get('order_items', [])
+            if not order_items:
+                order_items = [{
+                    'service_name': 'Laundry Service',
+                    'quantity': 1,
+                    'price': float(order.amount),
+                    'total': float(order.amount)
+                }]
+
+            pdf_buffer = generate_payment_receipt_pdf(order, order_items)
+
+            # Send payment success email with PDF attachment
             payment_success_message = f"""
 Hi {order.user.get_full_name() or order.user.username},
 
@@ -981,6 +1117,8 @@ Delivery Information:
 
 Your laundry will be processed shortly. You can track your order status in your dashboard.
 
+Please find your payment receipt attached as a PDF.
+
 Thank you for choosing Shine & Bright!
 
 Best regards,
@@ -989,13 +1127,18 @@ Shine & Bright Team
 """
 
             try:
-                send_mail(
+                # Create email with PDF attachment
+                email = EmailMessage(
                     subject=f"Payment Successful - Order #{order.id}",
-                    message=payment_success_message,
+                    body=payment_success_message,
                     from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[order.user.email],
-                    fail_silently=True,
+                    to=[order.user.email],
                 )
+
+                # Attach PDF
+                email.attach(f'payment_receipt_order_{order.id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
+
+                email.send(fail_silently=True)
             except Exception as e:
                 # Log the error but don't fail the payment
                 print(f"Failed to send payment success email: {e}")
