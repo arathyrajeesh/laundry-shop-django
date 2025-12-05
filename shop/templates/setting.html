@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: #f7f7f7; 
+            font-family: "Poppins", sans-serif; 
+        }
+        .page-container { 
+            max-width: 900px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+        }
+        .page-header { 
+            font-size: 30px; 
+            font-weight: 600; 
+            color: #0f334bff; 
+            margin-bottom: 25px; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px; 
+        }
+        .setting-group { 
+            margin-bottom: 30px; 
+        }
+        .setting-group h3 { 
+            font-size: 20px; 
+            color: #333; 
+            margin-bottom: 15px; 
+        }
+        .setting-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 0; 
+            border-bottom: 1px dashed #eee; 
+        }
+        .setting-item:last-child { 
+            border-bottom: none; 
+        }
+
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #0f334bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    background: {% if message.tags == 'error' %}#ffdddd{% else %}#ddffdd{% endif %};
+                    padding: 12px;
+                    border-left: 5px solid {% if message.tags == 'error' %}#e63946{% else %}#2d6a4f{% endif %};
+                    margin-bottom: 20px;
+                    border-radius: 5px;
+                    color: #333;
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div style="margin-bottom: 20px;">
+            <a href="{% url 'dashboard' %}" style="color: #0f334bff; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center;">
+                ← Back to Dashboard
+            </a>
+        </div>
+
+        <h1 class="page-header">User Settings ⚙️</h1>
+
+        <div class="setting-group">
+            <h3>Account Preferences</h3>
+            <div class="setting-item">
+                <span>Change Password</span>
+                <a href="{% url 'change_password' %}" style="color: #0f334bff; text-decoration: none;">Edit</a>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <h3>Notifications</h3>
+            <form method="post" style="margin-top: 15px;">
+                {% csrf_token %}
+                <div class="setting-item">
+                    <span>Enable Notification Badges</span>
+                    <label class="switch">
+                        <input type="checkbox" name="notifications_enabled" {% if profile.notifications_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <button type="submit" style="background: #0f334bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500;">
+                        Save Notification Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="setting-group">
+            <h3>Privacy</h3>
+            <div class="setting-item">
+                <span>View Data Policy</span>
+                <a href="{% url 'privacy_policy' %}" style="color: #0f334bff; text-decoration: none;">Edit</a>
+            </div>
+            <div class="setting-item">
+                <span>Delete Account</span>
+                <a href="{% url 'delete_account' %}" style="background: #dc3545; color: white; text-decoration: none; padding: 5px 10px; border-radius: 5px; display: inline-block;">Delete</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

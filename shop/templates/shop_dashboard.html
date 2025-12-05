@@ -1,0 +1,768 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Dashboard - {{ shop.name }}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+        }
+
+        :root {
+            --primary-color: #0f334bff;
+            --accent-color: #2ecc71;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+        }
+
+        .shop-header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .shop-header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        .shop-header .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .notification-container {
+            position: relative;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #000000;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .notification-btn:hover {
+            background: rgba(15, 51, 75, 0.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px 0;
+            display: none;
+            z-index: 1000;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            transition: background 0.2s;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .notification-footer {
+            padding: 10px 20px 5px;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+        }
+
+        .notification-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .notification-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0a2538;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .shop-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1a4d6e 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .welcome-section h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .icon-blue { background: var(--info-color); }
+        .icon-green { background: var(--accent-color); }
+        .icon-orange { background: var(--warning-color); }
+        .icon-purple { background: #9b59b6; }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dashboard-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section-header h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: #f8f9fa;
+        }
+
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd; 
+            color: #856404; 
+        }
+        .status-washing { 
+            background: #d1ecf1; 
+            color: #0c5460; 
+        }
+        .status-drying { 
+            background: #d4edda; 
+            color: #155724; 
+        }
+        .status-ironing { 
+            background: #e2e3e5; 
+            color: #383d41; 
+        }
+        .status-ready { 
+            background: #cce5ff; 
+            color: #004085; 
+        }
+        .status-completed { 
+            background: #d4edda; 
+            color: #155724; 
+        }
+
+        .status-select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .update-btn {
+            padding: 5px 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .update-btn:hover {
+            background: #27ae60;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .shop-container {
+                padding: 20px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 14px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 5px;
+            }
+
+            .shop-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shop-header">
+        <h1><i class="fas fa-store"></i> {{ shop.name }} - Dashboard</h1>
+        <div class="header-actions">
+            <div class="notification-container">
+                <button class="notification-btn" id="notification-trigger">
+                    <i class="fas fa-bell"></i>
+                    {% if shop_notifications|length > 0 %}
+                        <span class="notification-badge">{{ shop_notifications|length }}</span>
+                    {% endif %}
+                </button>
+
+                <div id="notification-dropdown-menu" class="notification-dropdown">
+                    {% if shop_notifications %}
+                        {% for notification in shop_notifications %}
+                            <div class="notification-item">
+                                <div class="notification-icon" style="background: {{ notification.color }};">
+                                    <i class="{{ notification.icon }}"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">{{ notification.title }}</div>
+                                    <div class="notification-message">{{ notification.message }}</div>
+                                    <div class="notification-time">{{ notification.time|date:"M d, H:i" }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="notification-footer">
+                            <a href="{% url 'shop_notifications' %}">View All Notifications</a>
+                        </div>
+                    {% else %}
+                        <div class="notification-item">
+                            <div style="text-align: center; padding: 20px; color: #999; width: 100%;">
+                                <i class="fas fa-bell-slash" style="font-size: 24px; margin-bottom: 10px;"></i><br>
+                                No new notifications
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="{% url 'shop_logout' %}" class="btn btn-secondary">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="shop-container">
+        <div class="welcome-section">
+            <h2>Welcome, {{ shop.name }}!</h2>
+            <p>Manage your orders and track your business performance</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ total_orders }}</div>
+                        <div class="stat-card-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-blue">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ pending_orders }}</div>
+                        <div class="stat-card-label">Pending Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-orange">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ completed_orders }}</div>
+                        <div class="stat-card-label">Completed Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">₹{{ total_revenue|floatformat:2 }}</div>
+                        <div class="stat-card-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card-icon icon-green">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">₹{{ today_revenue|floatformat:2 }}</div>
+                        <div class="stat-card-label">Today's Revenue</div>
+                    </div>
+                    <div class="stat-card-icon icon-purple">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-store-alt"></i> Branch Overview</h2>
+                <a href="{% url 'select_branch' %}" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> View Branch Orders
+                </a>
+            </div>
+
+            {% if branch_stats %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                {% for stat in branch_stats %}
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-value">{{ stat.total_orders }}</div>
+                            <div class="stat-card-label">{{ stat.branch.name }}</div>
+                        </div>
+                        <div class="stat-card-icon icon-blue">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; justify-content: space-between; font-size: 14px;">
+                        <span>Pending: <strong>{{ stat.pending_orders }}</strong></span>
+                        <span>Completed: <strong>{{ stat.completed_orders }}</strong></span>
+                        <span>Revenue: <strong>₹{{ stat.revenue|floatformat:0 }}</strong></span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-store-alt"></i>
+                <p>No branches found. Add branches to get started.</p>
+                <a href="{% url 'add_branch' %}" class="btn btn-primary" style="margin-top:15px;">Add Branch</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-receipt"></i> Recent Orders (All Branches)</h2>
+            </div>
+            {% if recent_orders %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Branch</th>
+                        <th>Pickup Date</th>
+                        <th>Delivery Date</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.branch.name }}</td>
+                        <td>{{ order.pickup_date|date:"M d, Y H:i" }}</td>
+                        <td>{{ order.delivery_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.cloth_status|lower }}">{{ order.cloth_status }}</span>
+                        </td>
+                        <td>₹{{ order.amount|floatformat:2 }}</td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <select class="status-select" id="status-{{ order.id }}">
+                                <option value="Pending" {% if order.cloth_status == "Pending" %}selected{% endif %}>Pending</option>
+                                <option value="Washing" {% if order.cloth_status == "Washing" %}selected{% endif %}>Washing</option>
+                                <option value="Drying" {% if order.cloth_status == "Drying" %}selected{% endif %}>Drying</option>
+                                <option value="Ironing" {% if order.cloth_status == "Ironing" %}selected{% endif %}>Ironing</option>
+                                <option value="Ready" {% if order.cloth_status == "Ready" %}selected{% endif %}>Ready for Pickup</option>
+                                <option value="Completed" {% if order.cloth_status == "Completed" %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button class="update-btn" onclick="updateOrderStatus({{ order.id }})">
+                                Update
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No orders yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2><i class="fas fa-store-alt"></i> Branches & Services</h2>
+            <a href="{% url 'add_branch' %}" class="btn btn-primary">+ Add Branch</a>
+        </div>
+
+        {% if branches %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Branch Name</th>
+                    <th>Address</th>
+                    <th>Services Offered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for branch in branches %}
+                <tr>
+                    <td>{{ branch.name }}</td>
+                    <td>{{ branch.address }}</td>
+
+                    <td>
+                        {% if branch.services.all %}
+                            {% for s in branch.services.all %}
+                                <span class="status-badge status-ready">{{ s.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="status-badge status-pending">No Services</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'edit_branch' branch.id %}" 
+                        class="btn btn-primary" 
+                        style="padding:6px 10px;font-size:12px;">
+                        Edit
+                        </a>
+
+                        <a href="{% url 'delete_branch' branch.id %}" 
+                        class="btn btn-secondary" 
+                        style="padding:6px 10px;font-size:12px;">
+                        Delete
+                        </a>
+
+                        <a href="{% url 'add_service_branch' branch.id %}"
+                        class="btn btn-primary"
+                        style="padding:6px 10px;font-size:12px;background:#9b59b6;">
+                        Add Service
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-map-marker-alt"></i>
+            <p>No branches added yet</p>
+            <a href="{% url 'add_branch' %}" class="btn btn-primary" style="margin-top:15px;">Add Branch</a>
+        </div>
+        {% endif %}
+    </div>
+
+
+    <script>
+        document.getElementById('notification-trigger').addEventListener('click', function() {
+            var dropdown = document.getElementById('notification-dropdown-menu');
+            dropdown.classList.toggle('show');
+        });
+
+        window.addEventListener('click', function(e) {
+            var container = document.querySelector('.notification-container');
+            if (!container.contains(e.target) && document.getElementById('notification-dropdown-menu').classList.contains('show')) {
+                document.getElementById('notification-dropdown-menu').classList.remove('show');
+            }
+        });
+
+        function updateOrderStatus(orderId) {
+            const statusSelect = document.getElementById(`status-${orderId}`);
+            const newStatus = statusSelect.value;
+
+            const formData = new FormData();
+            formData.append('status', newStatus);
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+            fetch(`/shop/order/${orderId}/update-status/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order status updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the order status.');
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
+

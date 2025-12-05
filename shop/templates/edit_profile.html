@@ -1,0 +1,470 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Shine & Bright</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f334b 0%, #1a5f7a 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-50%) translateX(-3px);
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            border-color: #0f334b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(15, 51, 75, 0.1);
+            outline: none;
+        }
+
+        .form-control[readonly] {
+            background: #f1f3f4;
+            cursor: not-allowed;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 2px dashed #0f334b;
+            border-radius: 12px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #0f334b;
+            font-weight: 500;
+        }
+
+        .file-input-label:hover {
+            background: #0f334b;
+            color: white;
+        }
+
+        .location-section {
+            background: linear-gradient(135deg, #220e3bff 0%, #442088ff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            color: white;
+        }
+
+        .location-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .location-input {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .location-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .detect-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .detect-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .place-result {
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0f334b 0%, #1a5f7a 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15, 51, 75, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header, .form-container {
+                padding: 20px;
+            }
+
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="{% url 'dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
+            <p>Update your personal information</p>
+        </div>
+
+        <div class="form-container">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.full_name.id_for_label }}">
+                        Full Name
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-user" style="color: #0f334b; font-size: 18px; min-width: 20px;"></i>
+                        {{ form.full_name }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}">
+                        Phone Number
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-phone" style="color: #0f334b; font-size: 18px; min-width: 20px;"></i>
+                        {{ form.phone }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.profile_image.id_for_label }}">
+                        Profile Picture
+                    </label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="{{ form.profile_image.id_for_label }}" name="{{ form.profile_image.name }}" accept="image/*">
+                        <label for="{{ form.profile_image.id_for_label }}" class="file-input-label">
+                            <i class="fas fa-upload"></i>
+                            Choose Profile Picture
+                        </label>
+                    </div>
+                    {% if profile.profile_image %}
+                        <small style="color: #666; margin-top: 5px; display: block;">
+                            Current: {{ profile.profile_image.name }}
+                        </small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.city.id_for_label }}">
+                        City
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-map-marker-alt" style="color: #0f334b; font-size: 18px; min-width: 20px;"></i>
+                        {{ form.city }}
+                    </div>
+                </div>
+
+                <div class="location-section">
+                    <h3>
+                        <i class="fas fa-location-arrow"></i>
+                        Location Detection
+                    </h3>
+
+                    <div class="location-grid">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="color: white;">Latitude</label>
+                            <input type="text" id="latitude" name="latitude" value="{{ profile.latitude }}" readonly class="location-input" placeholder="Not detected">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="color: white;">Longitude</label>
+                            <input type="text" id="longitude" name="longitude" value="{{ profile.longitude }}" readonly class="location-input" placeholder="Not detected">
+                        </div>
+                    </div>
+
+                    <button type="button" id="detectBtn" class="detect-btn">
+                        <i class="fas fa-search-location"></i>
+                        Auto-detect My Location
+                    </button>
+
+                    <div id="place_result" class="place-result">
+                        <i class="fas fa-map-pin"></i> Location not detected
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("detectBtn").addEventListener("click", function () {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+            btn.disabled = true;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => success(position, btn, originalText),
+                    (error) => handleError(error, btn, originalText)
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        function success(position, btn, originalText) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            const latInput = document.getElementById("latitude");
+            const lonInput = document.getElementById("longitude");
+
+            latInput.value = lat.toFixed(6);
+            lonInput.value = lon.toFixed(6);
+
+            latInput.style.borderColor = '#28a745';
+            lonInput.style.borderColor = '#28a745';
+
+            setTimeout(() => {
+                latInput.style.borderColor = '';
+                lonInput.style.borderColor = '';
+            }, 2000);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            getPlaceName(lat, lon);
+        }
+
+        function handleError(error, btn, originalText) {
+            let message = "Location access denied. Please enable location services.";
+
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "Location access denied. Please allow location access in your browser settings.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    message = "Location request timed out.";
+                    break;
+            }
+
+            alert(message);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        function getPlaceName(lat, lon) {
+            const placeResult = document.getElementById("place_result");
+            placeResult.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching location...';
+
+            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.address) {
+                        const city = data.address.city ||
+                            data.address.town ||
+                            data.address.village ||
+                            data.address.state ||
+                            data.address.country ||
+                            "Unknown location";
+
+                        placeResult.innerHTML = `<i class="fas fa-map-pin"></i> ${city}`;
+
+                        const cityField = document.getElementById("id_city");
+                        if (cityField && !cityField.value) {
+                            cityField.value = city;
+                            cityField.style.borderColor = '#28a745';
+                            setTimeout(() => {
+                                cityField.style.borderColor = '';
+                            }, 2000);
+                        }
+                    } else {
+                        placeResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unable to determine location';
+                    }
+                })
+                .catch(() => {
+                    placeResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unable to fetch location details';
+                });
+        }
+
+        document.getElementById("{{ form.profile_image.id_for_label }}").addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const label = document.querySelector(".file-input-label");
+                label.innerHTML = `<i class="fas fa-check"></i> ${file.name}`;
+                label.style.background = '#28a745';
+                label.style.color = 'white';
+            }
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>

@@ -1,0 +1,327 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Shine & Bright Laundry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f6ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .signup-container {
+            background: #ffffff;
+            width: 380px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin: 10px 0 20px;
+            color: #2c3e50;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #bbb;
+            outline: none;
+            font-size: 15px;
+            box-sizing: border-box; 
+        }
+
+        .password-container {
+            position: relative; 
+            margin: 10px 0;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding-right: 40px; 
+            margin: 0; 
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            padding: 5px;
+            z-index: 10;
+        }
+
+        input:focus {
+            border-color: #3498db;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background: #2d82c4;
+        }
+
+        .footer-text {
+            margin-top: 15px;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+            transition: text-decoration 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .shop-links-section {
+            margin-top: 20px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee;
+        }
+        
+        .shop-links-container {
+            display: flex; 
+            gap: 10px; 
+            justify-content: center;
+        }
+
+        .shop-links-container a {
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 500;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+        
+        .shop-links-container a:hover {
+            opacity: 0.9;
+            text-decoration: none;
+        }
+
+        .shop-login-btn {
+            background: #28a745; 
+        }
+
+        .shop-register-btn {
+            background: #17a2b8; 
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="signup-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div style="
+                background: {% if message.tags == 'error' %}#ffdddd{% else %}#ddffdd{% endif %};
+                padding: 12px;
+                border-left: 5px solid {% if message.tags == 'error' %}#e63946{% else %}#2d6a4f{% endif %};
+                margin-bottom: 15px;
+                border-radius: 5px;
+                color: #333;
+            ">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <img src="{% static 'images/Shine.png' %}" class="logo" alt="Shine & Bright Logo">
+
+    <h2>Create Account</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="text" name="username" placeholder="Enter Username" required autocomplete="username">
+        <input type="email" name="email" placeholder="Enter Email" required autocomplete="email">
+        
+        <div class="password-container">
+            <input type="password" id="password1" name="password" placeholder="Enter Password" required autocomplete="new-password">
+            <button type="button" class="toggle-password" onclick="togglePassword('password1')" aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+
+        <div class="password-container">
+            <input type="password" id="password2" name="password_confirm" placeholder="Confirm Password" required autocomplete="new-password">
+            <button type="button" class="toggle-password" onclick="togglePassword('password2')" aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+
+        <input type="text" name="manual_location" id="manual_location" placeholder="Enter your city or location (optional)" autocomplete="address-level2" style="margin-top: 10px;">
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+        <input type="hidden" name="city" id="city">
+        <p id="location-status" style="font-size: 12px; color: #888; margin-top: 5px;"></p>
+
+        <button type="submit">Signup</button>
+    </form>
+
+
+    <p class="footer-text">
+        Already have an account?
+        <a href="{% url 'login' %}">Login here</a>
+    </p>
+
+    <div class="shop-links-section">
+        <p style="color: #666; font-size: 14px; margin-bottom: 10px;">Are you a shop owner?</p>
+        <div class="shop-links-container">
+            <a href="{% url 'shop_login' %}" class="shop-login-btn">Shop Login</a>
+            <a href="{% url 'shop_register' %}" class="shop-register-btn">Register Shop</a>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    const locationStatus = document.getElementById("location-status");
+    const manualLocationInput = document.getElementById("manual_location");
+
+    // Function to update location status based on input
+    function updateLocationStatus() {
+        const manualLocation = manualLocationInput.value.trim();
+        if (manualLocation) {
+            document.getElementById("city").value = manualLocation;
+            document.getElementById("latitude").value = "";
+            document.getElementById("longitude").value = "";
+            locationStatus.textContent = `Manual location: ${manualLocation}`;
+        } else {
+            // Check if we have geolocation data
+            const city = document.getElementById("city").value;
+            if (city) {
+                locationStatus.textContent = `Location captured: ${city}`;
+            } else {
+                locationStatus.textContent = "Enter your location manually or allow automatic detection.";
+            }
+        }
+    }
+
+    // Add event listener to manual location input
+    manualLocationInput.addEventListener("input", updateLocationStatus);
+
+    window.onload = function () {
+        if (navigator.geolocation) {
+            locationStatus.textContent = "Attempting to get location...";
+            navigator.geolocation.getCurrentPosition(
+                async function (position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    // Only set geolocation data if user hasn't manually entered location
+                    if (!manualLocationInput.value.trim()) {
+                        document.getElementById("latitude").value = lat;
+                        document.getElementById("longitude").value = lon;
+
+                        const city = await getCityFromLocation(lat, lon);
+                        document.getElementById("city").value = city;
+
+                        locationStatus.textContent = city ? `Location captured: ${city}` : "Location captured (City pending).";
+                    }
+                },
+                function (error) {
+                    console.error("Geolocation failed:", error.message);
+                    // Only show error if user hasn't manually entered location
+                    if (!manualLocationInput.value.trim()) {
+                        locationStatus.textContent = "Location failed. Please enter your location manually.";
+                    }
+                }
+            );
+        } else {
+            // Only show not supported message if user hasn't manually entered location
+            if (!manualLocationInput.value.trim()) {
+                locationStatus.textContent = "Geolocation not supported. Please enter your location manually.";
+            }
+        }
+    };
+
+    async function getCityFromLocation(lat, lon) {
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)' // Replace with your actual contact
+                }
+            });
+            const data = await response.json();
+
+            if (data.address) {
+                return data.address.city ||
+                    data.address.town ||
+                    data.address.village ||
+                    data.address.county ||
+                    data.address.state ||
+                    data.address.country ||
+                    "Unknown City";
+            }
+            return "Unknown City";
+
+        } catch (error) {
+            console.error("Unable to fetch city from location:", error);
+            return "Unknown City";
+        }
+    }
+
+    function togglePassword(id) {
+        const passwordInput = document.getElementById(id);
+        const toggleBtn = passwordInput.nextElementSibling;
+        const icon = toggleBtn.querySelector('i');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            toggleBtn.setAttribute('aria-label', 'Hide password');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            toggleBtn.setAttribute('aria-label', 'Show password');
+        }
+    }
+</script>
+
+</html>

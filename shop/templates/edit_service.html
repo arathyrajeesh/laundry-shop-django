@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Service - {{ branch.name }}</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f7ff;
+            padding: 40px;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            margin: auto;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        .btn-primary {
+            background: #4a90e2;
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: #777;
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Edit Service - {{ branch.name }}</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Service Name:</label>
+        {{ form.name }}
+
+        <br><br>
+
+        <label>Price (Optional):</label>
+        {{ form.price }}
+
+        <br><br>
+
+        <button type="submit" class="btn-primary">Update Service</button>
+        <a href="{% url 'branch_orders' branch.id %}" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+
+</body>
+</html>

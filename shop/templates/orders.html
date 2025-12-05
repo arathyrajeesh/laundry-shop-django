@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body { background: #f7f7f7; font-family: "Poppins", sans-serif; }
+        .page-container { 
+            max-width: 1000px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+            position: relative; 
+        }
+        .page-header { font-size: 30px; font-weight: 600; color: #0f334bff; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            right: 10px;
+            color: #0f334bff;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            background: rgba(15, 51, 75, 0.1);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .back-btn:hover {
+            background: rgba(15, 51, 75, 0.2);
+            transform: translateX(-3px);
+        }
+        .order-card {
+            background: #fff; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            padding: 15px; 
+        }
+        .order-header { 
+            display: flex; 
+            justify-content: space-between; 
+            font-weight: 600; 
+            margin-bottom: 10px; 
+        }
+        .order-status { 
+            font-size: 14px; 
+            padding: 5px 10px; 
+            border-radius: 5px; 
+        }
+        .status-processing { 
+            background: #ffc107; 
+            color: #333; 
+        }
+        .status-delivered { 
+            background: #28a745; 
+            color: white; 
+        }
+        .order-details p { 
+            font-size: 14px; 
+            color: #666; 
+            margin-bottom: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <a href="{% url 'dashboard' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="page-header">My Orders 🧺</h1>
+
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <span>Order #{{ order.id }}</span>
+                    <span class="order-status
+                        {% if order.cloth_status == 'Pending' %}status-processing
+                        {% elif order.cloth_status == 'Completed' %}status-delivered
+                        {% else %}status-processing{% endif %}">
+                        {{ order.get_cloth_status_display }}
+                    </span>
+                </div>
+                <div class="order-details">
+                    <p><strong>Shop:</strong> {{ order.shop.name }}</p>
+                    <p><strong>Total Amount:</strong> ₹{{ order.amount }}</p>
+                    <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+
+                    {% if order.delivery_name %}
+                    <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                        <p style="margin: 0; font-weight: bold; color: #0f334bff;">Delivery Details:</p>
+                        <p style="margin: 5px 0;"><strong>Name:</strong> {{ order.delivery_name }}</p>
+                        {% if order.delivery_address %}
+                        <p style="margin: 5px 0;"><strong>Address:</strong> {{ order.delivery_address }}</p>
+                        {% endif %}
+                        {% if order.delivery_phone %}
+                        <p style="margin: 5px 0;"><strong>Phone:</strong> {{ order.delivery_phone }}</p>
+                        {% endif %}
+                        {% if order.special_instructions %}
+                        <p style="margin: 5px 0;"><strong>Instructions:</strong> {{ order.special_instructions }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="order-card">
+                <div class="order-details">
+                    <p style="text-align: center; color: #666;">No orders found. <a href="{% url 'dashboard' %}" style="color: #0f334bff;">Start shopping</a></p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

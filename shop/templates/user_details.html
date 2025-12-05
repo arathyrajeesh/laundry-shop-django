@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Details - Shine & Bright</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f334b 0%, #1a5f7a 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-50%) translateX(-3px);
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            border-color: #0f334b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(15, 51, 75, 0.1);
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0f334b 0%, #1a5f7a 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15, 51, 75, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #0f334b;
+        }
+
+        .order-summary h3 {
+            color: #0f334b;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .order-summary p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header, .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="{% url 'dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1><i class="fas fa-truck"></i> Delivery Details</h1>
+            <p>Please provide delivery information for your order</p>
+        </div>
+
+        <div class="form-container">
+            <div class="order-summary">
+                <h3><i class="fas fa-shopping-cart"></i> Order Summary</h3>
+                <p><strong>Order #{{ order.id }}</strong></p>
+                <p><strong>Total Amount:</strong> ₹{{ order.amount }}</p>
+                <p><strong>Status:</strong> {{ order.get_cloth_status_display }}</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.pickup_date.id_for_label }}">
+                        <i class="fas fa-calendar-alt"></i> Pickup Date & Time
+                    </label>
+                    {{ form.pickup_date }}
+                    {% if form.pickup_date.errors %}
+                        <div class="error-message" style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                            {{ form.pickup_date.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.delivery_date.id_for_label }}">
+                        <i class="fas fa-calendar-check"></i> Delivery Date & Time
+                    </label>
+                    {{ form.delivery_date }}
+                    {% if form.delivery_date.errors %}
+                        <div class="error-message" style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                            {{ form.delivery_date.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.delivery_name.id_for_label }}">
+                        <i class="fas fa-user"></i> Full Name for Delivery
+                    </label>
+                    {{ form.delivery_name }}
+                    {% if form.delivery_name.errors %}
+                        <div class="error-message" style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                            {{ form.delivery_name.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.delivery_address.id_for_label }}">
+                        <i class="fas fa-map-marker-alt"></i> Delivery Address
+                    </label>
+                    {{ form.delivery_address }}
+                    {% if form.delivery_address.errors %}
+                        <div class="error-message" style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                            {{ form.delivery_address.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.delivery_phone.id_for_label }}">
+                        <i class="fas fa-phone"></i> Contact Phone Number
+                    </label>
+                    {{ form.delivery_phone }}
+                    {% if form.delivery_phone.errors %}
+                        <div class="error-message" style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                            {{ form.delivery_phone.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.special_instructions.id_for_label }}">
+                        <i class="fas fa-sticky-note"></i> Special Instructions (Optional)
+                    </label>
+                    {{ form.special_instructions }}
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-credit-card"></i> Proceed to Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

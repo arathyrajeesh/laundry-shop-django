@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Login - Shine & Bright Laundry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            background: linear-gradient(135deg, #0f334bff 0%, #1a4d6e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin: 10px 0 5px;
+            color: #0f334bff;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            outline: none;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #0f334bff;
+            box-shadow: 0 0 0 3px rgba(15, 51, 75, 0.1);
+        }
+
+        .password-container {
+            position: relative; 
+            width: 100%;
+        }
+
+        .password-container input {
+            padding-right: 40px; 
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            padding: 5px;
+            z-index: 10;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: #0f334bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background: #0a2538;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        a {
+            color: #0f334bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c62828;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2e7d32;
+            font-size: 14px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <img src="{% static 'images/Shine.png' %}" alt="Logo" class="logo">
+    <h2>Shop Login</h2>
+    <p class="subtitle">Welcome back! Please login to your shop account</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="shop_name">Shop Name</label>
+            <input type="text" id="shop_name" name="shop_name" placeholder="Enter your shop name" required autofocus autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-container">
+                <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                <button type="button" class="toggle-password" id="togglePasswordBtn" aria-label="Toggle password visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="footer-text">
+        Don't have an account? <a href="{% url 'shop_register' %}">Register here</a>
+    </div>
+
+    <div class="footer-text" style="margin-top: 15px;">
+        <a href="{% url 'home' %}">← Back to Home</a>
+    </div>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePasswordBtn');
+    const icon = toggleBtn.querySelector('i');
+
+    toggleBtn.addEventListener('click', () => {
+        const type = passwordInput.type === "password" ? "text" : "password";
+        passwordInput.type = type;
+
+        if (type === "password") {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            toggleBtn.setAttribute('aria-label', 'Show password');
+        } else {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            toggleBtn.setAttribute('aria-label', 'Hide password');
+        }
+    });
+</script>
+
+</body>
+</html>

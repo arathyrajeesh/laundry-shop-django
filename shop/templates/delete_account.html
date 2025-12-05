@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - Shine & Bright</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .warning-icon {
+            font-size: 60px;
+            color: #e63946;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .warning-box ul {
+            color: #856404;
+            margin: 0;
+            padding-left: 20px;
+        }
+        .warning-box li {
+            margin-bottom: 8px;
+        }
+        .confirmation-text {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #495057;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 25px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .checkbox-container label {
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .info-note {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #0c5460;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="warning-icon">⚠️</div>
+        <h1>Delete Your Account</h1>
+        <p class="subtitle">This action cannot be undone. Please read carefully before proceeding.</p>
+
+        <div class="warning-box">
+            <h3>⚠️ Important Warning</h3>
+            <p>Deleting your account will permanently remove:</p>
+            <ul>
+                <li>Your account credentials and profile information</li>
+                <li>All your order history and service records</li>
+                <li>Your saved preferences and settings</li>
+                <li>Any accumulated rewards or loyalty points</li>
+                <li>Access to all Shine & Bright services</li>
+            </ul>
+            <p><strong>This action is irreversible.</strong> Once deleted, your data cannot be recovered.</p>
+        </div>
+
+        <div class="confirmation-text">
+            "I understand that deleting my account is permanent and all my data will be lost forever."
+        </div>
+
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <div class="checkbox-container">
+                <input type="checkbox" id="confirmDelete" name="confirm_delete" required>
+                <label for="confirmDelete">I confirm that I want to permanently delete my account</label>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                    Yes, Delete My Account
+                </button>
+                <a href="{% url 'settings' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+        <div class="info-note">
+            <strong>Need help?</strong> If you're having issues with our service or have questions about your account,
+            please contact our support team before deleting your account. We're here to help!
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('confirmDelete').addEventListener('change', function() {
+            const deleteBtn = document.getElementById('deleteBtn');
+            deleteBtn.disabled = !this.checked;
+
+            if (this.checked) {
+                deleteBtn.style.background = '#dc3545';
+            } else {
+                deleteBtn.style.background = '#cccccc';
+            }
+        });
+
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
+            const confirmed = confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

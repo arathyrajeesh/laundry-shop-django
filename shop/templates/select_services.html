@@ -1,0 +1,374 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Services - {{ shop.name }}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f7f7f7;
+        }
+
+        :root {
+            --primary-color: #0f334bff;
+            --accent-color: #2ecc71;
+            --secondary-color: #6c757d;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0a2538;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .shop-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .shop-header h1 {
+            color: var(--primary-color);
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .service-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .service-branch {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .service-price {
+            font-weight: 600;
+            color: var(--accent-color);
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .service-checkbox {
+            margin-right: 10px;
+        }
+
+        .proceed-section {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .proceed-btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .proceed-btn:hover {
+            background: #27ae60;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
+            {% if branch %}
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-map-marker-alt"></i> Ordering from: {{ branch.name }}
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            {% if branch %}
+                <a href="{% url 'select_branch_for_order' shop.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Change Branch
+                </a>
+            {% else %}
+                <a href="{% url 'shop_detail' shop.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Shop
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="shop-header">
+            <h1>Select Your Services</h1>
+            {% if branch %}
+                <p>Choose the services you need from {{ branch.name }} branch</p>
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">
+                    <i class="fas fa-map-marker-alt"></i> {{ branch.address }}
+                </div>
+            {% else %}
+                <p>Choose the services you need from {{ shop.name }}</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-concierge-bell"></i> Available Services</h2>
+            {% if services %}
+                <form id="service-form" method="post" action="{% url 'create_order' shop.id %}">
+                    {% csrf_token %}
+                    <div class="services-grid">
+                        {% for service in services %}
+                            <div class="service-card" data-service-id="{{ service.id }}" data-price="{% if service.price %}{{ service.price }}{% else %}0{% endif %}">
+                                <input type="checkbox" id="service-{{ service.id }}" name="selected_services" value="{{ service.id }}" class="service-checkbox" onchange="updateTotal()">
+                                <label for="service-{{ service.id }}">
+                                    <h4>{{ service.name }}</h4>
+                                    <div class="service-branch">
+                                        <i class="fas fa-map-marker-alt"></i> {{ service.branch.name }}
+                                    </div>
+                                    {% if service.price %}
+                                        <div class="service-price">₹{{ service.price }}</div>
+                                    {% else %}
+                                        <div class="service-price">Price on Request</div>
+                                    {% endif %}
+                                </label>
+                                <div class="quantity-selector">
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, -1)">-</button>
+                                    <input type="number" id="quantity-{{ service.id }}" name="quantity_{{ service.id }}" value="1" min="1" class="quantity-input" readonly onchange="updateTotal()">
+                                    <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, 1)">+</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-concierge-bell"></i>
+                    <p>No services available yet</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="section" id="total-section" style="display: none;">
+            <h2><i class="fas fa-calculator"></i> Order Summary</h2>
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 18px; margin-bottom: 10px;">Total Amount: <span id="total-amount" style="font-weight: bold; color: var(--accent-color); font-size: 24px;">₹0</span></div>
+                <div id="selected-services-list" style="margin-top: 15px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <strong>Selected Services:</strong>
+                    <div id="services-list" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        {% if services %}
+            <div class="proceed-section">
+                <h3>Ready to proceed with your order?</h3>
+                <p>Click below to continue with the selected services</p>
+                <a href="#" onclick="submitForm()" class="proceed-btn">
+                    <i class="fas fa-shopping-cart"></i> Proceed to Order
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function changeQuantity(serviceId, change) {
+            const input = document.getElementById(`quantity-${serviceId}`);
+            let currentValue = parseInt(input.value);
+            currentValue += change;
+            if (currentValue < 1) currentValue = 1;
+            input.value = currentValue;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const serviceCards = document.querySelectorAll('.service-card');
+            let total = 0;
+            let selectedServices = [];
+
+            serviceCards.forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    const serviceId = card.dataset.serviceId;
+                    const price = parseFloat(card.dataset.price) || 0;
+                    const quantity = parseInt(document.getElementById(`quantity-${serviceId}`).value) || 1;
+                    const serviceName = card.querySelector('h4').textContent;
+
+                    total += price * quantity;
+                    selectedServices.push(`${serviceName} (x${quantity}) - ₹${(price * quantity).toFixed(2)}`);
+                }
+            });
+
+            document.getElementById('total-amount').textContent = `₹${total.toFixed(2)}`;
+
+            const servicesList = document.getElementById('services-list');
+            servicesList.innerHTML = selectedServices.length > 0 ?
+                selectedServices.map(service => `<div>${service}</div>`).join('') :
+                '<div>No services selected</div>';
+
+            const totalSection = document.getElementById('total-section');
+            totalSection.style.display = selectedServices.length > 0 ? 'block' : 'none';
+        }
+
+        function submitForm() {
+            const form = document.getElementById('service-form');
+            const checkboxes = form.querySelectorAll('input[name="selected_services"]:checked');
+
+            if (checkboxes.length === 0) {
+                alert('Please select at least one service');
+                return;
+            }
+
+            form.submit();
+        }
+    </script>
+</body>
+</html>

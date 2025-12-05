@@ -1,0 +1,360 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ shop.name }} - Shine & Bright Laundry</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f7f7f7;
+        }
+
+        :root {
+            --primary-color: #0f334bff;
+            --accent-color: #2ecc71;
+            --secondary-color: #6c757d;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0a2538;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .shop-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shop-info h1 {
+            color: var(--primary-color);
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .shop-details {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        .detail-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .order-section {
+            text-align: center;
+        }
+
+        .order-btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .order-btn:hover {
+            background: #27ae60;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .branches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .branch-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .branch-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .branch-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .service-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .service-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .service-price {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .shop-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .shop-details {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
+        <div>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="shop-header">
+            <div class="shop-info">
+                <h1>{{ shop.name }}</h1>
+                <div class="shop-details">
+                    <div class="detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ shop.address }}, {{ shop.city }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ shop.phone }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <span>{% if shop.is_open %}Open Now{% else %}Currently Closed{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="order-section">
+                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                    Ready to place an order?
+                </div>
+                <a href="{% url 'select_branch_for_order' shop.id %}" class="order-btn">
+                    <i class="fas fa-shopping-cart"></i> Order Now
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-map-marker-alt"></i> Our Branches</h2>
+            {% if branches %}
+                <div class="branches-grid">
+                    {% for branch in branches %}
+                        <div class="branch-card">
+                            <h3>{{ branch.name }}</h3>
+                            <div class="detail-item" style="margin-bottom: 10px;">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ branch.address }}</span>
+                            </div>
+                            {% if branch.phone %}
+                                <div class="detail-item" style="margin-bottom: 10px;">
+                                    <i class="fas fa-phone"></i>
+                                    <span>{{ branch.phone }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Established {{ branch.created_at|date:"M Y" }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>No branches available yet</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-concierge-bell"></i> Our Services</h2>
+            {% if all_services %}
+                <div class="services-grid">
+                    {% for service in all_services %}
+                        <div class="service-card">
+                            <h4>{{ service.name }}</h4>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                                <i class="fas fa-map-marker-alt"></i> {{ service.branch.name }}
+                            </div>
+                            {% if service.price %}
+                                <div class="service-price">₹{{ service.price }}</div>
+                            {% else %}
+                                <div class="service-price">Price on Request</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-concierge-bell"></i>
+                    <p>No services available yet</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div id="order-form" class="section">
+            <h2><i class="fas fa-shopping-cart"></i> Place Your Order</h2>
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; text-align: center;">
+                <h3 style="color: var(--primary-color); margin-bottom: 15px;">Ready to get your laundry done?</h3>
+                <p style="color: #666; margin-bottom: 25px;">
+                    Contact us directly or visit one of our branches to place your order.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="tel:{{ shop.phone }}" class="btn btn-primary" style="padding: 12px 25px;">
+                        <i class="fas fa-phone"></i> Call Now
+                    </a>
+                    <a href="https://wa.me/{{ shop.phone|slice:":1" }}" target="_blank" class="btn" style="background: #25d366; color: white; padding: 12px 25px;">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    {% if branches %}
+                        <div style="margin-top: 15px; width: 100%; text-align: center; color: #666; font-size: 14px;">
+                            Or visit any of our {{ branches|length }} branches
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href="#order-form"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

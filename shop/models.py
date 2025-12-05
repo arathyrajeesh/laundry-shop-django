@@ -1,0 +1,114 @@
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    email_verified = models.BooleanField(default=False)
+    notifications_enabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"
+
+class LaundryShop(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(unique=True)
+    address = models.TextField(blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    is_approved = models.BooleanField(default=False)
+    is_open = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def set_password(self, raw_password):
+        from django.contrib.auth.hashers import make_password
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        from django.contrib.auth.hashers import check_password
+        return check_password(raw_password, self.password)
+
+    def __str__(self):
+        return self.name
+
+class Branch(models.Model):
+    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE, related_name='branches')
+    name = models.CharField(max_length=100)
+    address = models.TextField()
+    phone = models.CharField(max_length=15, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('shop', 'name')
+
+    def __str__(self):
+        return f"{self.shop.name} - {self.name}"
+
+class Service(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='services')
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    class Meta:
+        unique_together = ('branch', 'name')
+
+    def __str__(self):
+        return f"{self.branch.name} - {self.name}"
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Washing', 'Washing'),
+        ('Drying', 'Drying'),
+        ('Ironing', 'Ironing'),
+        ('Ready', 'Ready for Pickup'),
+        ('Completed', 'Completed'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    cloth_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    pickup_date = models.DateTimeField(blank=True, null=True)
+    delivery_date = models.DateTimeField(blank=True, null=True)
+    delivery_name = models.CharField(max_length=100, blank=True)
+    delivery_address = models.TextField(blank=True)
+    delivery_phone = models.CharField(max_length=15, blank=True)
+    special_instructions = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Order #{self.id} - {self.user.username}"
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    notification_type = models.CharField(max_length=50)
+    icon = models.CharField(max_length=50, default='fas fa-bell')
+    color = models.CharField(max_length=20, default='#3498db')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
+
+class EmailVerificationToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=100, unique=True)
+    expires_at = models.DateTimeField()
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def __str__(self):
+        return f"Token for {self.user.username}"

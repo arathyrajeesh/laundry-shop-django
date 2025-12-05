@@ -1,0 +1,548 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ branch.name }} Orders - {{ shop.name }}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+        }
+
+        :root {
+            --primary-color: #0f334bff;
+            --accent-color: #2ecc71;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        .header .breadcrumb {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .header .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .branch-info {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .branch-details h2 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .branch-details p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .icon-blue { background: var(--info-color); }
+        .icon-green { background: var(--accent-color); }
+        .icon-orange { background: var(--warning-color); }
+        .icon-purple { background: #9b59b6; }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dashboard-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section-header h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: #f8f9fa;
+        }
+
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-washing { background: #d1ecf1; color: #0c5460; }
+        .status-drying { background: #d4edda; color: #155724; }
+        .status-ironing { background: #e2e3e5; color: #383d41; }
+        .status-ready { background: #cce5ff; color: #004085; }
+        .status-completed { background: #d4edda; color: #155724; }
+
+        .update-btn {
+            padding: 5px 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .update-btn:hover {
+            background: #27ae60;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 14px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 5px;
+            }
+
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .branch-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
+            <div class="breadcrumb">
+                <a href="{% url 'shop_dashboard' %}">Dashboard</a> >
+                <a href="{% url 'select_branch' %}">Select Branch</a> >
+                {{ branch.name }}
+            </div>
+        </div>
+        <div>
+            <a href="{% url 'select_branch' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Branches
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Branch Info -->
+        <div class="branch-info">
+            <div class="branch-details">
+                <h2><i class="fas fa-map-marker-alt"></i> {{ branch.name }}</h2>
+                <p><strong>Address:</strong> {{ branch.address }}</p>
+                {% if branch.phone %}
+                <p><strong>Phone:</strong> {{ branch.phone }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <a href="{% url 'edit_branch' branch.id %}" class="btn btn-secondary">
+                    <i class="fas fa-edit"></i> Edit Branch
+                </a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ total_orders }}</div>
+                        <div class="stat-card-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-blue">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ pending_orders }}</div>
+                        <div class="stat-card-label">Pending Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-orange">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ completed_orders }}</div>
+                        <div class="stat-card-label">Completed Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">₹{{ total_revenue|floatformat:2 }}</div>
+                        <div class="stat-card-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card-icon icon-green">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">₹{{ today_revenue|floatformat:2 }}</div>
+                        <div class="stat-card-label">Today's Revenue</div>
+                    </div>
+                    <div class="stat-card-icon icon-purple">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-concierge-bell"></i> Services for {{ branch.name }}</h2>
+                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Service
+                </a>
+            </div>
+
+            {% if branch.services.all %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in branch.services.all %}
+                    <tr>
+                        <td>{{ service.name }}</td>
+                        <td>
+                            {% if service.price %}
+                            ₹{{ service.price|floatformat:2 }}
+                            {% else %}
+                            <span style="color: #666;">Not set</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'edit_service' service.id %}" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form method="post" action="{% url 'delete_service' service.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this service?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px; background: #dc3545;">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-concierge-bell"></i>
+                <p>No services added for this branch yet.</p>
+                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary" style="margin-top: 15px;">
+                    <i class="fas fa-plus"></i> Add First Service
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-receipt"></i> Orders for {{ branch.name }}</h2>
+            </div>
+            {% if recent_orders %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Customer Details</th>
+                        <th>Pickup Date</th>
+                        <th>Delivery Date</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>
+                            <strong>Name:</strong> {{ order.delivery_name|default:"Not provided" }}<br>
+                            <strong>Phone:</strong> {{ order.delivery_phone|default:"Not provided" }}<br>
+                            <strong>Email:</strong> {{ order.user.email }}<br>
+                            <strong>Address:</strong> {{ order.delivery_address|default:"Not provided"|truncatechars:30 }}<br>
+                            <strong>City:</strong> {{ order.user.profile.city|default:"Not provided" }}
+                        </td>
+                        <td>{{ order.pickup_date|date:"M d, Y H:i" }}</td>
+                        <td>{{ order.delivery_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.cloth_status|lower }}">{{ order.cloth_status }}</span>
+                        </td>
+                        <td>₹{{ order.amount|floatformat:2 }}</td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <select class="status-select" id="status-{{ order.id }}">
+                                <option value="Pending" {% if order.cloth_status == "Pending" %}selected{% endif %}>Pending</option>
+                                <option value="Washing" {% if order.cloth_status == "Washing" %}selected{% endif %}>Washing</option>
+                                <option value="Drying" {% if order.cloth_status == "Drying" %}selected{% endif %}>Drying</option>
+                                <option value="Ironing" {% if order.cloth_status == "Ironing" %}selected{% endif %}>Ironing</option>
+                                <option value="Ready" {% if order.cloth_status == "Ready" %}selected{% endif %}>Ready for Pickup</option>
+                                <option value="Completed" {% if order.cloth_status == "Completed" %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button class="update-btn" onclick="updateOrderStatus({{ order.id }})">
+                                Update
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No orders found for this branch</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function updateOrderStatus(orderId) {
+            const statusSelect = document.getElementById(`status-${orderId}`);
+            const newStatus = statusSelect.value;
+
+            const formData = new FormData();
+            formData.append('status', newStatus);
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+            fetch(`/shop/order/${orderId}/update-status/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order status updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the order status.');
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Shops - Admin</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+        }
+
+        :root {
+            --primary-color: #0f334bff;
+            --accent-color: #2ecc71;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .dashboard-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .shop-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s;
+        }
+
+        .shop-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .shop-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .shop-card p {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .approval-status {
+            margin-top: 10px;
+        }
+
+        .shop-card .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-open {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending-approval {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table thead {
+            background: #f8f9fa;
+        }
+
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 20px 15px;
+            }
+
+            .shops-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1><i class="fas fa-store"></i> Manage Shops</h1>
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="/admin/shop/laundryshop/add/" class="btn btn-primary" style="margin-left: 10px;">
+                <i class="fas fa-plus"></i> Add Shop
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="dashboard-section">
+            <h2 style="margin-bottom: 20px; color: var(--primary-color);">All Shops ({{ shops.count }})</h2>
+            
+            {% if shops %}
+            <div class="shops-grid">
+                {% for shop in shops %}
+                <div class="shop-card">
+                    <h3>{{ shop.name }}</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
+                    <p><i class="fas fa-phone"></i> {{ shop.phone }}</p>
+                    <span class="status {% if shop.is_open %}status-open{% else %}status-closed{% endif %}">
+                        {% if shop.is_open %}
+                        <i class="fas fa-door-open"></i> Open
+                        {% else %}
+                        <i class="fas fa-door-closed"></i> Closed
+                        {% endif %}
+                    </span>
+                    <div class="approval-status">
+                        <span class="status {% if shop.is_approved %}status-approved{% else %}status-pending-approval{% endif %}">
+                            {% if shop.is_approved %}
+                            <i class="fas fa-check"></i> Approved
+                            {% else %}
+                            <i class="fas fa-clock"></i> Pending Approval
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        {% if not shop.is_approved %}
+                        <button onclick="approveShop({{ shop.id }})" class="btn btn-primary" style="font-size: 12px; padding: 8px 15px; margin-right: 5px;">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button onclick="rejectShop({{ shop.id }})" class="btn btn-secondary" style="font-size: 12px; padding: 8px 15px;">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        {% endif %}
+                        <a href="/admin/shop/laundryshop/{{ shop.id }}/change/" class="btn btn-primary" style="font-size: 12px; padding: 8px 15px; margin-left: 5px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            
+            <table class="data-table" style="margin-top: 30px;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Approval</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shop in shops %}
+                    <tr>
+                        <td>#{{ shop.id }}</td>
+                        <td><strong>{{ shop.name }}</strong></td>
+                        <td>{{ shop.address }}</td>
+                        <td>{{ shop.phone }}</td>
+                        <td>
+                            <span class="status {% if shop.is_open %}status-open{% else %}status-closed{% endif %}">
+                                {% if shop.is_open %}Open{% else %}Closed{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status {% if shop.is_approved %}status-approved{% else %}status-pending-approval{% endif %}">
+                                {% if shop.is_approved %}Approved{% else %}Pending{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if not shop.is_approved %}
+                            <button onclick="approveShop({{ shop.id }})" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px; margin-right: 5px;">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button onclick="rejectShop({{ shop.id }})" class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                            {% endif %}
+                            <a href="/admin/shop/laundryshop/{{ shop.id }}/change/" class="btn btn-primary" style="font-size: 12px; padding: 5px 15px; margin-left: 5px;">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="text-align: center; padding: 40px; color: #999;">
+                <i class="fas fa-store" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>No shops found</p>
+                <a href="/admin/shop/laundryshop/add/" class="btn btn-primary" style="margin-top: 15px;">
+                    <i class="fas fa-plus"></i> Add First Shop
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function approveShop(shopId) {
+            if (confirm('Are you sure you want to approve this shop?')) {
+                fetch(`/admin-panel/shop/${shopId}/approve/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Shop approved successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while approving the shop.');
+                });
+            }
+        }
+
+        function rejectShop(shopId) {
+            if (confirm('Are you sure you want to reject this shop?')) {
+                fetch(`/admin-panel/shop/${shopId}/reject/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Shop rejected successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while rejecting the shop.');
+                });
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
+
