@@ -44,6 +44,7 @@ urlpatterns = [
     path("admin-panel/shops/", views.admin_shops, name="admin_shops"),
     path("admin-panel/shop/<int:shop_id>/approve/", views.admin_approve_shop, name="admin_approve_shop"),
     path("admin-panel/shop/<int:shop_id>/reject/", views.admin_reject_shop, name="admin_reject_shop"),
+    path("admin-panel/shop/<int:shop_id>/edit/", views.admin_edit_shop, name="admin_edit_shop"),
     path("admin-panel/order/<int:order_id>/update-status/", views.admin_update_order_status, name="admin_update_order_status"),
 
     # SHOP AUTHENTICATION
@@ -65,5 +66,8 @@ urlpatterns = [
     path("service/add/<int:branch_id>/", views.add_service, name="add_service_branch"),
     path('shop/service/<int:service_id>/edit/', views.edit_service, name='edit_service'),
     path('shop/service/<int:service_id>/delete/', views.delete_service, name='delete_service'),
+
+    # Shop status toggle
+    path('shop/toggle-shop-status/', views.toggle_shop_status, name='toggle_shop_status'),
 
 ]

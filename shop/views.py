@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.utils.translation import activate, get_language
-from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm
+from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
 from .models import Profile, Order, LaundryShop ,Service,Branch, Notification
 from django.contrib.auth import authenticate, login, logout
@@ -1307,39 +1307,60 @@ def admin_dashboard(request):
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
 def admin_update_order_status(request, order_id):
-    """Update order status (AJAX endpoint)."""
+    """Update order status and/or shop assignment (AJAX endpoint)."""
     if request.method == 'POST':
         order = get_object_or_404(Order, id=order_id)
         new_status = request.POST.get('status')
-        
-        if new_status in dict(Order.STATUS_CHOICES):
-            old_status = order.cloth_status
+        new_shop_id = request.POST.get('shop_id')
+
+        old_status = order.cloth_status
+        old_shop = order.shop
+        changes_made = []
+
+        # Update status if provided
+        if new_status and new_status in dict(Order.STATUS_CHOICES) and new_status != old_status:
             order.cloth_status = new_status
+            changes_made.append(f"status to {new_status}")
+
+        # Update shop if provided (only to approved shops)
+        if new_shop_id:
+            try:
+                new_shop = LaundryShop.objects.get(id=new_shop_id, is_approved=True)
+                if new_shop != old_shop:
+                    order.shop = new_shop
+                    # Reset branch when shop changes
+                    order.branch = None
+                    changes_made.append(f"shop to {new_shop.name}")
+            except LaundryShop.DoesNotExist:
+                return JsonResponse({'success': False, 'message': 'Invalid or unapproved shop selected'}, status=400)
+
+        if changes_made:
             order.save()
 
-            # Send status update notification emails
+            # Send notification emails
             try:
                 # Email to Customer
-                customer_subject = f"Order Status Updated - Order #{order.id}"
+                customer_subject = f"Order Updated - Order #{order.id}"
                 customer_message = f"""
 Hi {order.user.get_full_name() or order.user.username},
 
-Your order status has been updated!
+Your order has been updated!
 
 Order Details:
 - Order ID: #{order.id}
 - Shop: {order.shop.name}
-- Previous Status: {old_status}
-- New Status: {new_status}
+- Status: {order.cloth_status}
 - Amount: ₹{order.amount}
+
+Changes made: {', '.join(changes_made)}
 
 Delivery Information:
 - Name: {order.delivery_name or 'Not provided'}
 - Address: {order.delivery_address or 'Not provided'}
 - Phone: {order.delivery_phone or 'Not provided'}
 
-{'Your laundry is ready for pickup!' if new_status == 'Ready' else ''}
-{'Your order has been completed and delivered. Thank you for choosing us!' if new_status == 'Completed' else ''}
+{'Your laundry is ready for pickup!' if order.cloth_status == 'Ready' else ''}
+{'Your order has been completed and delivered. Thank you for choosing us!' if order.cloth_status == 'Completed' else ''}
 
 You can track your order status in your dashboard.
 
@@ -1348,8 +1369,63 @@ Shine & Bright Team
 🧺✨
 """
 
-                # Email to Shop (if status updated by admin)
-                if request.user.is_staff or request.user.is_superuser:
+                # Email to New Shop (if shop changed)
+                if order.shop != old_shop:
+                    new_shop_subject = f"Order Assigned to Your Shop - Order #{order.id}"
+                    new_shop_message = f"""
+Dear {order.shop.name} Team,
+
+A new order has been assigned to your shop by an administrator.
+
+Order Details:
+- Order ID: #{order.id}
+- Customer: {order.user.username} ({order.user.email})
+- Status: {order.cloth_status}
+- Amount: ₹{order.amount}
+
+Please take appropriate action based on the current status.
+
+Best regards,
+Shine & Bright System
+🧺✨
+"""
+
+                    send_mail(
+                        subject=new_shop_subject,
+                        message=new_shop_message,
+                        from_email=settings.EMAIL_HOST_USER,
+                        recipient_list=[order.shop.email],
+                        fail_silently=True,
+                    )
+
+                    # Email to Old Shop (if shop changed)
+                    if old_shop != order.shop:
+                        old_shop_subject = f"Order Reassigned - Order #{order.id}"
+                        old_shop_message = f"""
+Dear {old_shop.name} Team,
+
+Order #{order.id} has been reassigned to another shop by an administrator.
+
+Order Details:
+- Order ID: #{order.id}
+- Customer: {order.user.username}
+- New Shop: {order.shop.name}
+
+Best regards,
+Shine & Bright System
+🧺✨
+"""
+
+                        send_mail(
+                            subject=old_shop_subject,
+                            message=old_shop_message,
+                            from_email=settings.EMAIL_HOST_USER,
+                            recipient_list=[old_shop.email],
+                            fail_silently=True,
+                        )
+
+                # Email to Shop for status updates
+                elif new_status and new_status != old_status:
                     shop_subject = f"Order Status Updated by Admin - Order #{order.id}"
                     shop_message = f"""
 Dear {order.shop.name} Team,
@@ -1388,12 +1464,12 @@ Shine & Bright System
                 )
 
             except Exception as e:
-                print(f"Failed to send status update emails: {e}")
+                print(f"Failed to send update emails: {e}")
 
-            return JsonResponse({'success': True, 'message': 'Order status updated successfully'})
+            return JsonResponse({'success': True, 'message': f'Order updated successfully: {", ".join(changes_made)}'})
         else:
-            return JsonResponse({'success': False, 'message': 'Invalid status'}, status=400)
-    
+            return JsonResponse({'success': False, 'message': 'No changes made'}, status=400)
+
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
 
@@ -1416,11 +1492,18 @@ def admin_orders(request):
             Q(id__icontains=search_query)
         )
     
+    # Only show orders from approved shops that are visible in admin dashboard
+    approved_shops = LaundryShop.objects.filter(is_approved=True)
+
+    # Filter orders to only show those from approved shops
+    orders = orders.filter(shop__is_approved=True)
+
     context = {
         'orders': orders,
         'status_choices': Order.STATUS_CHOICES,
         'current_status': status_filter,
         'search_query': search_query,
+        'all_shops': approved_shops,  # Only approved shops for reassignment
     }
     
     return render(request, 'admin_orders.html', context)
@@ -1484,6 +1567,32 @@ def admin_reject_shop(request, shop_id):
         shop.delete()  # Or set is_approved=False and is_open=False
         return JsonResponse({'success': True, 'message': 'Shop rejected and removed'})
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_edit_shop(request, shop_id):
+    """Edit shop details (custom admin interface)."""
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    if request.method == 'POST':
+        form = LaundryShopForm(request.POST, instance=shop)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Shop updated successfully.')
+            return redirect('admin_shops')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = LaundryShopForm(instance=shop)
+
+    context = {
+        'form': form,
+        'shop': shop,
+    }
+
+    return render(request, 'admin_edit_shop.html', context)
+
+
+# --- SHOP AUTHENTICATION VIEWS ---
 
 
 # --- SHOP AUTHENTICATION VIEWS ---
@@ -2121,4 +2230,24 @@ def delete_service(request, service_id):
     service.delete()
     messages.success(request, 'Service deleted.')
     return redirect('branch_orders', branch_id=branch_id)
+
+
+@shop_login_required
+@require_POST
+def toggle_shop_status(request):
+    """Toggle shop open/closed status."""
+    shop_id = request.session.get('shop_id')
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    is_open = request.POST.get('is_open') == 'True'
+
+    # Update shop status
+    shop.is_open = is_open
+    shop.save()
+
+    status_text = "opened" if is_open else "closed"
+    return JsonResponse({
+        'success': True,
+        'message': f'Shop has been {status_text} successfully!'
+    })
 

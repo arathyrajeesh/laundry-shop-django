@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from django.utils import timezone
-from .models import Profile,Service,Branch,Order
+from .models import Profile,Service,Branch,Order,LaundryShop
 
 class ProfileForm(forms.ModelForm):
     class Meta:
@@ -70,3 +70,19 @@ class UserDetailsForm(forms.ModelForm):
             self.add_error('delivery_date', "Pickup date and delivery date cannot be the same.")
 
         return cleaned_data
+
+class LaundryShopForm(forms.ModelForm):
+    class Meta:
+        model = LaundryShop
+        fields = ['name', 'email', 'address', 'phone', 'city', 'latitude', 'longitude', 'is_approved', 'is_open']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Shop name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email address'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Full address'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact phone'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}),
+            'latitude': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Latitude', 'step': 'any'}),
+            'longitude': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Longitude', 'step': 'any'}),
+            'is_approved': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_open': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
