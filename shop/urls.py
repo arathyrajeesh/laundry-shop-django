@@ -70,4 +70,7 @@ urlpatterns = [
     # Shop status toggle
     path('shop/toggle-shop-status/', views.toggle_shop_status, name='toggle_shop_status'),
 
+    # Ratings
+    path("shop/<int:shop_id>/rate/", views.rate_shop, name="rate_shop"),
+    path("service/<int:service_id>/rate/", views.rate_service, name="rate_service"),
 ]

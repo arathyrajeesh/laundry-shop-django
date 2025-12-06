@@ -8,9 +8,9 @@ from django.contrib.auth import update_session_auth_hash
 from django.utils.translation import activate, get_language
 from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
-from .models import Profile, Order, LaundryShop ,Service,Branch, Notification
+from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 from django.db import IntegrityError
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
@@ -733,10 +733,18 @@ def shop_detail(request, shop_id):
     # Get all services across all branches
     all_services = Service.objects.filter(branch__shop=shop).select_related('branch')
 
+    # Get shop ratings
+    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
+    user_rating = ShopRating.objects.filter(shop=shop, user=request.user).first()
+    average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+
     context = {
         'shop': shop,
         'branches': branches,
         'all_services': all_services,
+        'shop_ratings': shop_ratings,
+        'user_rating': user_rating,
+        'average_rating': average_rating,
     }
 
     return render(request, 'shop_detail.html', context)
@@ -749,6 +757,10 @@ def branch_detail(request, branch_id):
 
     # Get all services for this branch
     services = Service.objects.filter(branch=branch)
+
+    # Get service ratings for the user
+    for service in services:
+        service.user_rating = ServiceRating.objects.filter(service=service, user=request.user).first()
 
     context = {
         'branch': branch,
@@ -1934,6 +1946,10 @@ def shop_dashboard(request):
     # Sort notifications by time (most recent first)
     shop_notifications.sort(key=lambda x: x['time'], reverse=True)
 
+    # Get shop ratings
+    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
+    average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+
     context = {
         'shop': shop,
         'branches': branches,
@@ -1945,6 +1961,8 @@ def shop_dashboard(request):
         'recent_orders': recent_orders,
         'branch_stats': branch_stats,
         'shop_notifications': shop_notifications[:5],  # Show up to 5 notifications
+        'shop_ratings': shop_ratings,
+        'average_rating': average_rating,
     }
 
     return render(request, 'shop_dashboard.html', context)
@@ -2251,3 +2269,66 @@ def toggle_shop_status(request):
         'message': f'Shop has been {status_text} successfully!'
     })
 
+
+@login_required
+@require_POST
+def rate_shop(request, shop_id):
+    """Handle shop rating submission."""
+    shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
+    rating = request.POST.get('rating')
+    comment = request.POST.get('comment', '').strip()
+
+    if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+        return JsonResponse({'success': False, 'message': 'Invalid rating. Please select a rating between 1 and 5.'}, status=400)
+
+    rating = int(rating)
+
+    # Check if user already rated this shop
+    existing_rating = ShopRating.objects.filter(user=request.user, shop=shop).first()
+    if existing_rating:
+        existing_rating.rating = rating
+        existing_rating.comment = comment
+        existing_rating.save()
+        message = 'Your rating has been updated successfully!'
+    else:
+        ShopRating.objects.create(
+            user=request.user,
+            shop=shop,
+            rating=rating,
+            comment=comment
+        )
+        message = 'Thank you for rating this shop!'
+
+    return JsonResponse({'success': True, 'message': message})
+
+
+@login_required
+@require_POST
+def rate_service(request, service_id):
+    """Handle service rating submission."""
+    service = get_object_or_404(Service, id=service_id)
+    rating = request.POST.get('rating')
+    comment = request.POST.get('comment', '').strip()
+
+    if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+        return JsonResponse({'success': False, 'message': 'Invalid rating. Please select a rating between 1 and 5.'}, status=400)
+
+    rating = int(rating)
+
+    # Check if user already rated this service
+    existing_rating = ServiceRating.objects.filter(user=request.user, service=service).first()
+    if existing_rating:
+        existing_rating.rating = rating
+        existing_rating.comment = comment
+        existing_rating.save()
+        message = 'Your rating has been updated successfully!'
+    else:
+        ServiceRating.objects.create(
+            user=request.user,
+            service=service,
+            rating=rating,
+            comment=comment
+        )
+        message = 'Thank you for rating this service!'
+
+    return JsonResponse({'success': True, 'message': message})

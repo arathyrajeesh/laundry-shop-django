@@ -411,6 +411,7 @@
         .notifications-section {
             background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
             padding: 30px;
+            margin-top: 20px;
             border-radius: 15px;
             box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
             margin-bottom: 20px;
@@ -593,7 +594,7 @@
 
     <div class="section-container">
                 <div class="mb-10">
-                    <h2 class="section-heading">🔍 Search for laundry services</h2>
+                    <h2 class="section-heading">Search for laundry services</h2>
             <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 3px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
                 <form method="GET" class="search-form">
                     <input type="text" name="search" value="{{ search_query }}" class="search-input"
@@ -612,7 +613,7 @@
         </div>
 
         <div class="mb-10">
-            <h2 class="section-heading"> Services Near You</h2>
+            <h2 class="section-heading">Services Near You</h2>
             {% if services_nearby %}
                 <div class="shop-grid">
                     {% for service in services_nearby %}

@@ -169,6 +169,36 @@
         .service-price {
             font-weight: 600;
             color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .service-rating {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .rating-form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .rating-form input[type="radio"] {
+            display: none;
+        }
+
+        .rating-form label {
+            color: #ddd;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .rating-form input[type="radio"]:checked ~ label,
+        .rating-form label:hover,
+        .rating-form label:hover ~ label {
+            color: #ffd700;
         }
 
         .empty-state {
@@ -259,6 +289,23 @@
                             {% else %}
                                 <div class="service-price">Price on Request</div>
                             {% endif %}
+                            {% if user.is_authenticated %}
+                                <div class="service-rating">
+                                    {% if service.user_rating %}
+                                        Your rating: {% for i in "12345"|make_list %}<i class="fas fa-star" style="color: {% if forloop.counter <= service.user_rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>{% endfor %}
+                                    {% else %}
+                                        Rate this service:
+                                    {% endif %}
+                                </div>
+                                <form class="rating-form" method="post" action="{% url 'rate_service' service.id %}">
+                                    {% csrf_token %}
+                                    {% for i in "12345"|make_list %}
+                                        <input type="radio" id="service-star-{{ service.id }}-{{ i }}" name="rating" value="{{ i }}" {% if service.user_rating and service.user_rating.rating == forloop.counter %}checked{% endif %} required>
+                                        <label for="service-star-{{ service.id }}-{{ i }}"><i class="fas fa-star"></i></label>
+                                    {% endfor %}
+                                    <button type="submit" style="margin-left: 10px; padding: 5px 10px; font-size: 12px;" class="btn btn-primary">Rate</button>
+                                </form>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -298,6 +345,52 @@
     </div>
 
     <script>
+        document.querySelectorAll('.rating-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+
+                submitBtn.textContent = 'Rating...';
+                submitBtn.disabled = true;
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        const messageDiv = document.createElement('div');
+                        messageDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 10px; border-radius: 5px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; z-index: 1000;';
+                        messageDiv.textContent = data.message;
+                        document.body.appendChild(messageDiv);
+
+                        // Reload page after 2 seconds
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        alert('Error: ' + data.message);
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+        });
+
         document.querySelectorAll('a[href="#order-form"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();

@@ -111,6 +111,32 @@ class Notification(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.title}"
 
+class ShopRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('user', 'shop')
+
+    def __str__(self):
+        return f"{self.user.username} rated {self.shop.name}: {self.rating}"
+
+class ServiceRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('user', 'service')
+
+    def __str__(self):
+        return f"{self.user.username} rated {self.service.name}: {self.rating}"
+
 class EmailVerificationToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=100, unique=True)

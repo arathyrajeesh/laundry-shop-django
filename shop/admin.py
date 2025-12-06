@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Order, LaundryShop,Service,Branch
+from .models import Profile, Order, LaundryShop,Service,Branch, ShopRating, ServiceRating
 
 # Register your models here.
 
@@ -35,3 +35,14 @@ class ServiceAdmin(admin.ModelAdmin):
 class BranchAdmin(admin.ModelAdmin):
     list_display = ('name', 'shop', 'phone')
     list_filter = ('shop',)
+@admin.register(ShopRating)
+class ShopRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'shop', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__username', 'shop__name', 'comment')
+
+@admin.register(ServiceRating)
+class ServiceRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'service', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__username', 'service__name', 'comment')
