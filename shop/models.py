@@ -13,6 +13,7 @@ class Profile(models.Model):
     longitude = models.FloatField(blank=True, null=True)
     email_verified = models.BooleanField(default=False)
     notifications_enabled = models.BooleanField(default=True)
+    login_email_sent = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
@@ -136,6 +137,19 @@ class ServiceRating(models.Model):
 
     def __str__(self):
         return f"{self.user.username} rated {self.service.name}: {self.rating}"
+
+class BranchRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('user', 'branch')
+
+    def __str__(self):
+        return f"{self.user.username} rated {self.branch.name}: {self.rating}"
 
 class EmailVerificationToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

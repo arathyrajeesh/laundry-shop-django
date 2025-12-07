@@ -100,6 +100,69 @@
             border-left: 4px solid #28a745;
             background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
         }
+        .rating-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .rating-form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .star-rating {
+            display: flex;
+            gap: 5px;
+        }
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            color: #ddd;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffd700;
+        }
+        .rating-comment {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn-rate {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .btn-rate:hover {
+            background: #218838;
+        }
+        .existing-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+        .existing-stars {
+            display: flex;
+            gap: 2px;
+        }
     </style>
 </head>
 <body>
@@ -144,6 +207,37 @@
                     </div>
                     {% endif %}
 
+                    {% if order.cloth_status == 'Completed' and order.branch %}
+                    <div class="rating-section">
+                        <h4 style="margin: 0 0 10px 0; color: #0f334bff; font-size: 16px;">Rate this Branch</h4>
+                        {% if order.branch_rating %}
+                        <div class="existing-rating">
+                            <span>Your rating:</span>
+                            <div class="existing-stars">
+                                {% for i in "12345"|make_list %}
+                                    <i class="fas fa-star" style="color: {% if forloop.counter <= order.branch_rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                            <span style="font-size: 14px;">({{ order.branch_rating.rating }}/5)</span>
+                            {% if order.branch_rating.comment %}
+                            <span style="font-size: 14px; margin-left: 10px;">"{{ order.branch_rating.comment }}"</span>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <form class="rating-form" method="post" action="{% url 'rate_branch' order.branch.id %}">
+                            {% csrf_token %}
+                            <div class="star-rating">
+                                {% for i in "12345"|make_list %}
+                                <input type="radio" id="star{{ i }}_{{ order.id }}" name="rating" value="{{ i }}" required>
+                                <label for="star{{ i }}_{{ order.id }}"><i class="fas fa-star"></i></label>
+                                {% endfor %}
+                            </div>
+                            <input type="text" class="rating-comment" name="comment" placeholder="Leave a comment (optional)" maxlength="500">
+                            <button type="submit" class="btn-rate">Submit Rating</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

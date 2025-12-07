@@ -8,7 +8,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.utils.translation import activate, get_language
 from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
-from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating
+from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Sum, Avg
 from django.db import IntegrityError
@@ -248,8 +248,11 @@ def login_page(request):
         if user is not None:
             login(request, user)
 
-            # Send login success email
-            login_message = f"""
+            # Send login success email only once per user
+            try:
+                profile = user.profile
+                if not profile.login_email_sent:
+                    login_message = f"""
 Hi {user.username},
 
 You have successfully logged in to your Shine & Bright Laundry account.
@@ -273,13 +276,20 @@ Shine & Bright Team
 🧺✨
 """
 
-            send_mail(
-                subject="Login Successful - Shine & Bright",
-                message=login_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
+                    send_mail(
+                        subject="Login Successful - Shine & Bright",
+                        message=login_message,
+                        from_email=settings.EMAIL_HOST_USER,
+                        recipient_list=[user.email],
+                        fail_silently=True,
+                    )
+
+                    # Mark that login email has been sent
+                    profile.login_email_sent = True
+                    profile.save()
+            except Exception as e:
+                # If profile doesn't exist or other error, continue without sending email
+                pass
 
             messages.success(request, "Login successful!")
             # Redirect to 'next' parameter if present, otherwise check user type
@@ -707,7 +717,13 @@ def help_view(request):
 def my_orders(request):
     """Renders the My Orders page."""
     # Pass user orders data here
-    user_orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    user_orders = Order.objects.filter(user=request.user).select_related('shop', 'branch').order_by('-created_at')
+
+    # Add branch rating data to each order
+    for order in user_orders:
+        if order.branch:
+            order.branch_rating = BranchRating.objects.filter(user=request.user, branch=order.branch).first()
+
     return render(request, 'orders.html', {'orders': user_orders})
 
 
@@ -725,6 +741,12 @@ def shop_detail(request, shop_id):
 
     # Get all branches for this shop
     branches = Branch.objects.filter(shop=shop).prefetch_related('services')
+
+    # Add rating data to each branch
+    for branch in branches:
+        branch_ratings = BranchRating.objects.filter(branch=branch)
+        branch.average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+        branch.branch_ratings = branch_ratings
 
     # If shop has only one branch, redirect to branch detail
     if branches.count() == 1:
@@ -762,10 +784,18 @@ def branch_detail(request, branch_id):
     for service in services:
         service.user_rating = ServiceRating.objects.filter(service=service, user=request.user).first()
 
+    # Get branch ratings
+    branch_ratings = BranchRating.objects.filter(branch=branch).select_related('user')
+    user_rating = BranchRating.objects.filter(branch=branch, user=request.user).first()
+    average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+
     context = {
         'branch': branch,
         'shop': branch.shop,
         'services': services,
+        'branch_ratings': branch_ratings,
+        'user_rating': user_rating,
+        'average_rating': average_rating,
     }
 
     return render(request, 'branch_detail.html', context)
@@ -777,6 +807,12 @@ def select_branch_for_order(request, shop_id):
     shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
 
     branches = Branch.objects.filter(shop=shop).prefetch_related('services')
+
+    # Add rating data to each branch
+    for branch in branches:
+        branch_ratings = BranchRating.objects.filter(branch=branch)
+        branch.average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+        branch.branch_ratings = branch_ratings
 
     context = {
         'shop': shop,
@@ -889,93 +925,72 @@ def create_order(request, shop_id):
     request.session['total_amount'] = float(total_amount)
     # We'll create Razorpay order later in the payment view
 
-    # Send order notification emails to admin and shop
+    # Note: Admin and shop email notifications removed as per requirements
+    # Only the user receives the bill email after order creation
+
+    # Send order confirmation bill to user
     try:
-        # Get admin email (first superuser or staff user)
-        admin_user = User.objects.filter(is_superuser=True).first() or User.objects.filter(is_staff=True).first()
-        admin_email = admin_user.email if admin_user else settings.EMAIL_HOST_USER
+        # Generate PDF bill
+        order_items = [
+            {
+                'service_name': item['service'].name,
+                'quantity': item['quantity'],
+                'price': float(item['price']),
+                'total': float(item['total'])
+            } for item in order_items
+        ]
 
-        # Prepare order details
-        order_items_text = "\n".join([
-            f"- {item['service_name']} (x{item['quantity']}) - ₹{item['total']}"
-            for item in request.session.get('order_items', [])
-        ])
+        pdf_buffer = generate_payment_receipt_pdf(order, order_items)
 
-        # Email to Admin
-        admin_subject = f"New Order Placed - Order #{order.id}"
-        admin_message = f"""
-Dear Admin,
+        # Send bill email
+        bill_message = f"""
+Hi {order.user.get_full_name() or order.user.username},
 
-A new order has been placed on Shine & Bright Laundry System.
+Thank you for placing your order with Shine & Bright Laundry Services! 🧺✨
 
-Order Details:
-- Order ID: #{order.id}
-- Customer: {request.user.username} ({request.user.email})
-- Shop: {shop.name}
-- Branch: {branch.name if branch else 'Main Branch'}
-- Total Amount: ₹{total_amount}
-
-Order Items:
-{order_items_text}
-
-Delivery Details:
-- Name: {order.delivery_name or 'Not provided yet'}
-- Address: {order.delivery_address or 'Not provided yet'}
-- Phone: {order.delivery_phone or 'Not provided yet'}
-
-Please process this order promptly.
-
-Best regards,
-Shine & Bright System
-🧺✨
-"""
-
-        # Email to Shop Owner
-        shop_subject = f"New Order Received - Order #{order.id}"
-        shop_message = f"""
-Dear {shop.name} Team,
-
-You have received a new order on Shine & Bright Laundry System.
+Your order has been successfully created and is now being processed.
 
 Order Details:
 - Order ID: #{order.id}
-- Customer: {request.user.username}
-- Customer Email: {request.user.email}
-- Branch: {branch.name if branch else 'Main Branch'}
-- Total Amount: ₹{total_amount}
+- Shop: {order.shop.name}
+- Branch: {order.branch.name if order.branch else 'Main Branch'}
+- Total Amount: ₹{order.amount}
+- Status: {order.get_cloth_status_display()}
 
-Order Items:
-{order_items_text}
+Delivery Information:
+- Name: {order.delivery_name or 'To be provided'}
+- Address: {order.delivery_address or 'To be provided'}
+- Phone: {order.delivery_phone or 'To be provided'}
 
-Please prepare to process this order. The customer will provide delivery details shortly.
+Please complete the payment to proceed with your order processing. You can make the payment using the secure payment gateway.
 
-You can manage this order through your shop dashboard.
+Please find your order bill attached as a PDF.
+
+If you have any questions, feel free to contact us.
+
+Thank you for choosing Shine & Bright!
 
 Best regards,
-Shine & Bright System
+Shine & Bright Team
 🧺✨
 """
 
-        # Send emails
-        send_mail(
-            subject=admin_subject,
-            message=admin_message,
+        # Create email with PDF attachment
+        email = EmailMessage(
+            subject=f"Order Bill - Order #{order.id}",
+            body=bill_message,
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[admin_email],
-            fail_silently=True,
+            to=[order.user.email],
         )
 
-        send_mail(
-            subject=shop_subject,
-            message=shop_message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[shop.email],
-            fail_silently=True,
-        )
+        # Attach PDF
+        email.attach(f'order_bill_{order.id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
+
+        email.send(fail_silently=True)
 
     except Exception as e:
         # Log the error but don't fail the order process
-        print(f"Failed to send order notification emails: {e}")
+        print(f"Failed to send order bill email: {e}")
 
     # Redirect to user details page
     return redirect('user_details')
@@ -2257,7 +2272,8 @@ def toggle_shop_status(request):
     shop_id = request.session.get('shop_id')
     shop = get_object_or_404(LaundryShop, id=shop_id)
 
-    is_open = request.POST.get('is_open') == 'True'
+    is_open_str = request.POST.get('is_open', '').lower()
+    is_open = is_open_str in ['true', '1', 'True']
 
     # Update shop status
     shop.is_open = is_open
@@ -2330,5 +2346,37 @@ def rate_service(request, service_id):
             comment=comment
         )
         message = 'Thank you for rating this service!'
+
+    return JsonResponse({'success': True, 'message': message})
+
+
+@login_required
+@require_POST
+def rate_branch(request, branch_id):
+    """Handle branch rating submission."""
+    branch = get_object_or_404(Branch, id=branch_id, shop__is_approved=True)
+    rating = request.POST.get('rating')
+    comment = request.POST.get('comment', '').strip()
+
+    if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+        return JsonResponse({'success': False, 'message': 'Invalid rating. Please select a rating between 1 and 5.'}, status=400)
+
+    rating = int(rating)
+
+    # Check if user already rated this branch
+    existing_rating = BranchRating.objects.filter(user=request.user, branch=branch).first()
+    if existing_rating:
+        existing_rating.rating = rating
+        existing_rating.comment = comment
+        existing_rating.save()
+        message = 'Your rating has been updated successfully!'
+    else:
+        BranchRating.objects.create(
+            user=request.user,
+            branch=branch,
+            rating=rating,
+            comment=comment
+        )
+        message = 'Thank you for rating this branch!'
 
     return JsonResponse({'success': True, 'message': message})

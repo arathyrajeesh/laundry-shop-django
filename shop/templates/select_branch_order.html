@@ -125,6 +125,33 @@
             padding: 25px;
         }
 
+        .branch-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ddd;
+            font-size: 16px;
+        }
+
+        .star.filled {
+            color: #ffd700;
+        }
+
+        .rating-text {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
         .branch-services {
             margin-bottom: 20px;
         }
@@ -220,6 +247,16 @@
                     <p><i class="fas fa-location-dot"></i> {{ branch.address }}</p>
                 </div>
                 <div class="branch-body">
+                    {% if branch.average_rating %}
+                    <div class="branch-rating">
+                        <div class="stars">
+                            {% for i in "12345"|make_list %}
+                                <i class="fas fa-star star {% if forloop.counter <= branch.average_rating %}filled{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <span class="rating-text">{{ branch.average_rating|floatformat:1 }} ({{ branch.branch_ratings|length }} review{{ branch.branch_ratings|length|pluralize }})</span>
+                    </div>
+                    {% endif %}
                     <div class="branch-services">
                         <h4>Available Services</h4>
                         <div class="services-list">

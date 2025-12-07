@@ -73,4 +73,5 @@ urlpatterns = [
     # Ratings
     path("shop/<int:shop_id>/rate/", views.rate_shop, name="rate_shop"),
     path("service/<int:service_id>/rate/", views.rate_service, name="rate_service"),
+    path("branch/<int:branch_id>/rate/", views.rate_branch, name="rate_branch"),
 ]
