@@ -160,7 +160,7 @@
 </head>
 <body>
     <div class="admin-header">
-        <h1><i class="fas fa-list-alt"></i> View Orders</h1>
+        <h1><i class="fas fa-list-alt"></i> {% if title %}{{ title }}{% else %}View Orders{% endif %}</h1>
         <div>
             <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
@@ -169,6 +169,26 @@
     </div>
 
     <div class="admin-container">
+        {% if total_revenue %}
+        <div class="dashboard-section" style="margin-bottom: 20px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin: 0; font-size: 18px;">
+                        {% if show_payments_focus %}Total Payments from {% endif %}{% if title %}{{ title }}{% else %}Orders{% endif %}
+                    </h3>
+                    <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">
+                        {% if show_payments_focus %}Combined payments from all displayed orders{% else %}Combined revenue from all displayed orders{% endif %}
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);">
+                        {% if show_payments_focus %}{{ total_revenue }}{% else %}₹{{ total_revenue|floatformat:2 }}{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="filters">
             <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap; width: 100%; align-items: center;">
                 <input type="text" name="search" placeholder="Search by username, email, or order ID..." value="{{ search_query }}">
@@ -190,17 +210,16 @@
         </div>
 
         <div class="dashboard-section">
-            <h2 style="margin-bottom: 20px; color: var(--primary-color);">All Orders</h2>
+            <h2 style="margin-bottom: 20px; color: var(--primary-color);">
+                {% if title %}{{ title }}{% else %}All Orders{% endif %} ({{ orders.count }})
+            </h2>
             
             {% if orders %}
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Email</th>
-                        <th>Shop</th>
-                        <th>Status</th>
+                        <th>Customer Name</th>
                         <th>Amount</th>
                         <th>Date</th>
                     </tr>
@@ -209,12 +228,7 @@
                     {% for order in orders %}
                     <tr>
                         <td>#{{ order.id }}</td>
-                        <td>{{ order.user.username }}</td>
-                        <td>{{ order.user.email }}</td>
-                        <td>{{ order.shop.name|default:"N/A" }}</td>
-                        <td>
-                            <span class="status-badge status-{{ order.cloth_status|lower }}">{{ order.cloth_status }}</span>
-                        </td>
+                        <td>{{ order.user.get_full_name|default:order.user.username }}</td>
                         <td>₹{{ order.amount|floatformat:2 }}</td>
                         <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
                     </tr>

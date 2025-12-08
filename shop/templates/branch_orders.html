@@ -382,6 +382,53 @@
 
         <div class="dashboard-section">
             <div class="section-header">
+                <h2><i class="fas fa-star"></i> Branch Ratings</h2>
+            </div>
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                <div style="font-size: 24px; font-weight: 600; color: var(--primary-color);">
+                    {% if average_rating %}
+                        {{ average_rating|floatformat:1 }} <i class="fas fa-star" style="color: #ffd700;"></i>
+                    {% else %}
+                        No ratings yet
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="font-size: 18px; font-weight: 600; color: #333;">{{ branch_ratings|length }} Customer Review{{ branch_ratings|length|pluralize }}</div>
+                    <div style="color: #666; margin-top: 5px;">Average rating from all customers</div>
+                </div>
+            </div>
+
+            {% if branch_ratings %}
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for rating in branch_ratings %}
+                        <div style="border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <strong style="color: var(--primary-color);">{{ rating.user.username }}</strong>
+                                    <div>
+                                        {% for i in "12345"|make_list %}
+                                            <i class="fas fa-star" style="color: {% if forloop.counter <= rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <span style="color: #999; font-size: 12px;">{{ rating.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                {% if rating.comment %}
+                                    <p style="color: #555; margin: 0; line-height: 1.4;">{{ rating.comment }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-star-half-alt"></i>
+                    <p>No customer ratings yet for this branch. Encourage customers to leave reviews!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
                 <h2><i class="fas fa-concierge-bell"></i> Services for {{ branch.name }}</h2>
                 <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add Service

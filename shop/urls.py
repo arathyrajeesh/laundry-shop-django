@@ -40,8 +40,11 @@ urlpatterns = [
     # ADMIN DASHBOARD
     path("admin-dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("admin-panel/orders/", views.admin_orders, name="admin_orders"),
+    path("admin-panel/orders/revenue/", views.admin_revenue_orders, name="admin_revenue_orders"),
+    path("admin-panel/payments/", views.admin_payments, name="admin_payments"),
     path("admin-panel/users/", views.admin_users, name="admin_users"),
     path("admin-panel/shops/", views.admin_shops, name="admin_shops"),
+    path("admin-panel/shops/open/", views.admin_open_shops, name="admin_open_shops"),
     path("admin-panel/shop/<int:shop_id>/approve/", views.admin_approve_shop, name="admin_approve_shop"),
     path("admin-panel/shop/<int:shop_id>/reject/", views.admin_reject_shop, name="admin_reject_shop"),
     path("admin-panel/shop/<int:shop_id>/edit/", views.admin_edit_shop, name="admin_edit_shop"),
