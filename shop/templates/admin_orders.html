@@ -220,6 +220,7 @@
                     <tr>
                         <th>Order ID</th>
                         <th>Customer Name</th>
+                        <th>Shop</th>
                         <th>Amount</th>
                         <th>Date</th>
                     </tr>
@@ -229,6 +230,7 @@
                     <tr>
                         <td>#{{ order.id }}</td>
                         <td>{{ order.user.get_full_name|default:order.user.username }}</td>
+                        <td>{{ order.shop.name|default:"N/A" }}</td>
                         <td>₹{{ order.amount|floatformat:2 }}</td>
                         <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
                     </tr>
