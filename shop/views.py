@@ -1907,12 +1907,16 @@ def shop_dashboard(request):
     branch_stats = []
     for branch in branches:
         branch_orders = Order.objects.filter(branch=branch)
+        branch_ratings = BranchRating.objects.filter(branch=branch)
+        branch_average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
         branch_stats.append({
             'branch': branch,
             'total_orders': branch_orders.count(),
             'pending_orders': branch_orders.filter(cloth_status="Pending").count(),
             'completed_orders': branch_orders.filter(cloth_status="Completed").count(),
             'revenue': branch_orders.aggregate(total=Sum('amount'))['total'] or 0,
+            'average_rating': branch_average_rating,
+            'total_ratings': branch_ratings.count(),
         })
 
     # Generate shop notifications

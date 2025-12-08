@@ -688,6 +688,16 @@
                         <span>Completed: <strong>{{ stat.completed_orders }}</strong></span>
                         <span>Revenue: <strong>₹{{ stat.revenue|floatformat:0 }}</strong></span>
                     </div>
+                    {% if stat.average_rating %}
+                    <div style="margin-top: 10px; display: flex; align-items: center; gap: 5px; font-size: 14px;">
+                        <div style="display: flex; gap: 2px;">
+                            {% for i in "12345"|make_list %}
+                                <i class="fas fa-star" style="color: {% if forloop.counter <= stat.average_rating %}#ffd700{% else %}#ddd{% endif %}; font-size: 12px;"></i>
+                            {% endfor %}
+                        </div>
+                        <span style="color: #666;">{{ stat.average_rating|floatformat:1 }} ({{ stat.total_ratings }})</span>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -756,73 +766,72 @@
             </div>
             {% endif %}
         </div>
-    </div>
 
-    <div class="dashboard-section">
-        <div class="section-header">
-            <h2><i class="fas fa-store-alt"></i> Branches & Services</h2>
-            <a href="{% url 'add_branch' %}" class="btn btn-primary">+ Add Branch</a>
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-store-alt"></i> Branches & Services</h2>
+                <a href="{% url 'add_branch' %}" class="btn btn-primary">+ Add Branch</a>
+            </div>
+
+            {% if branches %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Branch Name</th>
+                        <th>Address</th>
+                        <th>Services Offered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for branch in branches %}
+                    <tr>
+                        <td>{{ branch.name }}</td>
+                        <td>{{ branch.address }}</td>
+
+                        <td>
+                            {% if branch.services.all %}
+                                {% for s in branch.services.all %}
+                                    <span class="status-badge status-ready">{{ s.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="status-badge status-pending">No Services</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'edit_branch' branch.id %}" 
+                            class="btn btn-primary" 
+                            style="padding:6px 10px;font-size:12px;">
+                            Edit
+                            </a>
+
+                            <a href="{% url 'delete_branch' branch.id %}" 
+                            class="btn btn-secondary" 
+                            style="padding:6px 10px;font-size:12px;">
+                            Delete
+                            </a>
+
+                            <a href="{% url 'add_service_branch' branch.id %}"
+                            class="btn btn-primary"
+                            style="padding:6px 10px;font-size:12px;background:#9b59b6;">
+                            Add Service
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>No branches added yet</p>
+                <a href="{% url 'add_branch' %}" class="btn btn-primary" style="margin-top:15px;">Add Branch</a>
+            </div>
+            {% endif %}
         </div>
-
-        {% if branches %}
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Branch Name</th>
-                    <th>Address</th>
-                    <th>Services Offered</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for branch in branches %}
-                <tr>
-                    <td>{{ branch.name }}</td>
-                    <td>{{ branch.address }}</td>
-
-                    <td>
-                        {% if branch.services.all %}
-                            {% for s in branch.services.all %}
-                                <span class="status-badge status-ready">{{ s.name }}</span>
-                            {% endfor %}
-                        {% else %}
-                            <span class="status-badge status-pending">No Services</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        <a href="{% url 'edit_branch' branch.id %}" 
-                        class="btn btn-primary" 
-                        style="padding:6px 10px;font-size:12px;">
-                        Edit
-                        </a>
-
-                        <a href="{% url 'delete_branch' branch.id %}" 
-                        class="btn btn-secondary" 
-                        style="padding:6px 10px;font-size:12px;">
-                        Delete
-                        </a>
-
-                        <a href="{% url 'add_service_branch' branch.id %}"
-                        class="btn btn-primary"
-                        style="padding:6px 10px;font-size:12px;background:#9b59b6;">
-                        Add Service
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        {% else %}
-        <div class="empty-state">
-            <i class="fas fa-map-marker-alt"></i>
-            <p>No branches added yet</p>
-            <a href="{% url 'add_branch' %}" class="btn btn-primary" style="margin-top:15px;">Add Branch</a>
-        </div>
-        {% endif %}
-    </div>
 
 
     <script>

@@ -93,6 +93,28 @@
             margin-bottom: 10px;
         }
 
+        .branch-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .rating-stars i {
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        .rating-text {
+            color: #666;
+            font-size: 14px;
+        }
+
         .branch-details {
             display: flex;
             gap: 30px;
@@ -249,6 +271,16 @@
             <div class="branch-info">
                 <h1>{{ branch.name }}</h1>
                 <p style="color: #666; margin-bottom: 20px;">Branch of {{ shop.name }}</p>
+                {% if average_rating %}
+                <div class="branch-rating">
+                    <div class="rating-stars">
+                        {% for i in "12345"|make_list %}
+                            <i class="fas fa-star" style="color: {% if forloop.counter <= average_rating %}#ffd700{% else %}#ddd{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <span class="rating-text">{{ average_rating|floatformat:1 }} ({{ branch_ratings.count }} review{{ branch_ratings.count|pluralize }})</span>
+                </div>
+                {% endif %}
                 <div class="branch-details">
                     <div class="detail-item">
                         <i class="fas fa-map-marker-alt"></i>
@@ -265,6 +297,25 @@
                         <span>Established {{ branch.created_at|date:"M Y" }}</span>
                     </div>
                 </div>
+                {% if user.is_authenticated %}
+                    <div class="branch-rating-form" style="margin-top: 20px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                            {% if user_rating %}
+                                Your rating: {% for i in "12345"|make_list %}<i class="fas fa-star" style="color: {% if forloop.counter <= user_rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>{% endfor %}
+                            {% else %}
+                                Rate this branch:
+                            {% endif %}
+                        </div>
+                        <form class="rating-form" method="post" action="{% url 'rate_branch' branch.id %}">
+                            {% csrf_token %}
+                            {% for i in "12345"|make_list %}
+                                <input type="radio" id="branch-star-{{ i }}" name="rating" value="{{ i }}" {% if user_rating and user_rating.rating == forloop.counter %}checked{% endif %} required>
+                                <label for="branch-star-{{ i }}"><i class="fas fa-star"></i></label>
+                            {% endfor %}
+                            <button type="submit" style="margin-left: 10px; padding: 5px 10px; font-size: 12px;" class="btn btn-primary">Rate</button>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
             <div class="order-section">
                 <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
