@@ -1269,10 +1269,7 @@ def admin_dashboard(request):
     completed_orders = Order.objects.filter(cloth_status="Completed").count()
     washing_orders = Order.objects.filter(cloth_status="Washing").count()
     ready_orders = Order.objects.filter(cloth_status="Ready").count()
-
-    # Payments - orders that have been paid for
-    total_payments = Order.objects.filter(payment_status="Completed").count()
-
+    
     # Revenue
     total_revenue = Order.objects.aggregate(total=Sum('amount'))['total'] or 0
     today_revenue = Order.objects.filter(
@@ -1313,7 +1310,6 @@ def admin_dashboard(request):
         'completed_orders': completed_orders,
         'washing_orders': washing_orders,
         'ready_orders': ready_orders,
-        'total_payments': total_payments,
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
         'total_users': total_users,
@@ -1510,19 +1506,19 @@ def admin_orders(request):
     """View all orders with filtering."""
     status_filter = request.GET.get('status', '')
     search_query = request.GET.get('search', '')
-
+    
     orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
-
+    
     if status_filter:
         orders = orders.filter(cloth_status=status_filter)
-
+    
     if search_query:
         orders = orders.filter(
             Q(user__username__icontains=search_query) |
             Q(user__email__icontains=search_query) |
             Q(id__icontains=search_query)
         )
-
+    
     # Only show orders from approved shops that are visible in admin dashboard
     approved_shops = LaundryShop.objects.filter(is_approved=True)
 
@@ -1536,90 +1532,7 @@ def admin_orders(request):
         'search_query': search_query,
         'all_shops': approved_shops,  # Only approved shops for reassignment
     }
-
-    return render(request, 'admin_orders.html', context)
-
-
-@login_required
-@user_passes_test(is_staff_user, login_url='login')
-def admin_revenue_orders(request):
-    """View orders that contribute to total revenue (completed orders)."""
-    status_filter = request.GET.get('status', 'Completed')  # Default to completed
-    search_query = request.GET.get('search', '')
-
-    # Only show completed orders that contribute to revenue
-    orders = Order.objects.filter(
-        cloth_status='Completed',
-        payment_status='Completed'
-    ).select_related('user', 'shop').order_by('-created_at')
-
-    if status_filter and status_filter != 'Completed':
-        orders = orders.filter(cloth_status=status_filter)
-
-    if search_query:
-        orders = orders.filter(
-            Q(user__username__icontains=search_query) |
-            Q(user__email__icontains=search_query) |
-            Q(id__icontains=search_query)
-        )
-
-    # Only show orders from approved shops
-    orders = orders.filter(shop__is_approved=True)
-
-    # Calculate total revenue from these orders
-    total_revenue = orders.aggregate(total=Sum('amount'))['total'] or 0
-
-    context = {
-        'orders': orders,
-        'status_choices': Order.STATUS_CHOICES,
-        'current_status': status_filter,
-        'search_query': search_query,
-        'title': 'Revenue Orders',
-        'total_revenue': total_revenue,
-        'show_revenue_focus': True,  # Flag to indicate this is revenue-focused view
-    }
-
-    return render(request, 'admin_orders.html', context)
-
-
-@login_required
-@user_passes_test(is_staff_user, login_url='login')
-def admin_payments(request):
-    """View all payments/orders that have been completed."""
-    status_filter = request.GET.get('status', '')  # Allow filtering by any status
-    search_query = request.GET.get('search', '')
-
-    # Show all orders that have completed payments (regardless of cloth status)
-    orders = Order.objects.filter(
-        payment_status='Completed'
-    ).select_related('user', 'shop', 'branch').order_by('-created_at')
-
-    if status_filter:
-        orders = orders.filter(cloth_status=status_filter)
-
-    if search_query:
-        orders = orders.filter(
-            Q(user__username__icontains=search_query) |
-            Q(user__email__icontains=search_query) |
-            Q(id__icontains=search_query)
-        )
-
-    # Only show orders from approved shops
-    orders = orders.filter(shop__is_approved=True)
-
-    # Calculate total payments from these orders
-    total_payments = orders.aggregate(total=Sum('amount'))['total'] or 0
-
-    context = {
-        'orders': orders,
-        'status_choices': Order.STATUS_CHOICES,
-        'current_status': status_filter,
-        'search_query': search_query,
-        'title': 'All Payments',
-        'total_revenue': total_payments,
-        'show_payments_focus': True,  # Flag to indicate this is payments-focused view
-    }
-
+    
     return render(request, 'admin_orders.html', context)
 
 
@@ -1658,71 +1571,6 @@ def admin_shops(request):
     }
 
     return render(request, 'admin_shops.html', context)
-
-
-@login_required
-@user_passes_test(is_staff_user, login_url='login')
-def admin_open_shops(request):
-    """View only open shops."""
-    open_shops = LaundryShop.objects.filter(is_open=True, is_approved=True).order_by('name')
-
-    # Calculate total revenue for open shops
-    total_revenue = Order.objects.filter(
-        shop__in=open_shops,
-        payment_status='Completed'
-    ).aggregate(total=Sum('amount'))['total'] or 0
-
-    context = {
-        'shops': open_shops,
-        'title': 'Open Shops',
-        'show_status': False,  # Don't show approve/reject buttons since these are already open
-        'total_revenue': total_revenue,
-    }
-
-    return render(request, 'admin_shops.html', context)
-
-
-@login_required
-@user_passes_test(is_staff_user, login_url='login')
-def admin_shop_detail(request, shop_id):
-    """View detailed information about a specific shop."""
-    shop = get_object_or_404(LaundryShop, id=shop_id)
-
-    # Get branches for this shop
-    branches = Branch.objects.filter(shop=shop).prefetch_related('services')
-
-    # Calculate shop statistics
-    total_orders = Order.objects.filter(shop=shop).count()
-    completed_orders = Order.objects.filter(shop=shop, cloth_status='Completed').count()
-    total_revenue = Order.objects.filter(shop=shop, payment_status='Completed').aggregate(total=Sum('amount'))['total'] or 0
-
-    # Today's revenue for this shop
-    today_revenue = Order.objects.filter(
-        shop=shop,
-        payment_status='Completed',
-        created_at__date=datetime.now().date()
-    ).aggregate(total=Sum('amount'))['total'] or 0
-
-    # Recent orders for this shop
-    recent_orders = Order.objects.filter(shop=shop).select_related('user', 'branch').order_by('-created_at')[:10]
-
-    # Shop ratings
-    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
-    average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
-
-    context = {
-        'shop': shop,
-        'branches': branches,
-        'total_orders': total_orders,
-        'completed_orders': completed_orders,
-        'total_revenue': total_revenue,
-        'today_revenue': today_revenue,
-        'recent_orders': recent_orders,
-        'shop_ratings': shop_ratings,
-        'average_rating': average_rating,
-    }
-
-    return render(request, 'admin_shop_detail.html', context)
 
 
 @login_required
@@ -2183,10 +2031,6 @@ def branch_orders(request, branch_id):
     # Recent orders for this branch
     recent_orders = branch_orders.select_related('user')[:20]  # Show more orders on branch page
 
-    # Get branch ratings
-    branch_ratings = BranchRating.objects.filter(branch=branch).select_related('user')
-    average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
-
     context = {
         'shop': shop,
         'branch': branch,
@@ -2200,8 +2044,6 @@ def branch_orders(request, branch_id):
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
         'recent_orders': recent_orders,
-        'branch_ratings': branch_ratings,
-        'average_rating': average_rating,
     }
 
     return render(request, 'branch_orders.html', context)
