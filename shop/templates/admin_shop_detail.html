@@ -1,0 +1,533 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ shop.name }} - Admin Shop Details</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+        }
+
+        :root {
+            --primary-color: #0f334bff;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        .admin-header .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0a2538;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .icon-blue { background: var(--info-color); }
+        .icon-green { background: var(--accent-color); }
+        .icon-orange { background: var(--warning-color); }
+        .icon-red { background: var(--danger-color); }
+        .icon-purple { background: #9b59b6; }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dashboard-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section-header h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: #f8f9fa;
+        }
+
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-washing { background: #d1ecf1; color: #0c5460; }
+        .status-drying { background: #d4edda; color: #155724; }
+        .status-ironing { background: #e2e3e5; color: #383d41; }
+        .status-ready { background: #cce5ff; color: #004085; }
+        .status-completed { background: #d4edda; color: #155724; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .shop-info {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1a4d6e 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .shop-info h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .shop-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-item i {
+            color: var(--accent-color);
+            width: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 20px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                font-size: 14px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 5px;
+            }
+
+            .admin-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1><i class="fas fa-store"></i> {{ shop.name }} - Shop Details</h1>
+        <div class="header-actions">
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="{% url 'admin_edit_shop' shop.id %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit Shop
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="shop-info">
+            <h1>{{ shop.name }}</h1>
+            <div class="shop-details">
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ shop.address }}, {{ shop.city }}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ shop.phone|default:"Not provided" }}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ shop.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-clock"></i>
+                    <span>
+                        {% if shop.is_open %}Open{% else %}Closed{% endif %}
+                        {% if shop.is_approved %}
+                            <span class="status-badge status-completed" style="margin-left: 10px;">Approved</span>
+                        {% else %}
+                            <span class="status-badge status-pending" style="margin-left: 10px;">Pending Approval</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ total_orders }}</div>
+                        <div class="stat-card-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-blue">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ completed_orders }}</div>
+                        <div class="stat-card-label">Completed Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">₹{{ total_revenue|floatformat:2 }}</div>
+                        <div class="stat-card-label">Total Revenue</div>
+                    </div>
+                    <div class="stat-card-icon icon-green">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">₹{{ today_revenue|floatformat:2 }}</div>
+                        <div class="stat-card-label">Today's Revenue</div>
+                    </div>
+                    <div class="stat-card-icon icon-purple">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">{{ branches|length }}</div>
+                        <div class="stat-card-label">Total Branches</div>
+                    </div>
+                    <div class="stat-card-icon icon-orange">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value">
+                            {% if average_rating %}
+                                {{ average_rating|floatformat:1 }}
+                                <i class="fas fa-star" style="color: #ffd700; font-size: 16px;"></i>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="stat-card-label">Average Rating</div>
+                    </div>
+                    <div class="stat-card-icon icon-purple">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-map-marker-alt"></i> Branches</h2>
+                {% if shop.is_approved %}
+                    <a href="{% url 'admin_edit_shop' shop.id %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Branch
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if branches %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Branch Name</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Services</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for branch in branches %}
+                        <tr>
+                            <td>{{ branch.name }}</td>
+                            <td>{{ branch.address|truncatechars:40 }}</td>
+                            <td>{{ branch.phone|default:"N/A" }}</td>
+                            <td>
+                                {% if branch.services.all %}
+                                    {{ branch.services.count }} service{{ branch.services.count|pluralize }}
+                                {% else %}
+                                    <span class="status-badge status-pending">No Services</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ branch.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>No branches found for this shop</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-receipt"></i> Recent Orders</h2>
+                <a href="{% url 'admin_orders' %}" class="btn btn-primary">View All Orders</a>
+            </div>
+
+            {% if recent_orders %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Branch</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.user.username }}</td>
+                            <td>{{ order.branch.name|default:"Main Branch" }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.cloth_status|lower }}">{{ order.cloth_status }}</span>
+                            </td>
+                            <td>₹{{ order.amount|floatformat:2 }}</td>
+                            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No orders yet for this shop</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-star"></i> Shop Ratings</h2>
+            </div>
+
+            {% if shop_ratings %}
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                    <div style="font-size: 24px; font-weight: 600; color: var(--primary-color);">
+                        {{ average_rating|floatformat:1 }} <i class="fas fa-star" style="color: #ffd700;"></i>
+                        ({{ shop_ratings|length }} review{{ shop_ratings|length|pluralize }})
+                    </div>
+                </div>
+
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for rating in shop_ratings %}
+                        <div style="border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <strong style="color: var(--primary-color);">{{ rating.user.username }}</strong>
+                                    <div>
+                                        {% for i in "12345"|make_list %}
+                                            <i class="fas fa-star" style="color: {% if forloop.counter <= rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <span style="color: #999; font-size: 12px;">{{ rating.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                {% if rating.comment %}
+                                    <p style="color: #555; margin: 0; line-height: 1.4;">{{ rating.comment }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-star-half-alt"></i>
+                    <p>No customer ratings yet for this shop</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

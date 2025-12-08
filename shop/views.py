@@ -1684,6 +1684,49 @@ def admin_open_shops(request):
 
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
+def admin_shop_detail(request, shop_id):
+    """View detailed information about a specific shop."""
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    # Get branches for this shop
+    branches = Branch.objects.filter(shop=shop).prefetch_related('services')
+
+    # Calculate shop statistics
+    total_orders = Order.objects.filter(shop=shop).count()
+    completed_orders = Order.objects.filter(shop=shop, cloth_status='Completed').count()
+    total_revenue = Order.objects.filter(shop=shop, payment_status='Completed').aggregate(total=Sum('amount'))['total'] or 0
+
+    # Today's revenue for this shop
+    today_revenue = Order.objects.filter(
+        shop=shop,
+        payment_status='Completed',
+        created_at__date=datetime.now().date()
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    # Recent orders for this shop
+    recent_orders = Order.objects.filter(shop=shop).select_related('user', 'branch').order_by('-created_at')[:10]
+
+    # Shop ratings
+    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
+    average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+
+    context = {
+        'shop': shop,
+        'branches': branches,
+        'total_orders': total_orders,
+        'completed_orders': completed_orders,
+        'total_revenue': total_revenue,
+        'today_revenue': today_revenue,
+        'recent_orders': recent_orders,
+        'shop_ratings': shop_ratings,
+        'average_rating': average_rating,
+    }
+
+    return render(request, 'admin_shop_detail.html', context)
+
+
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
 def admin_approve_shop(request, shop_id):
     """Approve a shop."""
     if request.method == 'POST':

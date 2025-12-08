@@ -48,6 +48,7 @@ urlpatterns = [
     path("admin-panel/shop/<int:shop_id>/approve/", views.admin_approve_shop, name="admin_approve_shop"),
     path("admin-panel/shop/<int:shop_id>/reject/", views.admin_reject_shop, name="admin_reject_shop"),
     path("admin-panel/shop/<int:shop_id>/edit/", views.admin_edit_shop, name="admin_edit_shop"),
+    path("admin-panel/shop/<int:shop_id>/", views.admin_shop_detail, name="admin_shop_detail"),
     path("admin-panel/order/<int:order_id>/update-status/", views.admin_update_order_status, name="admin_update_order_status"),
 
     # SHOP AUTHENTICATION

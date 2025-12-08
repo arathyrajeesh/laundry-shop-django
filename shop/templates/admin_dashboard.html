@@ -384,18 +384,6 @@
                 </div>
             </div>
 
-            <a href="{% url 'admin_payments' %}" class="stat-card" style="text-decoration: none; color: inherit;">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">{{ total_payments }}</div>
-                        <div class="stat-card-label">All Payments</div>
-                    </div>
-                    <div class="stat-card-icon icon-blue">
-                        <i class="fas fa-credit-card"></i>
-                    </div>
-                </div>
-            </a>
-
             <div class="stat-card">
                 <div class="stat-card-header">
                     <div>
@@ -467,18 +455,6 @@
                     </div>
                 </div>
             </div>
-
-            <a href="{% url 'admin_payments' %}" class="stat-card" style="text-decoration: none; color: inherit;">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">{{ total_orders }}</div>
-                        <div class="stat-card-label">All Payments</div>
-                    </div>
-                    <div class="stat-card-icon icon-blue">
-                        <i class="fas fa-credit-card"></i>
-                    </div>
-                </div>
-            </a>
         </div>
 
         <div class="dashboard-section">
@@ -670,7 +646,9 @@
                 {% for shop in shops_with_branches %}
                 <div class="shop-section" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
                     <h3 style="color: var(--primary-color); margin-bottom: 15px; font-size: 20px;">
-                        <i class="fas fa-store"></i> {{ shop.name }}
+                        <a href="{% url 'admin_shop_detail' shop.id %}" style="color: inherit; text-decoration: none;">
+                            <i class="fas fa-store"></i> {{ shop.name }}
+                        </a>
                         {% if shop.is_approved %}
                             <span class="status-badge status-completed">Approved</span>
                         {% else %}
