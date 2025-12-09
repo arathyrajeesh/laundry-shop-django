@@ -1,310 +1,240 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup - Shine & Bright Laundry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f6ff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        .signup-container {
-            background: #ffffff;
-            width: 380px;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
+        body {
+            background: #fff;
         }
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+        .page-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT PANEL IMAGE */
+        .left-panel {
+            width: 50%;
+            background: #000;
+            position: relative;
+            overflow: hidden; 
+            
+        }
+
+        .left-panel video {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            margin-bottom: 10px;
+            filter: brightness(0.7);            
+        }
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(68, 69, 73, 0.3), rgba(33, 25, 78, 0.3));
+            z-index: 1;
+        }
+
+        /* RIGHT PANEL FORM */
+        .right-panel {
+            width: 75%;
+            padding: 40px 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand {
+            font-family: cursive;
+            font-size: 24px;
+            margin-bottom: 40px;
+            color: #111;
+        }
+
+        .signup-box {
+            max-width: 400px;
         }
 
         h2 {
-            margin: 10px 0 20px;
-            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #111;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #bbb;
-            outline: none;
-            font-size: 15px;
-            box-sizing: border-box; 
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
         }
 
         .password-container {
-            position: relative; 
-            margin: 10px 0;
-        }
-
-        .password-container input {
-            width: 100%;
-            padding-right: 40px; 
-            margin: 0; 
+            position: relative;
         }
 
         .toggle-password {
             position: absolute;
-            right: 12px;
+            right: 15px;
             top: 50%;
-            transform: translateY(-50%);
             background: none;
             border: none;
+            transform: translateY(-50%);
             cursor: pointer;
-            font-size: 18px;
-            color: #666;
-            padding: 5px;
-            z-index: 10;
-        }
-
-        input:focus {
-            border-color: #3498db;
+            color: #888;
         }
 
         button[type="submit"] {
             width: 100%;
-            padding: 12px;
-            background: #3498db;
+            background: #0c0f2d;
             color: white;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
             margin-top: 10px;
-            transition: background 0.3s ease;
+            cursor: pointer;
         }
 
-        button[type="submit"]:hover {
-            background: #2d82c4;
+        .footer-small, .signup-text {
+            font-size: 12px;
+            color: #777;
+            margin-top: 10px;
         }
 
-        .footer-text {
-            margin-top: 15px;
-        }
-
-        a {
-            color: #3498db;
+        .signup-text a {
+            color: #7b61ff;
+            font-weight: 600;
             text-decoration: none;
-            transition: text-decoration 0.3s ease;
         }
 
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .shop-links-section {
-            margin-top: 20px; 
-            padding-top: 20px; 
-            border-top: 1px solid #eee;
-        }
-        
-        .shop-links-container {
-            display: flex; 
-            gap: 10px; 
+        .logo-box {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            background: #e8ddff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
-
-        .shop-links-container a {
-            padding: 8px 16px; 
-            border-radius: 8px; 
-            text-decoration: none; 
-            font-size: 14px; 
-            font-weight: 500;
-            color: white;
-            transition: opacity 0.3s ease;
+        .form-container{
+            display:flex;
+            justify-content:center;
         }
-        
-        .shop-links-container a:hover {
-            opacity: 0.9;
-            text-decoration: none;
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .shop-login-btn {
-            background: #28a745; 
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .left-panel {
+                display: none;
+            }
+            .right-panel {
+                width: 100%;
+                padding: 30px;
+            }
         }
-
-        .shop-register-btn {
-            background: #17a2b8; 
-        }
-
     </style>
-
 </head>
 <body>
 
-<div class="signup-container">
-    {% if messages %}
-        {% for message in messages %}
-            <div style="
-                background: {% if message.tags == 'error' %}#ffdddd{% else %}#ddffdd{% endif %};
-                padding: 12px;
-                border-left: 5px solid {% if message.tags == 'error' %}#e63946{% else %}#2d6a4f{% endif %};
-                margin-bottom: 15px;
-                border-radius: 5px;
-                color: #333;
-            ">
-                {{ message }}
+<div class="page-wrapper">
+
+    <!-- LEFT PANEL IMAGE -->
+    <div class="left-panel">
+        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+            <source src="{% static 'images/signup.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+
+    <!-- RIGHT PANEL FORM -->
+    <div class="right-panel">
+        <div class="signup-box">
+            <div class="logo-box">
+                <img src="{% static 'images/Shine.png' %}" alt="Logo">
             </div>
-        {% endfor %}
-    {% endif %}
 
-    <img src="{% static 'images/Shine.png' %}" class="logo" alt="Shine & Bright Logo">
+            <h2>Create Account</h2>
 
-    <h2>Create Account</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="
+                        background: {% if message.tags == 'error' %}#ffdddd{% else %}#ddffdd{% endif %};
+                        padding: 12px;
+                        border-left: 5px solid {% if message.tags == 'error' %}#e63946{% else %}#2d6a4f{% endif %};
+                        margin-bottom: 15px;
+                        border-radius: 5px;
+                        color: #333;
+                    ">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-    <form method="POST">
-        {% csrf_token %}
+            <div class="form-container">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Enter Username" required>
+                    <input type="email" name="email" placeholder="Enter Email" required>
+                    
+                    <div class="password-container">
+                        <input type="password" id="password1" name="password" placeholder="Enter Password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password1')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
 
-        <input type="text" name="username" placeholder="Enter Username" required autocomplete="username">
-        <input type="email" name="email" placeholder="Enter Email" required autocomplete="email">
-        
-        <div class="password-container">
-            <input type="password" id="password1" name="password" placeholder="Enter Password" required autocomplete="new-password">
-            <button type="button" class="toggle-password" onclick="togglePassword('password1')" aria-label="Toggle password visibility">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
+                    <div class="password-container">
+                        <input type="password" id="password2" name="password_confirm" placeholder="Confirm Password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password2')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
 
-        <div class="password-container">
-            <input type="password" id="password2" name="password_confirm" placeholder="Confirm Password" required autocomplete="new-password">
-            <button type="button" class="toggle-password" onclick="togglePassword('password2')" aria-label="Toggle password visibility">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
+                    <input type="text" name="manual_location" id="manual_location" placeholder="Enter your city or location (optional)">
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                    <input type="hidden" name="city" id="city">
+                    <p id="location-status" style="font-size: 12px; color: #888; margin-top: 5px;"></p>
 
-        <input type="text" name="manual_location" id="manual_location" placeholder="Enter your city or location (optional)" autocomplete="address-level2" style="margin-top: 10px;">
-        <input type="hidden" name="latitude" id="latitude">
-        <input type="hidden" name="longitude" id="longitude">
-        <input type="hidden" name="city" id="city">
-        <p id="location-status" style="font-size: 12px; color: #888; margin-top: 5px;"></p>
-
-        <button type="submit">Signup</button>
-    </form>
-
-
-    <p class="footer-text">
-        Already have an account?
-        <a href="{% url 'login' %}">Login here</a>
-    </p>
-
-    <div class="shop-links-section">
-        <p style="color: #666; font-size: 14px; margin-bottom: 10px;">Are you a shop owner?</p>
-        <div class="shop-links-container">
-            <a href="{% url 'shop_login' %}" class="shop-login-btn">Shop Login</a>
-            <a href="{% url 'shop_register' %}" class="shop-register-btn">Register Shop</a>
+                    <button type="submit">Signup</button>
+                </form>
+            </div>
+            <p class="signup-text">
+                Already have an account? <a href="{% url 'login' %}">Login here</a>
+            </p>
         </div>
     </div>
+
 </div>
 
-</body>
 <script>
-    const locationStatus = document.getElementById("location-status");
-    const manualLocationInput = document.getElementById("manual_location");
-
-    // Function to update location status based on input
-    function updateLocationStatus() {
-        const manualLocation = manualLocationInput.value.trim();
-        if (manualLocation) {
-            document.getElementById("city").value = manualLocation;
-            document.getElementById("latitude").value = "";
-            document.getElementById("longitude").value = "";
-            locationStatus.textContent = `Manual location: ${manualLocation}`;
-        } else {
-            // Check if we have geolocation data
-            const city = document.getElementById("city").value;
-            if (city) {
-                locationStatus.textContent = `Location captured: ${city}`;
-            } else {
-                locationStatus.textContent = "Enter your location manually or allow automatic detection.";
-            }
-        }
-    }
-
-    // Add event listener to manual location input
-    manualLocationInput.addEventListener("input", updateLocationStatus);
-
-    window.onload = function () {
-        if (navigator.geolocation) {
-            locationStatus.textContent = "Attempting to get location...";
-            navigator.geolocation.getCurrentPosition(
-                async function (position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    // Only set geolocation data if user hasn't manually entered location
-                    if (!manualLocationInput.value.trim()) {
-                        document.getElementById("latitude").value = lat;
-                        document.getElementById("longitude").value = lon;
-
-                        const city = await getCityFromLocation(lat, lon);
-                        document.getElementById("city").value = city;
-
-                        locationStatus.textContent = city ? `Location captured: ${city}` : "Location captured (City pending).";
-                    }
-                },
-                function (error) {
-                    console.error("Geolocation failed:", error.message);
-                    // Only show error if user hasn't manually entered location
-                    if (!manualLocationInput.value.trim()) {
-                        locationStatus.textContent = "Location failed. Please enter your location manually.";
-                    }
-                }
-            );
-        } else {
-            // Only show not supported message if user hasn't manually entered location
-            if (!manualLocationInput.value.trim()) {
-                locationStatus.textContent = "Geolocation not supported. Please enter your location manually.";
-            }
-        }
-    };
-
-    async function getCityFromLocation(lat, lon) {
-        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
-
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)' // Replace with your actual contact
-                }
-            });
-            const data = await response.json();
-
-            if (data.address) {
-                return data.address.city ||
-                    data.address.town ||
-                    data.address.village ||
-                    data.address.county ||
-                    data.address.state ||
-                    data.address.country ||
-                    "Unknown City";
-            }
-            return "Unknown City";
-
-        } catch (error) {
-            console.error("Unable to fetch city from location:", error);
-            return "Unknown City";
-        }
-    }
-
     function togglePassword(id) {
         const passwordInput = document.getElementById(id);
         const toggleBtn = passwordInput.nextElementSibling;
@@ -314,14 +244,67 @@
             passwordInput.type = 'text';
             icon.classList.remove('fa-eye');
             icon.classList.add('fa-eye-slash');
-            toggleBtn.setAttribute('aria-label', 'Hide password');
         } else {
             passwordInput.type = 'password';
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
-            toggleBtn.setAttribute('aria-label', 'Show password');
+        }
+    }
+
+    const locationStatus = document.getElementById("location-status");
+    const manualLocationInput = document.getElementById("manual_location");
+
+    function updateLocationStatus() {
+        const manualLocation = manualLocationInput.value.trim();
+        if (manualLocation) {
+            document.getElementById("city").value = manualLocation;
+            document.getElementById("latitude").value = "";
+            document.getElementById("longitude").value = "";
+            locationStatus.textContent = `Manual location: ${manualLocation}`;
+        } else {
+            const city = document.getElementById("city").value;
+            if (city) locationStatus.textContent = `Location captured: ${city}`;
+            else locationStatus.textContent = "Enter your location manually or allow automatic detection.";
+        }
+    }
+
+    manualLocationInput.addEventListener("input", updateLocationStatus);
+
+    window.onload = function () {
+        if (navigator.geolocation) {
+            locationStatus.textContent = "Attempting to get location...";
+            navigator.geolocation.getCurrentPosition(async function (position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                if (!manualLocationInput.value.trim()) {
+                    document.getElementById("latitude").value = lat;
+                    document.getElementById("longitude").value = lon;
+
+                    const city = await getCityFromLocation(lat, lon);
+                    document.getElementById("city").value = city;
+
+                    locationStatus.textContent = city ? `Location captured: ${city}` : "Location captured (City pending).";
+                }
+            }, function (error) {
+                if (!manualLocationInput.value.trim())
+                    locationStatus.textContent = "Location failed. Please enter manually.";
+            });
+        }
+    };
+
+    async function getCityFromLocation(lat, lon) {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, {
+                headers: { 'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)' }
+            });
+            const data = await res.json();
+            return data.address?.city || data.address?.town || data.address?.village || "Unknown City";
+        } catch (err) {
+            return "Unknown City";
         }
     }
 </script>
 
+</body>
 </html>

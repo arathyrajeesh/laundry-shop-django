@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from .forms import CustomPasswordChangeForm
 from django.utils.translation import activate, get_language
 from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
@@ -565,13 +566,16 @@ def settings_view(request):
 def change_password(request):
     """Handle password change for users."""
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = CustomPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
 
-            # Send email notification
-            password_change_message = f"""
+            send_email = form.cleaned_data.get('send_email', True)
+
+            if send_email:
+                # Send email notification
+                password_change_message = f"""
 Hi {user.username},
 
 Your password has been successfully changed on Shine & Bright.
@@ -590,20 +594,23 @@ Shine & Bright Team
 
 """
 
-            send_mail(
-                subject=" Password Changed - Shine & Bright",
-                message=password_change_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
+                send_mail(
+                    subject=" Password Changed - Shine & Bright",
+                    message=password_change_message,
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[user.email],
+                    fail_silently=True,
+                )
 
-            messages.success(request, 'Your password was successfully updated! A confirmation email has been sent.')
+                messages.success(request, 'Your password was successfully updated! A confirmation email has been sent.')
+            else:
+                messages.success(request, 'Your password was successfully updated!')
+
             return redirect('settings')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = PasswordChangeForm(request.user)
+        form = CustomPasswordChangeForm(request.user)
     return render(request, 'change_password.html', {
         'form': form
     })
@@ -1506,19 +1513,19 @@ def admin_orders(request):
     """View all orders with filtering."""
     status_filter = request.GET.get('status', '')
     search_query = request.GET.get('search', '')
-    
+
     orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
-    
+
     if status_filter:
         orders = orders.filter(cloth_status=status_filter)
-    
+
     if search_query:
         orders = orders.filter(
             Q(user__username__icontains=search_query) |
             Q(user__email__icontains=search_query) |
             Q(id__icontains=search_query)
         )
-    
+
     # Only show orders from approved shops that are visible in admin dashboard
     approved_shops = LaundryShop.objects.filter(is_approved=True)
 
@@ -1532,8 +1539,80 @@ def admin_orders(request):
         'search_query': search_query,
         'all_shops': approved_shops,  # Only approved shops for reassignment
     }
-    
+
     return render(request, 'admin_orders.html', context)
+
+
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_payments(request):
+    """View all payments/orders with payment status filtering."""
+    payment_status_filter = request.GET.get('payment_status', '')
+    search_query = request.GET.get('search', '')
+
+    orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
+
+    if payment_status_filter:
+        orders = orders.filter(payment_status=payment_status_filter)
+
+    if search_query:
+        orders = orders.filter(
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(id__icontains=search_query)
+        )
+
+    # Only show orders from approved shops
+    orders = orders.filter(shop__is_approved=True)
+
+    # Calculate total revenue for filtered orders
+    total_revenue = orders.aggregate(total=Sum('amount'))['total'] or 0
+
+    context = {
+        'orders': orders,
+        'payment_status_choices': Order.PAYMENT_STATUS_CHOICES,
+        'current_payment_status': payment_status_filter,
+        'search_query': search_query,
+        'total_revenue': total_revenue,
+    }
+
+    return render(request, 'admin_orders.html', context)  # Reuse the same template
+
+
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_revenue_orders(request):
+    """View orders sorted by revenue (amount) with filtering."""
+    status_filter = request.GET.get('status', '')
+    search_query = request.GET.get('search', '')
+
+    orders = Order.objects.select_related('user', 'shop').order_by('-amount')  # Sort by amount descending
+
+    if status_filter:
+        orders = orders.filter(cloth_status=status_filter)
+
+    if search_query:
+        orders = orders.filter(
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(id__icontains=search_query)
+        )
+
+    # Only show orders from approved shops
+    orders = orders.filter(shop__is_approved=True)
+
+    # Calculate total revenue for filtered orders
+    total_revenue = orders.aggregate(total=Sum('amount'))['total'] or 0
+
+    context = {
+        'orders': orders,
+        'status_choices': Order.STATUS_CHOICES,
+        'current_status': status_filter,
+        'search_query': search_query,
+        'total_revenue': total_revenue,
+    }
+
+    return render(request, 'admin_orders.html', context)  # Reuse the same template
 
 
 @login_required
@@ -1571,6 +1650,54 @@ def admin_shops(request):
     }
 
     return render(request, 'admin_shops.html', context)
+
+
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_open_shops(request):
+    """View only open shops."""
+    shops = LaundryShop.objects.filter(is_open=True).order_by('name')
+
+    context = {
+        'shops': shops,
+    }
+
+    return render(request, 'admin_shops.html', context)
+
+
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_shop_detail(request, shop_id):
+    """View detailed information about a specific shop."""
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    # Get branches and their services
+    branches = Branch.objects.filter(shop=shop).prefetch_related('services')
+
+    # Get recent orders
+    recent_orders = Order.objects.filter(shop=shop).select_related('user', 'branch').order_by('-created_at')[:10]
+
+    # Statistics
+    total_orders = Order.objects.filter(shop=shop).count()
+    completed_orders = Order.objects.filter(shop=shop, cloth_status='Completed').count()
+    total_revenue = Order.objects.filter(shop=shop).aggregate(total=Sum('amount'))['total'] or 0
+
+    # Shop ratings
+    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
+    average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+
+    context = {
+        'shop': shop,
+        'branches': branches,
+        'recent_orders': recent_orders,
+        'total_orders': total_orders,
+        'completed_orders': completed_orders,
+        'total_revenue': total_revenue,
+        'shop_ratings': shop_ratings,
+        'average_rating': average_rating,
+    }
+
+    return render(request, 'admin_shop_detail.html', context)
 
 
 @login_required

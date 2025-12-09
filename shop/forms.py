@@ -3,6 +3,14 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.utils import timezone
 from .models import Profile,Service,Branch,Order,LaundryShop
 
+class CustomPasswordChangeForm(PasswordChangeForm):
+    send_email = forms.BooleanField(
+        required=False,
+        initial=True,
+        label="Send confirmation email",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
