@@ -194,6 +194,21 @@
         .google-btn:hover .arrow-icon {
             transform: translateX(3px); /* small animation */
         }
+        .forgot-password {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .forgot-password a {
+            font-size: 13px;
+            color: #7b61ff;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
@@ -242,6 +257,10 @@
                     <button type="button" class="toggle-password" id="togglePassword">
                         <i class="fas fa-eye"></i>
                     </button>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="{% url 'password_reset' %}">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="login-btn">Continue</button>
