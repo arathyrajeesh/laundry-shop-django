@@ -100,4 +100,7 @@ urlpatterns = [
         path("reset/done/",
                 auth_views.PasswordResetCompleteView.as_view(template_name="password_reset_complete.html"),
                 name="password_reset_complete"),
+        path("shop/reset/", views.shop_reset_request, name="shop_reset_request"),
+        path("shop/reset/<str:token>/", views.shop_reset_confirm, name="shop_reset_confirm"),
+
 ]

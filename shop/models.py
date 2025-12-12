@@ -161,3 +161,11 @@ class EmailVerificationToken(models.Model):
 
     def __str__(self):
         return f"Token for {self.user.username}"
+
+class ShopPasswordResetToken(models.Model):
+    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
+    token = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(hours=1)

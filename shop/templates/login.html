@@ -127,17 +127,33 @@
             color: #7b61ff;
             text-decoration: none;
         }
-
-        .signup-text {
-            margin-top: 15px;
+        .combined-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
             font-size: 13px;
+            color: #444;
         }
 
-        .signup-text a {
+        .combined-links .divider {
+            width: 1px;
+            height: 14px;
+            background: #ccc;
+        }
+
+        .combined-links a {
             color: #7b61ff;
             font-weight: 600;
             text-decoration: none;
+            transition: 0.2s ease;
         }
+
+        .combined-links a:hover {
+            text-decoration: underline;
+        }
+
 
         /* RIGHT SIDE IMAGE */
         .right-panel {
@@ -271,9 +287,11 @@
                 <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
             </p>
 
-            <p class="signup-text">
-                Don’t have an account? <a href="{% url 'signup' %}">Sign up</a>
-            </p>
+            <div class="combined-links">
+            <span>Don’t have an account? <a href="{% url 'signup' %}">Sign up</a></span>
+            <span class="divider"></span>
+            <span>Are you a shop owner? <a href="{% url 'shop_login' %}">Login here</a></span>
+        </div>
 
         </div>
     </div>

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Login - Shine & Bright Laundry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
         body {
             font-family: "Poppins", Arial, sans-serif;
@@ -80,14 +81,14 @@
         }
 
         .password-container {
-            position: relative; 
+            position: relative;
             width: 100%;
         }
 
         .password-container input {
-            padding-right: 40px; 
+            padding-right: 40px;
         }
-        
+
         .toggle-password {
             position: absolute;
             right: 10px;
@@ -100,6 +101,24 @@
             color: #666;
             padding: 5px;
             z-index: 10;
+        }
+
+        /* ⭐ FORGOT PASSWORD LINK */
+        .forgot-password {
+            text-align: right;
+            margin-top: -12px;
+            margin-bottom: 15px;
+        }
+
+        .forgot-password a {
+            color: #0f334bff;
+            font-size: 13px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
         }
 
         button[type="submit"] {
@@ -159,6 +178,7 @@
         }
     </style>
 </head>
+
 <body>
 
 <div class="login-container">
@@ -190,6 +210,11 @@
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
+        </div>
+
+        <!-- ⭐ NEW FORGOT PASSWORD LINK -->
+        <div class="forgot-password">
+            <a href="{% url 'shop_reset_request' %}">Forgot password?</a>
         </div>
 
         <button type="submit">Login</button>

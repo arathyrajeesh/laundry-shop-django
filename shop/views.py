@@ -29,6 +29,10 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from io import BytesIO
+import uuid
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import LaundryShop, ShopPasswordResetToken
 
 def generate_payment_receipt_pdf(order, order_items):
     """Generate a PDF payment receipt for the order."""
@@ -2511,3 +2515,50 @@ def rate_branch(request, branch_id):
         message = 'Thank you for rating this branch!'
 
     return JsonResponse({'success': True, 'message': message})
+
+def shop_reset_request(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            shop = LaundryShop.objects.get(email=email)
+        except LaundryShop.DoesNotExist:
+            messages.error(request, "Shop not found")
+            return redirect("shop_reset_request")
+
+        token = str(uuid.uuid4())
+        ShopPasswordResetToken.objects.create(shop=shop, token=token)
+
+        reset_link = f"http://localhost:8000/shop/reset/{token}/"
+
+        send_mail(
+            "Shop Password Reset - Shine & Bright",
+            f"Click to reset your password:\n{reset_link}",
+            settings.EMAIL_HOST_USER,
+            [email],
+        )
+
+        messages.success(request, "Reset link sent to email")
+        return redirect("shop_login")
+
+    return render(request, "shop_reset_request.html")
+
+def shop_reset_confirm(request, token):
+    try:
+        token_obj = ShopPasswordResetToken.objects.get(token=token)
+        shop = token_obj.shop
+    except ShopPasswordResetToken.DoesNotExist:
+        return HttpResponse("Invalid or expired link")
+
+    if token_obj.is_expired():
+        token_obj.delete()
+        return HttpResponse("Reset link expired")
+
+    if request.method == "POST":
+        new_password = request.POST.get("password")
+        shop.set_password(new_password)
+        shop.save()
+        token_obj.delete()
+        messages.success(request, "Password updated successfully!")
+        return redirect("shop_login")
+
+    return render(request, "shop_reset_confirm.html", {"token": token})
