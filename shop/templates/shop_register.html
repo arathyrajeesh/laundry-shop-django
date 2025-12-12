@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: "Poppins", Arial, sans-serif;
-            background: linear-gradient(135deg, #0f334bff 0%, #1a4d6e 100%);
+            background: url("{% static 'images/bg1.jpeg' %}") no-repeat center center/cover;            display: flex;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -124,7 +124,7 @@
         #detectLocationBtn {
             width: 100%; 
             padding: 12px; 
-            background: #17a2b8; 
+            background:  #0f334bff; 
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -136,7 +136,7 @@
         }
 
         #detectLocationBtn:hover:not([disabled]) {
-            background: #138496;
+            background:  #041e30ff;
         }
 
         #detectLocationBtn:disabled {
