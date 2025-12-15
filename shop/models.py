@@ -95,7 +95,7 @@ class Order(models.Model):
     delivery_phone = models.CharField(max_length=15, blank=True)
     special_instructions = models.TextField(blank=True)
     created_at = models.DateTimeField(default=timezone.now)
-
+    delay_notified = models.BooleanField(default=False)
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
 
