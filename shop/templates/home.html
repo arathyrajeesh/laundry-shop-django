@@ -726,9 +726,15 @@
         </ul>
         
         <div class="nav-actions">
-            <a href="{% url 'dashboard' %}" class="schedule-btn">
-                Schedule a Pickup
-            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="schedule-btn">
+                    Schedule a Pickup
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="schedule-btn">
+                    Schedule a Pickup
+                </a>
+            {% endif %}
         </div>
     </nav>
 
