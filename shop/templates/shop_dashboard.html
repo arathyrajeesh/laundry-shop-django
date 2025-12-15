@@ -402,6 +402,19 @@
             font-weight: 600;
             display: inline-block;
         }
+        .status-delayed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .delayed-section {
+            border-left: 6px solid #e74c3c;
+        }
+
+        .delayed-title {
+            color: #e74c3c;
+            font-weight: 700;
+        }
 
         .status-pending {
             background: #fff3cd; 
@@ -661,6 +674,50 @@
                 </div>
             {% endif %}
         </div>
+        {% if delayed_orders_count > 0 %}
+        <div class="dashboard-section delayed-section">
+            <div class="section-header">
+                <h2 class="delayed-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Delayed Orders ({{ delayed_orders_count }})
+                </h2>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Branch</th>
+                        <th>Delivery Date</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in delayed_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>
+                            {{ order.user.username }}<br>
+                            <small style="color:#777;">{{ order.user.email }}</small>
+                        </td>
+                        <td>{{ order.branch.name }}</td>
+                        <td style="color:#e74c3c;font-weight:600;">
+                            {{ order.delivery_date|date:"M d, Y H:i" }}
+                        </td>
+                        <td>
+                            <span class="status-badge status-delayed">
+                                {{ order.cloth_status }}
+                            </span>
+                        </td>
+                        <td>₹{{ order.amount|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
 
         <div class="dashboard-section">
             <div class="section-header">

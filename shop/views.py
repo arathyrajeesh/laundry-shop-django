@@ -2068,6 +2068,16 @@ def shop_dashboard(request):
 
     # Recent orders notifications
     recent_orders_for_notifications = Order.objects.filter(shop=shop).order_by('-created_at')[:10]
+    now = timezone.now()
+
+    delayed_orders = Order.objects.select_related(
+        'user', 'branch'
+    ).filter(
+        shop=shop,
+        delivery_date__isnull=False,
+        delivery_date__lt=now,
+        cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
+    ).order_by('delivery_date')
 
     for order in recent_orders_for_notifications:
         if order.cloth_status == 'Pending':
@@ -2126,6 +2136,8 @@ def shop_dashboard(request):
         'shop_notifications': shop_notifications[:5],  # Show up to 5 notifications
         'shop_ratings': shop_ratings,
         'average_rating': average_rating,
+        'delayed_orders': delayed_orders,
+        'delayed_orders_count': delayed_orders.count(),
     }
 
     return render(request, 'shop_dashboard.html', context)
