@@ -36,6 +36,8 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from .models import Order, Profile
 
+def splash(request):
+    return render(request, 'splash.html')
 def generate_payment_receipt_pdf(order, order_items):
     """Generate a PDF payment receipt for the order."""
     buffer = BytesIO()
