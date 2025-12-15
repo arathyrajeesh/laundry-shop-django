@@ -14,6 +14,8 @@ urlpatterns = [
 
         # DASHBOARD
         path("dashboard/", views.user_dashboard, name="dashboard"),
+        path("newsletter/subscribe/", views.newsletter_subscribe, name="newsletter_subscribe"),
+
 
         # SHOPS
         path("shop/<int:shop_id>/", views.shop_detail, name="shop_detail"),

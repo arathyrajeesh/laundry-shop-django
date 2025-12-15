@@ -169,3 +169,10 @@ class ShopPasswordResetToken(models.Model):
 
     def is_expired(self):
         return timezone.now() > self.created_at + timezone.timedelta(hours=1)
+
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

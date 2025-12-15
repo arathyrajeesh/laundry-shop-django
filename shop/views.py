@@ -32,7 +32,8 @@ from io import BytesIO
 import uuid
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import LaundryShop, ShopPasswordResetToken
+from .models import LaundryShop, ShopPasswordResetToken,NewsletterSubscriber
+from django.template.loader import render_to_string
 
 def generate_payment_receipt_pdf(order, order_items):
     """Generate a PDF payment receipt for the order."""
@@ -2562,3 +2563,40 @@ def shop_reset_confirm(request, token):
         return redirect("shop_login")
 
     return render(request, "shop_reset_confirm.html", {"token": token})
+
+def newsletter_subscribe(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        if not email:
+            messages.error(request, "Email is required")
+            return redirect(request.META.get("HTTP_REFERER", "/"))
+
+        # Save subscriber
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
+
+        if not created:
+            messages.warning(request, "You are already subscribed!")
+            return redirect(request.META.get("HTTP_REFERER", "/"))
+
+        # Get approved shops (limit 3)
+        shops = LaundryShop.objects.filter(is_approved=True)[:3]
+
+        # Email content
+        subject = "Welcome to Shine & Bright – Shop Details Inside 🧺✨"
+        html_message = render_to_string(
+            "emails/newsletter_shop_details.html",
+            {"shops": shops}
+        )
+
+        email_message = EmailMessage(
+            subject=subject,
+            body=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[email],
+        )
+        email_message.content_subtype = "html"
+        email_message.send(fail_silently=True)
+
+        messages.success(request, "Subscribed successfully! Shop details sent to your email.")
+        return redirect(request.META.get("HTTP_REFERER", "/"))

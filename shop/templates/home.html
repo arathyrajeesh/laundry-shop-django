@@ -1032,8 +1032,9 @@
             <div class="footer-col footer-newsletter">
                 <h3>Newsletter Subscribe</h3>
                 <p>Sign up and receive our special offers:</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Your e-mail address" required>
+                <form method="POST" action="{% url 'newsletter_subscribe' %}">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Your e-mail address" required>
                     <button type="submit">Subscribe now</button>
                 </form>
             </div>

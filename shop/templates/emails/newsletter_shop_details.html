@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h2>Welcome to Shine & Bright Laundry 🧺✨</h2>
+
+        <p>Thank you for subscribing! Here are some of our trusted laundry shops:</p>
+
+        {% for shop in shops %}
+        <hr>
+        <h3>{{ shop.name }}</h3>
+        <p>
+        📍 {{ shop.address }}<br>
+        📞 {{ shop.phone }}<br>
+        🏙 {{ shop.city }}
+        </p>
+        {% endfor %}
+
+        <p>
+        ✔ Washing & Dry Cleaning<br>
+        ✔ Doorstep Pickup & Delivery<br>
+        ✔ Trusted Professionals
+        </p>
+
+        <p>
+        <strong>Shine & Bright Team</strong>
+        </p>
+
+    </div>
+</body>
+</html>
