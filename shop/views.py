@@ -19,7 +19,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, JsonResponse # Added for placeholder views
 from django.db.models import Count, Q
 from datetime import datetime
-from django.utils import timezone
 from django.views.decorators.http import require_POST
 import uuid
 from django.http import HttpResponseRedirect
@@ -34,6 +33,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import LaundryShop, ShopPasswordResetToken,NewsletterSubscriber
 from django.template.loader import render_to_string
+from django.utils import timezone
+from .models import Order, Profile
 
 def generate_payment_receipt_pdf(order, order_items):
     """Generate a PDF payment receipt for the order."""
@@ -1314,6 +1315,15 @@ def admin_dashboard(request):
 
     # Shops with their branches
     shops_with_branches = LaundryShop.objects.prefetch_related('branches').all()
+    now = timezone.now()
+
+    delayed_orders = Order.objects.select_related(
+        'user', 'shop'
+    ).filter(
+        delivery_date__isnull=False,
+        delivery_date__lt=now,
+        cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
+    ).order_by('delivery_date')
 
     context = {
         # Statistics
@@ -1338,6 +1348,8 @@ def admin_dashboard(request):
         'recent_branches': recent_branches,
         'all_shops': LaundryShop.objects.all(),
         'shops_with_branches': shops_with_branches,
+        'delayed_orders': delayed_orders,
+        'delayed_orders_count': delayed_orders.count(),
     }
     
     return render(request, 'admin_dashboard.html', context)

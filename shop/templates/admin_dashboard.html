@@ -443,6 +443,19 @@
                     </div>
                 </div>
             </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-card-value" style="color:#e74c3c;">
+                            {{ delayed_orders_count }}
+                        </div>
+                        <div class="stat-card-label">Delayed Orders</div>
+                    </div>
+                    <div class="stat-card-icon icon-red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
 
             <div class="stat-card">
                 <div class="stat-card-header">
@@ -550,6 +563,57 @@
             <div class="empty-state">
                 <i class="fas fa-chart-bar"></i>
                 <p>No status data available</p>
+            </div>
+            {% endif %}
+        </div>
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2 style="color:#e74c3c;">
+                    <i class="fas fa-exclamation-circle"></i> Delayed Orders
+                </h2>
+            </div>
+
+            {% if delayed_orders %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Shop</th>
+                        <th>Status</th>
+                        <th>Delivery Date</th>
+                        <th>Overdue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in delayed_orders %}
+                    <tr style="background:#fff5f5;">
+                        <td><strong>#{{ order.id }}</strong></td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.user.profile.phone|default:"N/A" }}</td>
+                        <td>{{ order.user.email }}</td>
+                        <td>{{ order.shop.name }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.cloth_status|lower }}">
+                                {{ order.cloth_status }}
+                            </span>
+                        </td>
+                        <td>{{ order.delivery_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <span class="status-badge status-pending">
+                                {{ order.delivery_date|timesince }} late
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-check-circle" style="color:#2ecc71;"></i>
+                <p>No delayed orders</p>
             </div>
             {% endif %}
         </div>
