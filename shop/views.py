@@ -2633,3 +2633,22 @@ def newsletter_subscribe(request):
 
         messages.success(request, "Subscribed successfully! Shop details sent to your email.")
         return redirect(request.META.get("HTTP_REFERER", "/"))
+
+@require_POST
+def update_order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    # 🚫 Block changes if already completed
+    if order.cloth_status == "Completed":
+        return JsonResponse({
+            "success": False,
+            "message": "Completed orders cannot be modified."
+        })
+
+    new_status = request.POST.get("status")
+    order.cloth_status = new_status
+    order.save()
+
+    return JsonResponse({
+        "success": True
+    })

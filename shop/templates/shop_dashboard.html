@@ -800,7 +800,12 @@
                         <td>₹{{ order.amount|floatformat:2 }}</td>
                         <td>{{ order.created_at|date:"M d, Y" }}</td>
                         <td>
-                            <select class="status-select" id="status-{{ order.id }}">
+                            <select 
+                                class="status-select"
+                                id="status-{{ order.id }}"
+                                data-original="{{ order.cloth_status }}"
+                                onchange="handleStatusChange({{ order.id }})"
+                                {% if order.cloth_status == "Completed" %}disabled{% endif %}>
                                 <option value="Pending" {% if order.cloth_status == "Pending" %}selected{% endif %}>Pending</option>
                                 <option value="Washing" {% if order.cloth_status == "Washing" %}selected{% endif %}>Washing</option>
                                 <option value="Drying" {% if order.cloth_status == "Drying" %}selected{% endif %}>Drying</option>
@@ -1024,9 +1029,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Order status updated successfully!');
-                    location.reload();
-                } else {
+                    showMessage("Order status updated successfully!", "success");
+
+                    // Lock dropdown if completed
+                    if (newStatus === "Completed") {
+                        statusSelect.disabled = true;
+                        statusSelect.setAttribute("data-original", "Completed");
+                    }
+
+                    setTimeout(() => location.reload(), 1200);
+                }
+                else {
                     alert('Error: ' + data.message);
                 }
             })
@@ -1064,6 +1077,39 @@
             }
         `;
         document.head.appendChild(style);
+        function handleStatusChange(orderId) {
+            const select = document.getElementById(`status-${orderId}`);
+            const newStatus = select.value;
+            const originalStatus = select.getAttribute("data-original");
+
+            // If trying to change after completed (extra safety)
+            if (originalStatus === "Completed") {
+                showMessage("Completed orders cannot be modified.", "error");
+                select.value = "Completed";
+                return;
+            }
+
+            // If user selects Completed
+            if (newStatus === "Completed") {
+                const confirmed = confirm(
+                    "⚠️ FINAL CONFIRMATION\n\n" +
+                    "Once this order is marked as COMPLETED:\n" +
+                    "• Cloth status cannot be changed again\n" +
+                    "• This action is permanent\n\n" +
+                    "Do you want to continue?"
+                );
+
+                if (!confirmed) {
+                    select.value = originalStatus;
+                    return;
+                }
+
+                showMessage("Order marked as Completed. This action is permanent.", "success");
+            } else {
+                showMessage(`Status changed to "${newStatus}". Click Update to save.`, "success");
+            }
+        }
+
     </script>
 </body>
 </html>
