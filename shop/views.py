@@ -35,6 +35,7 @@ from .models import LaundryShop, ShopPasswordResetToken,NewsletterSubscriber
 from django.template.loader import render_to_string
 from django.utils import timezone
 from .models import Order, Profile
+from django.db.models import Count
 
 def splash(request):
     return render(request, 'splash.html')
@@ -535,7 +536,12 @@ def user_dashboard(request):
         unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
     else:
         unread_count = 0
-
+        
+    previous_shops = (
+    LaundryShop.objects
+    .filter(order__user=request.user, order__cloth_status='Completed')
+    .distinct()
+)
     return render(request, "user_dashboard.html", {
         "pending_count": pending,
         "completed_count": completed,
@@ -547,6 +553,7 @@ def user_dashboard(request):
         "user_city": user_city,
         "recent_notifications": recent_notifications,  # Show up to 5 notifications
         "unread_count": unread_count,
+        "previous_shops": previous_shops,   
     })
 
 # --- NEW DROPDOWN VIEWS ---

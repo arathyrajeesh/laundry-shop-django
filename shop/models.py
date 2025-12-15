@@ -96,6 +96,7 @@ class Order(models.Model):
     special_instructions = models.TextField(blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     delay_notified = models.BooleanField(default=False)
+    thank_you_sent = models.BooleanField(default=False)
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
 

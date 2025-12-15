@@ -688,6 +688,39 @@
                 </tbody>
             </table>
         </div>
+        <div class="mb-10">
+            <h2 class="section-heading">Previously Used Shops</h2>
+
+            {% if previous_shops %}
+                <div class="shop-grid">
+                    {% for shop in previous_shops %}
+                        <div class="card">
+                            <h3>{{ shop.name }}</h3>
+
+                            <p style="color:#666; font-size:14px; margin-top:4px;">
+                                {{ shop.address|truncatechars:40 }} <br>
+                                📍 {{ shop.city }}
+                            </p>
+
+                            <span class="status" style="background:#6f42c1;">
+                                Previously Ordered
+                            </span>
+
+                            <a href="{% url 'shop_detail' shop.id %}" class="btn">
+                                Order Again
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="background:white; padding:30px; border-radius:10px; text-align:center; box-shadow:0 3px 15px rgba(0,0,0,0.1);">
+                    <p class="empty-message">
+                        You haven’t completed any orders yet.<br>
+                        Once an order is completed, your favorite shops will appear here 😊
+                    </p>
+                </div>
+            {% endif %}
+        </div>
 
         <div class="notifications-section">
             <div class="notifications-header">
