@@ -12,15 +12,15 @@
     <style>
         /* --- LAUNDRY THEME VARIABLES --- */
         :root {
-            --color-primary: #00bcd4; /* Aqua/Teal - Water & Cleanliness */
-            --color-secondary: #0097a7; /* Darker Teal */
-            --color-accent: #ffeb3b; /* Bright Yellow/Green - Sunlight & Freshness */
-            --color-location-bg: linear-gradient(135deg, #4dd0e1 0%, #00bcd4 100%); /* Light to Dark Aqua */
+            --color-primary: #140d35ff; /* Aqua/Teal - Water & Cleanliness */
+            --color-secondary: #acbec0ff; /* Darker Teal */
+            --color-accent: #100835ff; /* Bright Yellow/Green - Sunlight & Freshness */
+            --color-location-bg: linear-gradient(135deg, #041647ff 0%, #2371caff 100%); /* Light to Dark Aqua */
             --color-text-dark: #333;
-            --color-text-light: #666;
+            --color-text-light: #f0e4e4ff;
             --color-white: #fff;
             --color-success: #4caf50; /* Green for Success */
-            --color-border: #e0f7fa; /* Very Light Blue for borders */
+            --color-border: #a7a6dbff; /* Very Light Blue for borders */
         }
 
         * {
@@ -60,13 +60,6 @@
         .header {
             /* Vibrant clean theme with pattern */
             background: var(--color-primary); 
-            background-image: repeating-linear-gradient(
-                -45deg, 
-                var(--color-secondary) 0%, 
-                var(--color-secondary) 10px, 
-                var(--color-primary) 10px, 
-                var(--color-primary) 20px
-            );
             color: var(--color-white);
             padding: 35px 40px;
             text-align: center;
@@ -282,7 +275,7 @@
             transition: all 0.4s ease-in-out;
         }
         .profile-img-display:hover {
-             transform: scale(1.05);
+            transform: scale(1.05);
         }
 
         /* Hiding lat/long inputs but keeping them in the form for submission */
