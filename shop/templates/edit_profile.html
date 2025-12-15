@@ -4,12 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile - Shine & Bright</title>
+    <title>Edit Profile - Shine & Bright Laundry</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
+        /* --- LAUNDRY THEME VARIABLES --- */
+        :root {
+            --color-primary: #00bcd4; /* Aqua/Teal - Water & Cleanliness */
+            --color-secondary: #0097a7; /* Darker Teal */
+            --color-accent: #ffeb3b; /* Bright Yellow/Green - Sunlight & Freshness */
+            --color-location-bg: linear-gradient(135deg, #4dd0e1 0%, #00bcd4 100%); /* Light to Dark Aqua */
+            --color-text-dark: #333;
+            --color-text-light: #666;
+            --color-white: #fff;
+            --color-success: #4caf50; /* Green for Success */
+            --color-border: #e0f7fa; /* Very Light Blue for borders */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -20,22 +33,23 @@
         body {
             min-height: 100vh;
             padding: 20px;
+            background-color: #f4f6f9; /* Soft background */
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: white;
+            background: var(--color-white);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Softer shadow */
             overflow: hidden;
-            animation: slideUp 0.5s ease-out;
+            animation: slideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
@@ -44,22 +58,33 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #0f334b 0%, #1a5f7a 100%);
-            color: white;
-            padding: 30px 40px;
+            /* Vibrant clean theme with pattern */
+            background: var(--color-primary); 
+            background-image: repeating-linear-gradient(
+                -45deg, 
+                var(--color-secondary) 0%, 
+                var(--color-secondary) 10px, 
+                var(--color-primary) 10px, 
+                var(--color-primary) 20px
+            );
+            color: var(--color-white);
+            padding: 35px 40px;
             text-align: center;
             position: relative;
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.3);
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 30px;
+            font-weight: 700;
             margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
         }
 
         .header p {
-            opacity: 0.9;
+            opacity: 1;
             font-size: 14px;
+            font-weight: 400;
         }
 
         .back-btn {
@@ -67,17 +92,17 @@
             left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: white;
+            color: var(--color-white);
             text-decoration: none;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 50px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.2);
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-50%) translateX(-3px);
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-50%) translateX(-5px);
         }
 
         .form-container {
@@ -86,46 +111,52 @@
 
         .form-group {
             margin-bottom: 25px;
-            position: relative;
             display: flex;
             flex-direction: column;
         }
 
         .form-group label {
             display: block;
-            font-weight: 500;
-            color: #333;
+            font-weight: 600;
+            color: var(--color-text-dark);
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 15px;
         }
-
 
         .form-control {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
             font-size: 15px;
             transition: all 0.3s ease;
-            background: #f8f9fa;
+            background: #fdfefe;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .form-control:focus {
-            border-color: #0f334b;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(15, 51, 75, 0.1);
+            border-color: var(--color-primary);
+            background: var(--color-white);
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.2);
             outline: none;
         }
 
         .form-control[readonly] {
-            background: #f1f3f4;
+            background: #e9ecef;
             cursor: not-allowed;
         }
 
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
+        .input-icon-group {
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+        }
+        
+        .input-icon {
+            color: var(--color-primary); 
+            font-size: 20px; 
+            min-width: 20px;
+            text-align: center;
         }
 
         .file-input-wrapper input[type="file"] {
@@ -137,121 +168,134 @@
             align-items: center;
             justify-content: center;
             padding: 15px;
-            border: 2px dashed #0f334b;
-            border-radius: 12px;
-            background: #f8f9fa;
+            border: 2px dashed var(--color-primary);
+            border-radius: 10px;
+            background: #e0f7fa;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: #0f334b;
+            color: var(--color-primary);
             font-weight: 500;
-        }
-
-        .file-input-label:hover {
-            background: #0f334b;
-            color: white;
-        }
-
-        .location-section {
-            background: linear-gradient(135deg, #220e3bff 0%, #442088ff 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 30px 0;
-            color: white;
-        }
-
-        .location-section h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
             gap: 10px;
         }
 
-        .location-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+        .file-input-label:hover {
+            background: #b2ebf2;
+        }
+        
+        .file-input-label.file-selected {
+            background: var(--color-success);
+            color: var(--color-white);
+            border-color: var(--color-success);
         }
 
-        .location-input {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 14px;
+        .location-section {
+            background: var(--color-location-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            color: var(--color-white);
+            box-shadow: 0 8px 20px rgba(0, 188, 212, 0.2);
+            text-align: center; /* Center items since we removed the grid */
         }
 
-        .location-input::placeholder {
-            color: rgba(255,255,255,0.7);
+        .location-section h3 {
+            font-size: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the heading */
+            gap: 10px;
+            font-weight: 600;
         }
+        
+        /* Removed .location-grid CSS as it's no longer used */
 
         .detect-btn {
             width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
+            padding: 14px;
+            background: var(--color-accent); 
+            border: none;
+            color: var(--color-text-dark);
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: 0 4px 10px rgba(255, 235, 59, 0.4);
         }
 
-        .detect-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
+        .detect-btn:hover:not(:disabled) {
+            background: #ffe53c;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 235, 59, 0.6);
+        }
+        
+        .detect-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .place-result {
             text-align: center;
             font-weight: 600;
             font-size: 16px;
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 12px;
             background: rgba(255,255,255,0.1);
             border-radius: 8px;
         }
 
         .submit-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #0f334b 0%, #1a5f7a 100%);
-            color: white;
+            padding: 18px;
+            background: var(--color-primary); 
+            color: var(--color-white);
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 30px;
+            margin-top: 40px;
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
         }
 
         .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(15, 51, 75, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 188, 212, 0.6);
         }
 
         .submit-btn:active {
             transform: translateY(-1px);
         }
+        
+        .profile-img-display {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--color-primary); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+            transition: all 0.4s ease-in-out;
+        }
+        .profile-img-display:hover {
+             transform: scale(1.05);
+        }
 
+        /* Hiding lat/long inputs but keeping them in the form for submission */
+        .hidden-location-inputs {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
             }
-
             .header, .form-container {
                 padding: 20px;
-            }
-
-            .location-grid {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -260,14 +304,35 @@
 <body>
     <div class="container">
         <div class="header">
-            <a href="{% url 'dashboard' %}" class="back-btn">
+            <a href="{% url 'dashboard' %}" class="back-btn" title="Back to Dashboard">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
-            <p>Update your personal information</p>
+            <h1><i class="fas fa-bath"></i> Edit Profile</h1> 
+            <p>Manage your details for **Shine & Bright**</p>
         </div>
 
         <div class="form-container">
+            <div style="text-align:center; margin-bottom:30px;">
+                {% if profile.profile_image %}
+                    <img 
+                        id="profileImagePreview"
+                        src="{{ profile.profile_image.url }}"
+                        alt="Profile Image"
+                        class="profile-img-display"
+                    >
+                {% else %}
+                    <img 
+                        id="profileImagePreview"
+                        src="{% static 'images/default_profile.png' %}" 
+                        alt="Default Profile Image"
+                        class="profile-img-display"
+                    >
+                {% endif %}
+                <p style="font-size:13px; color:var(--color-text-light); margin-top:10px;">
+                    Profile Picture
+                </p>
+            </div>
+            
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
 
@@ -275,8 +340,8 @@
                     <label for="{{ form.full_name.id_for_label }}">
                         Full Name
                     </label>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-user" style="color: #0f334b; font-size: 18px; min-width: 20px;"></i>
+                    <div class="input-icon-group">
+                        <i class="fas fa-user input-icon"></i>
                         {{ form.full_name }}
                     </div>
                 </div>
@@ -285,8 +350,8 @@
                     <label for="{{ form.phone.id_for_label }}">
                         Phone Number
                     </label>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-phone" style="color: #0f334b; font-size: 18px; min-width: 20px;"></i>
+                    <div class="input-icon-group">
+                        <i class="fas fa-phone input-icon"></i>
                         {{ form.phone }}
                     </div>
                 </div>
@@ -297,53 +362,41 @@
                     </label>
                     <div class="file-input-wrapper">
                         <input type="file" id="{{ form.profile_image.id_for_label }}" name="{{ form.profile_image.name }}" accept="image/*">
-                        <label for="{{ form.profile_image.id_for_label }}" class="file-input-label">
+                        
+                        <label for="{{ form.profile_image.id_for_label }}" class="file-input-label" id="fileInputLabel">
                             <i class="fas fa-upload"></i>
                             Choose Profile Picture
                         </label>
                     </div>
-                    {% if profile.profile_image %}
-                        <small style="color: #666; margin-top: 5px; display: block;">
-                            Current: {{ profile.profile_image.name }}
-                        </small>
-                    {% endif %}
                 </div>
 
                 <div class="form-group">
                     <label for="{{ form.city.id_for_label }}">
                         City
                     </label>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-map-marker-alt" style="color: #0f334b; font-size: 18px; min-width: 20px;"></i>
+                    <div class="input-icon-group">
+                        <i class="fas fa-map-marker-alt input-icon"></i>
                         {{ form.city }}
                     </div>
                 </div>
 
+                <div class="hidden-location-inputs">
+                    <input type="hidden" id="latitude" name="latitude" value="{{ profile.latitude|default_if_none:'' }}">
+                    <input type="hidden" id="longitude" name="longitude" value="{{ profile.longitude|default_if_none:'' }}">
+                </div>
                 <div class="location-section">
                     <h3>
-                        <i class="fas fa-location-arrow"></i>
-                        Location Detection
+                        <i class="fas fa-map-marked-alt"></i>
+                        Service Location
                     </h3>
-
-                    <div class="location-grid">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label style="color: white;">Latitude</label>
-                            <input type="text" id="latitude" name="latitude" value="{{ profile.latitude }}" readonly class="location-input" placeholder="Not detected">
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label style="color: white;">Longitude</label>
-                            <input type="text" id="longitude" name="longitude" value="{{ profile.longitude }}" readonly class="location-input" placeholder="Not detected">
-                        </div>
-                    </div>
 
                     <button type="button" id="detectBtn" class="detect-btn">
                         <i class="fas fa-search-location"></i>
-                        Auto-detect My Location
+                        Auto-detect My City
                     </button>
 
                     <div id="place_result" class="place-result">
-                        <i class="fas fa-map-pin"></i> Location not detected
+                        <i class="fas fa-map-pin"></i> Click above to set your city
                     </div>
                 </div>
 
@@ -355,6 +408,7 @@
     </div>
 
     <script>
+        // --- Geolocation and Reverse Geocoding Logic ---
         document.getElementById("detectBtn").addEventListener("click", function () {
             const btn = this;
             const originalText = btn.innerHTML;
@@ -364,7 +418,8 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => success(position, btn, originalText),
-                    (error) => handleError(error, btn, originalText)
+                    (error) => handleError(error, btn, originalText),
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             } else {
                 alert("Geolocation is not supported by this browser.");
@@ -376,20 +431,12 @@
         function success(position, btn, originalText) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
+            
+            // Set values to the HIDDEN inputs (crucial for form submission)
+            document.getElementById("latitude").value = lat.toFixed(6);
+            document.getElementById("longitude").value = lon.toFixed(6);
 
-            const latInput = document.getElementById("latitude");
-            const lonInput = document.getElementById("longitude");
-
-            latInput.value = lat.toFixed(6);
-            lonInput.value = lon.toFixed(6);
-
-            latInput.style.borderColor = '#28a745';
-            lonInput.style.borderColor = '#28a745';
-
-            setTimeout(() => {
-                latInput.style.borderColor = '';
-                lonInput.style.borderColor = '';
-            }, 2000);
+            // No visual feedback for lat/long needed as they are hidden
 
             btn.innerHTML = originalText;
             btn.disabled = false;
@@ -399,7 +446,6 @@
 
         function handleError(error, btn, originalText) {
             let message = "Location access denied. Please enable location services.";
-
             switch(error.code) {
                 case error.PERMISSION_DENIED:
                     message = "Location access denied. Please allow location access in your browser settings.";
@@ -408,20 +454,17 @@
                     message = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    message = "Location request timed out.";
+                    message = "Location request timed out. Try again.";
                     break;
             }
-
-            alert(message);
-
+            document.getElementById("place_result").innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
 
         function getPlaceName(lat, lon) {
             const placeResult = document.getElementById("place_result");
-            placeResult.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching location...';
-
+            placeResult.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching location name...';
             const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
 
             fetch(url)
@@ -433,38 +476,51 @@
                             data.address.village ||
                             data.address.state ||
                             data.address.country ||
-                            "Unknown location";
-
-                        placeResult.innerHTML = `<i class="fas fa-map-pin"></i> ${city}`;
+                            "Detected location";
+                            
+                        placeResult.innerHTML = `<i class="fas fa-check-circle"></i> Detected: **${city}**`;
 
                         const cityField = document.getElementById("id_city");
-                        if (cityField && !cityField.value) {
+                        if (cityField) {
                             cityField.value = city;
-                            cityField.style.borderColor = '#28a745';
+                            
+                            // Visual feedback for the visible City input field
+                            cityField.style.borderColor = 'var(--color-success)';
                             setTimeout(() => {
-                                cityField.style.borderColor = '';
-                            }, 2000);
+                                cityField.style.borderColor = 'var(--color-border)';
+                            }, 1500);
                         }
                     } else {
-                        placeResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unable to determine location';
+                        placeResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unable to determine location name';
                     }
                 })
                 .catch(() => {
-                    placeResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unable to fetch location details';
+                    placeResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Network error fetching location details';
                 });
         }
 
+        // --- Profile Image Preview Logic ---
         document.getElementById("{{ form.profile_image.id_for_label }}").addEventListener("change", function(e) {
             const file = e.target.files[0];
+            const label = document.getElementById("fileInputLabel");
+            const imagePreview = document.getElementById("profileImagePreview");
+
             if (file) {
-                const label = document.querySelector(".file-input-label");
                 label.innerHTML = `<i class="fas fa-check"></i> ${file.name}`;
-                label.style.background = '#28a745';
-                label.style.color = 'white';
+                label.classList.add('file-selected');
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.borderColor = 'var(--color-success)'; 
+                };
+                reader.readAsDataURL(file);
+            } else {
+                label.innerHTML = `<i class="fas fa-upload"></i> Choose Profile Picture`;
+                label.classList.remove('file-selected');
+                imagePreview.style.borderColor = 'var(--color-primary)'; 
             }
         });
     </script>
-</body>
-</html>
 </body>
 </html>

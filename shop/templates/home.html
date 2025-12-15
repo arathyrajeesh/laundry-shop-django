@@ -1011,7 +1011,6 @@
                 <div class="footer-brand">Shine & Bright</div>
                 <p>We are professionals in the laundry and dry cleaning business, which means we always stay up to date on the latest technologies and cleaning methods.</p>
                 <div class="social-icons">
-                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
                     <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
                     <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
@@ -1032,7 +1031,7 @@
             <div class="footer-col footer-newsletter">
                 <h3>Newsletter Subscribe</h3>
                 <p>Sign up and receive our special offers:</p>
-                <form method="POST" action="{% url 'newsletter_subscribe' %}">
+                <form class="newsletter-form" method="POST" action="{% url 'newsletter_subscribe' %}">
                     {% csrf_token %}
                     <input type="email" name="email" placeholder="Your e-mail address" required>
                     <button type="submit">Subscribe now</button>
