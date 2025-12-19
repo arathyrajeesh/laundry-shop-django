@@ -30,7 +30,56 @@ class LaundryShop(models.Model):
     is_approved = models.BooleanField(default=False)
     is_open = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
-
+    
+    razorpay_account_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Razorpay Account ID for marketplace payments"
+    )
+    
+    # Bank Details
+    bank_account_holder_name = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Account holder name as per bank records"
+    )
+    bank_account_number = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Bank account number"
+    )
+    bank_ifsc_code = models.CharField(
+        max_length=11,
+        blank=True,
+        null=True,
+        help_text="IFSC code (e.g., HDFC0001234)"
+    )
+    bank_name = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Bank name (e.g., HDFC Bank, SBI)"
+    )
+    bank_branch = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Bank branch name"
+    )
+    bank_account_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('Savings', 'Savings'),
+            ('Current', 'Current'),
+        ],
+        blank=True,
+        null=True,
+        help_text="Type of bank account"
+    )
+    
     def set_password(self, raw_password):
         from django.contrib.auth.hashers import make_password
         self.password = make_password(raw_password)
@@ -97,6 +146,15 @@ class Order(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     delay_notified = models.BooleanField(default=False)
     thank_you_sent = models.BooleanField(default=False)
+    
+    # Payment tracking fields for marketplace payments
+    platform_commission = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Platform commission amount")
+    shop_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Amount to be transferred to shop")
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True, help_text="Razorpay payment ID")
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True, help_text="Razorpay order ID")
+    transfer_id = models.CharField(max_length=100, blank=True, null=True, help_text="Razorpay transfer ID to shop")
+    transfer_status = models.CharField(max_length=50, default='Pending', help_text="Status of transfer to shop")
+    
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
 

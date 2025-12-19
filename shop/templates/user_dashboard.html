@@ -465,6 +465,32 @@
             margin-bottom: 0;
         }
 
+        .notification-item {
+            position: relative;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            opacity: 0;
+            cursor: pointer;
+            color: #999;
+            z-index: 10;
+        }
+
+        .notification-item:hover .notification-close {
+            opacity: 1;
+        }
+
+        .notification-close:hover {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
         .notification-icon {
             width: 40px;
             height: 40px;
@@ -660,7 +686,8 @@
             <table class="status-table">
                 <thead>
                     <tr>
-                        <th>Cloth</th>
+                        <th>Order</th>
+                        <th>Shop</th>
                         <th>Status</th>
                         <th>Delivered On</th>
                     </tr>
@@ -669,10 +696,16 @@
                     {% for cloth in cloth_status %}
                         <tr>
                             <td>{{ cloth.cloth_name }}</td>
+                            <td>
+                                <span style="color: #667eea; font-weight: 600;">
+                                    <i class="fas fa-store" style="margin-right: 5px;"></i>
+                                    {{ cloth.shop_name }}
+                                </span>
+                            </td>
                             <td class="status-text">{{ cloth.status }}</td>
                             <td>
                                 {% if cloth.delivery_date %}
-                                    {{ cloth.delivery_date }}
+                                    {{ cloth.delivery_date|date:"M d, Y" }}
                                 {% else %}
                                     Not yet delivered
                                 {% endif %}
@@ -680,7 +713,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="3" class="empty-message">
+                            <td colspan="4" class="empty-message">
                                 No cloth status available.
                             </td>
                         </tr>
@@ -732,14 +765,17 @@
 
             {% if recent_notifications %}
                 {% for notification in recent_notifications %}
-                    <div class="notification-item notification-{{ notification.type }}">
+                    <div class="notification-item notification-{{ notification.type }}" data-notification-id="{{ notification.id }}" onclick="markNotificationRead({{ notification.id }}, this)">
                         <div class="notification-icon">
                             <i class="{{ notification.icon }}"></i>
                         </div>
                         <div class="notification-content">
                             <div class="notification-title">{{ notification.title }}</div>
                             <div class="notification-message">{{ notification.message }}</div>
-                            <div class="notification-time">{{ notification.time }}</div>
+                            <div class="notification-time">{{ notification.time|date:"M d, Y H:i" }}</div>
+                        </div>
+                        <div class="notification-close" onclick="event.stopPropagation(); markNotificationRead({{ notification.id }}, this.closest('.notification-item'))" style="cursor: pointer; padding: 5px; color: #999; opacity: 0.5; transition: all 0.3s;">
+                            <i class="fas fa-times"></i>
                         </div>
                     </div>
                 {% endfor %}
@@ -803,6 +839,95 @@
             }
             return cookieValue;
         }
+
+        // Mark individual notification as read and hide it
+        function markNotificationRead(notificationId, element) {
+            fetch(`/notifications/${notificationId}/mark-read/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fade out and remove the notification
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateX(-20px)';
+                    element.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        element.remove();
+                        
+                        // Check if no notifications left
+                        const notificationsSection = document.querySelector('.notifications-section');
+                        const notificationItems = notificationsSection.querySelectorAll('.notification-item');
+                        if (notificationItems.length === 0) {
+                            // Show "No notifications" message
+                            const noNotificationsHTML = `
+                                <div class="no-notifications">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <h4>No New Notifications</h4>
+                                    <p>You're all caught up! New notifications will appear here.</p>
+                                </div>
+                            `;
+                            const notificationsContainer = notificationsSection.querySelector('.notifications-header').nextElementSibling;
+                            if (notificationsContainer) {
+                                notificationsContainer.innerHTML = noNotificationsHTML;
+                            }
+                        }
+                        
+                        // Update unread count badge
+                        updateUnreadCount();
+                    }, 300);
+                }
+            })
+            .catch(error => {
+                console.error('Error marking notification as read:', error);
+            });
+        }
+
+        // Update unread count badge
+        function updateUnreadCount() {
+            const badges = document.querySelectorAll('.notification-badge');
+            badges.forEach(badge => {
+                const currentCount = parseInt(badge.textContent) || 0;
+                const newCount = Math.max(0, currentCount - 1);
+                if (newCount > 0) {
+                    badge.textContent = newCount;
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
+        }
+
+        // Auto-mark notifications as read when dashboard loads (after 5 seconds of viewing)
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const notificationItems = document.querySelectorAll('.notification-item');
+                notificationItems.forEach(function(item) {
+                    const notificationId = item.getAttribute('data-notification-id');
+                    if (notificationId) {
+                        // Mark as read but don't hide immediately - user can still see it
+                        fetch(`/notifications/${notificationId}/mark-read/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update unread count
+                                updateUnreadCount();
+                            }
+                        });
+                    }
+                });
+            }, 5000); // Mark as read after 5 seconds of viewing
+        });
     </script>
 
 </body>

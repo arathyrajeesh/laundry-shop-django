@@ -1,5 +1,12 @@
 import razorpay
 from django.shortcuts import render, redirect, get_object_or_404
+from .payment_utils import (
+    create_razorpay_order,
+    capture_payment_and_transfer,
+    verify_payment_signature,
+    calculate_commission,
+    get_razorpay_client,
+)
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -7,7 +14,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .forms import CustomPasswordChangeForm
 from django.utils.translation import activate, get_language
-from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm
+from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm,ShopBankDetailsForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
 from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating
 from django.contrib.auth import authenticate, login, logout
@@ -163,13 +170,20 @@ def generate_payment_receipt_pdf(order, order_items):
 # We'll use the user's last 5 orders as a stand-in.
 def get_cloth_status(user):
     # Fetch actual orders and format them
-    # For now, return a placeholder list if no orders exist, 
-    # or fetch the last few orders
-    orders = Order.objects.filter(user=user).order_by('-id')[:5]
+    # Only show orders with completed payment
+    orders = Order.objects.filter(
+        user=user,
+        payment_status='Completed'  # Only show paid orders
+    ).select_related('shop').order_by('-id')[:5]
     if orders:
-        return [{'cloth_name': f"Order #{order.id}", 'status': order.cloth_status, 'delivery_date': order.created_at} for order in orders]
+        return [{
+            'cloth_name': f"Order #{order.id}", 
+            'status': order.cloth_status, 
+            'delivery_date': order.created_at,
+            'shop_name': order.shop.name
+        } for order in orders]
     return [
-        {'cloth_name': 'No recent orders', 'status': 'N/A', 'delivery_date': 'N/A'}
+        {'cloth_name': 'No recent orders', 'status': 'N/A', 'delivery_date': 'N/A', 'shop_name': 'N/A'}
     ]
 
 # --- Notification Helper Functions ---
@@ -457,11 +471,11 @@ def edit_profile(request):
 
 @login_required
 def user_dashboard(request):
-    # Statistics from your original code
-    pending = Order.objects.filter(user=request.user, cloth_status="Pending").count()
-    completed = Order.objects.filter(user=request.user, cloth_status="Completed").count()
+    # Statistics from your original code - Only count paid orders
+    pending = Order.objects.filter(user=request.user, cloth_status="Pending", payment_status="Completed").count()
+    completed = Order.objects.filter(user=request.user, cloth_status="Completed", payment_status="Completed").count()
 
-    spent = Order.objects.filter(user=request.user).aggregate(
+    spent = Order.objects.filter(user=request.user, payment_status="Completed").aggregate(
         total=Sum('amount')
     )["total"] or 0
 
@@ -515,12 +529,16 @@ def user_dashboard(request):
     create_order_notifications(request.user)
     create_welcome_notifications(request.user)
 
-    # Get recent notifications from database
-    recent_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:5]
+    # Get only UNREAD notifications from database (avoid showing read notifications)
+    recent_notifications = Notification.objects.filter(
+        user=request.user,
+        is_read=False  # Only show unread notifications
+    ).order_by('-created_at')[:5]
 
     # Format notifications for template (convert to dict format)
     recent_notifications = [
         {
+            'id': notification.id,
             'title': notification.title,
             'message': notification.message,
             'time': notification.created_at,
@@ -539,7 +557,7 @@ def user_dashboard(request):
         
     previous_shops = (
     LaundryShop.objects
-    .filter(order__user=request.user, order__cloth_status='Completed')
+    .filter(order__user=request.user, order__cloth_status='Completed', order__payment_status='Completed')
     .distinct()
 )
     return render(request, "user_dashboard.html", {
@@ -729,6 +747,19 @@ def mark_notifications_read(request):
 
 
 @login_required
+@require_POST
+def mark_notification_read(request, notification_id):
+    """Mark a single notification as read."""
+    try:
+        notification = Notification.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({'success': True})
+    except Notification.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Notification not found'}, status=404)
+
+
+@login_required
 def help_view(request):
     """Renders the Help page."""
     return render(request, 'help.html')
@@ -738,8 +769,11 @@ def help_view(request):
 @login_required
 def my_orders(request):
     """Renders the My Orders page."""
-    # Pass user orders data here
-    user_orders = Order.objects.filter(user=request.user).select_related('shop', 'branch').order_by('-created_at')
+    # Only show orders with completed payment
+    user_orders = Order.objects.filter(
+        user=request.user,
+        payment_status='Completed'  # Only show paid orders
+    ).select_related('shop', 'branch').order_by('-created_at')
 
     # Add branch rating data to each order
     for order in user_orders:
@@ -752,8 +786,11 @@ def my_orders(request):
 @login_required
 def billing_payments(request):
     """Renders the Billing & Payments page."""
-    # Pass billing/payment data here
-    user_orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    # Only show orders with completed payment
+    user_orders = Order.objects.filter(
+        user=request.user,
+        payment_status='Completed'  # Only show paid orders
+    ).order_by('-created_at')
     return render(request, 'billing.html', {'orders': user_orders})
 
 @login_required
@@ -921,14 +958,17 @@ def create_order(request, shop_id):
         messages.error(request, 'Unable to determine branch for order. Please try again.')
         return redirect('select_services', shop_id=shop_id)
 
-    # Create order in database
+    # Create order in database - linked to selected shop
     order = Order.objects.create(
         user=request.user,
-        shop=shop,
+        shop=shop,  # Order is linked to the selected shop
         branch=branch,
         amount=total_amount,
         cloth_status='Pending'
     )
+    
+    # Log shop information for payment tracking
+    print(f"Order #{order.id} created for shop: {shop.name} (ID: {shop.id})")
 
     # Store order items in session for later use
     request.session['order_items'] = [
@@ -1042,21 +1082,28 @@ def payment(request):
 
     # Create Razorpay order here instead of in create_order
     total_amount = request.session.get('total_amount', 0)
+    
+    # Get shop's Razorpay account ID (if linked) - Payment will go to this shop
+    shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
+    
+    # Log payment routing information
+    print(f"Payment for Order #{order.id} - Shop: {order.shop.name} (ID: {order.shop.id})")
+    if shop_account_id:
+        print(f"Shop has Razorpay account linked: {shop_account_id} - Payment will be transferred automatically")
+    else:
+        print(f"Shop Razorpay account not linked - Payment will stay with platform")
 
     try:
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        razorpay_order = client.order.create({
-            'amount': int(total_amount * 100),  # Amount in paisa
-            'currency': 'INR',
-            'payment_capture': '1'  # Auto capture
-        })
+        # Create Razorpay order using utility function
+        razorpay_order = create_razorpay_order(total_amount, shop_account_id)
         razorpay_order_id = razorpay_order['id']
         request.session['razorpay_order_id'] = razorpay_order_id
-    except razorpay.errors.BadRequestError:
-        messages.error(request, 'Payment service is currently unavailable. Please contact support.')
-        return redirect('dashboard')
+        
+        # Store order ID in database for tracking
+        order.razorpay_order_id = razorpay_order_id
+        order.save()
     except Exception as e:
-        messages.error(request, 'Unable to process payment at this time. Please try again later.')
+        messages.error(request, f'Unable to process payment at this time: {str(e)}')
         return redirect('dashboard')
 
     context = {
@@ -1073,28 +1120,87 @@ def payment(request):
 
 @login_required
 def user_details(request):
-    """Collect user delivery details before payment."""
+    """Collect user delivery details and show payment section."""
     order_id = request.session.get('order_id')
     if not order_id:
         messages.error(request, 'No order found. Please start over.')
         return redirect('dashboard')
 
     order = get_object_or_404(Order, id=order_id, user=request.user)
+    show_payment = False
+    razorpay_order_id = None
 
     if request.method == 'POST':
         form = UserDetailsForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
             messages.success(request, 'Delivery details saved successfully.')
-            return redirect('payment')
+            show_payment = True
+            
+            # Get order items from session
+            order_items = request.session.get('order_items', [])
+            total_amount = request.session.get('total_amount', order.amount)
+            
+            # Create Razorpay order
+            shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
+            
+            try:
+                razorpay_order = create_razorpay_order(total_amount, shop_account_id)
+                razorpay_order_id = razorpay_order['id']
+                request.session['razorpay_order_id'] = razorpay_order_id
+                
+                # Store order ID in database for tracking
+                order.razorpay_order_id = razorpay_order_id
+                order.save()
+            except Exception as e:
+                messages.error(request, f'Unable to process payment at this time: {str(e)}')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
         form = UserDetailsForm(instance=order)
+        # Check if delivery details are already filled
+        if order.delivery_name and order.delivery_address:
+            show_payment = True
+            # Get order items from session
+            order_items = request.session.get('order_items', [])
+            total_amount = request.session.get('total_amount', order.amount)
+            
+            # Create Razorpay order if not exists
+            if not order.razorpay_order_id:
+                shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
+                try:
+                    razorpay_order = create_razorpay_order(total_amount, shop_account_id)
+                    razorpay_order_id = razorpay_order['id']
+                    request.session['razorpay_order_id'] = razorpay_order_id
+                    order.razorpay_order_id = razorpay_order_id
+                    order.save()
+                except Exception as e:
+                    messages.error(request, f'Unable to process payment at this time: {str(e)}')
+            else:
+                razorpay_order_id = order.razorpay_order_id
+                request.session['razorpay_order_id'] = razorpay_order_id
+
+    # Get order items and total amount for payment section
+    order_items = request.session.get('order_items', [])
+    total_amount = request.session.get('total_amount', order.amount)
+    
+    # If no order_items in session, create a dummy item
+    if not order_items:
+        order_items = [{
+            'service': {'name': 'Laundry Service'},
+            'quantity': 1,
+            'total': total_amount
+        }]
 
     context = {
         'form': form,
         'order': order,
+        'show_payment': show_payment,
+        'order_items': order_items,
+        'total_amount': total_amount,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'shop': order.shop,
     }
 
     return render(request, 'user_details.html', context)
@@ -1113,42 +1219,83 @@ def payment_success(request):
         return redirect('dashboard')
 
     # Verify payment signature
-    try:
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        client.utility.verify_payment_signature({
-            'razorpay_order_id': razorpay_order_id,
-            'razorpay_payment_id': razorpay_payment_id,
-            'razorpay_signature': razorpay_signature
-        })
-    except razorpay.errors.BadRequestError:
-        messages.error(request, 'Payment verification failed due to service configuration. Please contact support.')
-        return redirect('dashboard')
-    except razorpay.errors.SignatureVerificationError:
+    if not verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature):
         messages.error(request, 'Payment verification failed. Please contact support.')
         return redirect('dashboard')
 
-        # Payment verified, update order status
-        order_id = request.session.get('order_id')
-        if order_id:
-            order = get_object_or_404(Order, id=order_id, user=request.user)
-            order.cloth_status = 'Washing'  # Move to next status
-            order.payment_status = 'Completed'  # Mark payment as completed
-            order.save()
+    # Payment verified, update order status and transfer funds
+    order_id = request.session.get('order_id')
+    if order_id:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        
+        # Store payment details
+        order.razorpay_payment_id = razorpay_payment_id
+        order.razorpay_order_id = razorpay_order_id
+        
+        # Calculate commission and shop amount
+        commission, shop_amount = calculate_commission(order.amount)
+        order.platform_commission = commission
+        order.shop_amount = shop_amount
+        
+        # Transfer payment to shop account (if shop has Razorpay account linked)
+        # Payment goes to the shop that was selected when order was created
+        shop_account_id = order.shop.razorpay_account_id if order.shop.razorpay_account_id else None
+        
+        # Log which shop is receiving the payment
+        print(f"Processing payment transfer for Order #{order.id}")
+        print(f"Shop: {order.shop.name} (ID: {order.shop.id})")
+        print(f"Order Amount: ₹{order.amount}")
+        print(f"Platform Commission: ₹{commission}")
+        print(f"Shop Amount: ₹{shop_amount}")
+        
+        if shop_account_id:
+            try:
+                print(f"Transferring ₹{shop_amount} to shop account: {shop_account_id}")
+                transfer_result = capture_payment_and_transfer(
+                    razorpay_payment_id,
+                    order.amount,
+                    shop_account_id,  # Payment goes to the selected shop's account
+                    commission_percentage=5  # 5% platform commission
+                )
+                
+                if transfer_result['success']:
+                    order.transfer_id = transfer_result.get('transfer_id')
+                    order.transfer_status = transfer_result.get('transfer_status', 'completed')
+                    print(f"✅ Payment successfully transferred to shop: {order.shop.name}")
+                else:
+                    order.transfer_status = transfer_result.get('transfer_status', 'failed')
+                    # Log error but don't fail the order
+                    print(f"❌ Transfer failed for order {order.id} to shop {order.shop.name}: {transfer_result.get('error')}")
+            except Exception as e:
+                # Log error but continue with order processing
+                order.transfer_status = 'failed'
+                print(f"❌ Error transferring payment for order {order.id} to shop {order.shop.name}: {str(e)}")
+        else:
+            # Shop doesn't have Razorpay account linked
+            order.transfer_status = 'shop_account_not_linked'
+            print(f"⚠️ Shop {order.shop.name} doesn't have Razorpay account linked. Payment held by platform.")
+        
+        order.cloth_status = 'Washing'  # Move to next status
+        order.payment_status = 'Completed'  # Mark payment as completed
+        order.save()
 
-            # Generate PDF receipt
-            order_items = request.session.get('order_items', [])
-            if not order_items:
-                order_items = [{
-                    'service_name': 'Laundry Service',
-                    'quantity': 1,
-                    'price': float(order.amount),
-                    'total': float(order.amount)
-                }]
+        # Create notification for user
+        create_status_update_notification(order, 'Washing')
 
-            pdf_buffer = generate_payment_receipt_pdf(order, order_items)
+        # Generate PDF receipt
+        order_items = request.session.get('order_items', [])
+        if not order_items:
+            order_items = [{
+                'service_name': 'Laundry Service',
+                'quantity': 1,
+                'price': float(order.amount),
+                'total': float(order.amount)
+            }]
 
-            # Send payment success email with PDF attachment
-            payment_success_message = f"""
+        pdf_buffer = generate_payment_receipt_pdf(order, order_items)
+
+        # Send payment success email with PDF attachment
+        payment_success_message = f"""
 Hi {order.user.get_full_name() or order.user.username},
 
 Your payment has been successfully processed!
@@ -1175,38 +1322,34 @@ Shine & Bright Team
 🧺✨
 """
 
-            try:
-                # Create email with PDF attachment
-                email = EmailMessage(
-                    subject=f"Payment Successful - Order #{order.id}",
-                    body=payment_success_message,
-                    from_email=settings.EMAIL_HOST_USER,
-                    to=[order.user.email],
-                )
+        try:
+            # Create email with PDF attachment
+            email = EmailMessage(
+                subject=f"Payment Successful - Order #{order.id}",
+                body=payment_success_message,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[order.user.email],
+            )
 
-                # Attach PDF
-                email.attach(f'payment_receipt_order_{order.id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
+            # Attach PDF
+            email.attach(f'payment_receipt_order_{order.id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
 
-                email.send(fail_silently=True)
-            except Exception as e:
-                # Log the error but don't fail the payment
-                print(f"Failed to send payment success email: {e}")
+            email.send(fail_silently=True)
+        except Exception as e:
+            # Log the error but don't fail the payment
+            print(f"Failed to send payment success email: {e}")
 
-            # Clear session
-            request.session.pop('order_items', None)
-            request.session.pop('order_id', None)
-            request.session.pop('shop_id', None)
-            request.session.pop('razorpay_order_id', None)
+        # Clear session
+        request.session.pop('order_items', None)
+        request.session.pop('order_id', None)
+        request.session.pop('shop_id', None)
+        request.session.pop('razorpay_order_id', None)
 
-            messages.success(request, f'Payment successful! Your order #{order.id} has been placed.')
-            return redirect('orders')
-
-    except razorpay.errors.SignatureVerificationError:
-        messages.error(request, 'Payment verification failed. Please contact support.')
+        messages.success(request, f'Payment successful! Your order #{order.id} has been placed.')
+        return redirect('orders')
+    else:
+        messages.error(request, 'No order found. Please start over.')
         return redirect('dashboard')
-
-    messages.error(request, 'Payment failed. Please try again.')
-    return redirect('dashboard')
 
 
 @login_required
@@ -1396,6 +1539,9 @@ def admin_update_order_status(request, order_id):
 
         if changes_made:
             order.save()
+
+            # Create notification for user
+            create_status_update_notification(order, new_status)
 
             # Send notification emails
             try:
@@ -2233,6 +2379,9 @@ def shop_update_order_status(request, order_id):
             order.cloth_status = new_status
             order.save()
 
+            # Create notification for user
+            create_status_update_notification(order, new_status)
+
             # Send status update notification emails
             try:
                 # Email to Customer
@@ -2649,6 +2798,43 @@ def update_order_status(request, order_id):
     order.cloth_status = new_status
     order.save()
 
+    # Create notification for user
+    create_status_update_notification(order, new_status)
+
     return JsonResponse({
         "success": True
     })
+
+
+@shop_login_required
+def shop_bank_details(request):
+    """Shop can view and edit their bank details."""
+    shop_id = request.session.get('shop_id')
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    if request.method == 'POST':
+        form = ShopBankDetailsForm(request.POST, instance=shop)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Bank details updated successfully!')
+            return redirect('shop_bank_details')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ShopBankDetailsForm(instance=shop)
+
+    # Check if bank details are complete
+    has_bank_details = all([
+        shop.bank_account_holder_name,
+        shop.bank_account_number,
+        shop.bank_ifsc_code,
+        shop.bank_name,
+    ])
+
+    context = {
+        'shop': shop,
+        'form': form,
+        'has_bank_details': has_bank_details,
+    }
+
+    return render(request, 'shop_bank_details.html', context)
