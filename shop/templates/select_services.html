@@ -214,12 +214,47 @@
             opacity: 0.5;
         }
 
+        .price-table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .price-table th {
+            background: var(--primary-color) !important;
+            color: white !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .price-table td {
+            background: white;
+            transition: background 0.3s;
+        }
+
+        .price-table tr:nth-child(even) td {
+            background: #f8f9fa;
+        }
+
+        .price-table tr:hover td {
+            background: #e3f2fd;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px 15px;
             }
             .services-grid {
                 grid-template-columns: 1fr;
+            }
+            .price-table {
+                font-size: 14px;
+            }
+            .price-table th,
+            .price-table td {
+                padding: 8px 6px;
             }
         }
     </style>
@@ -263,41 +298,76 @@
             {% endif %}
         </div>
 
+        <!-- Price List Section -->
         <div class="section">
-            <h2><i class="fas fa-concierge-bell"></i> Available Services</h2>
-            {% if services %}
-                <form id="service-form" method="post" action="{% url 'create_order' shop.id %}">
-                    {% csrf_token %}
-                    <div class="services-grid">
+            <h2><i class="fas fa-tags"></i> Service Price List</h2>
+            <div class="price-list-container">
+                <table class="price-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background: var(--primary-color); color: white;">
+                            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Service Name</th>
+                            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Branch</th>
+                            <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Rate per Cloth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {% for service in services %}
-                            <div class="service-card" data-service-id="{{ service.id }}" data-price="{% if service.price %}{{ service.price }}{% else %}0{% endif %}">
-                                <input type="checkbox" id="service-{{ service.id }}" name="selected_services" value="{{ service.id }}" class="service-checkbox" onchange="updateTotal()">
-                                <label for="service-{{ service.id }}">
-                                    <h4>{{ service.name }}</h4>
-                                    <div class="service-branch">
-                                        <i class="fas fa-map-marker-alt"></i> {{ service.branch.name }}
-                                    </div>
-                                    {% if service.price %}
-                                        <div class="service-price">₹{{ service.price }}</div>
-                                    {% else %}
-                                        <div class="service-price">Price on Request</div>
-                                    {% endif %}
-                                </label>
-                                <div class="quantity-selector">
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, -1)">-</button>
-                                    <input type="number" id="quantity-{{ service.id }}" name="quantity_{{ service.id }}" value="1" min="1" class="quantity-input" readonly onchange="updateTotal()">
-                                    <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, 1)">+</button>
-                                </div>
-                            </div>
+                        <tr style="background: #f8f9fa; border: 1px solid #ddd;">
+                            <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">{{ service.name }}</td>
+                            <td style="padding: 12px; border: 1px solid #ddd;">{{ service.branch.name }}</td>
+                            <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: var(--accent-color);">
+                                {% if service.price %}₹{{ service.price }}{% else %}Price on Request{% endif %}
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                </form>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-concierge-bell"></i> Select Your Services</h2>
+            {% if services %}
+                <div class="services-grid">
+                    {% for service in services %}
+                        <div class="service-card" data-service-id="{{ service.id }}">
+                            <input type="checkbox" id="service-{{ service.id }}" name="selected_services" value="{{ service.id }}" class="service-checkbox" onchange="toggleServiceSelection({{ service.id }})">
+                            <label for="service-{{ service.id }}">
+                                <h4>{{ service.name }}</h4>
+                                <div class="service-branch">
+                                    <i class="fas fa-map-marker-alt"></i> {{ service.branch.name }}
+                                </div>
+                                {% if service.price %}
+                                    <div class="service-price">₹{{ service.price }}</div>
+                                {% else %}
+                                    <div class="service-price">Price on Request</div>
+                                {% endif %}
+                            </label>
+                            <div class="quantity-selector">
+                                <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, -1)">-</button>
+                                <input type="number" id="quantity-{{ service.id }}" name="quantity_{{ service.id }}" value="1" min="1" class="quantity-input" readonly onchange="updateTotal()">
+                                <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, 1)">+</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
                 <div class="empty-state">
                     <i class="fas fa-concierge-bell"></i>
                     <p>No services available yet</p>
                 </div>
             {% endif %}
+        </div>
+
+        <!-- Cloth Selection Section -->
+        <div class="section" id="cloth-selection" style="display: none;">
+            <h2><i class="fas fa-tshirt"></i> Select Clothes for Selected Services</h2>
+            <form id="cloth-form" method="post" action="{% url 'create_order' shop.id %}">
+                {% csrf_token %}
+                <div id="cloth-selection-content">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </form>
         </div>
 
         <div class="section" id="total-section" style="display: none;">
@@ -323,12 +393,101 @@
     </div>
 
     <script>
+        // Available clothes data from server
+        const availableClothes = [
+            {% for cloth in clothes %}
+                '{{ cloth.name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        // Service cloth prices data
+        const serviceClothPrices = {
+            {% for service in services %}
+                {{ service.id }}: {
+                    {% for cloth_price in service.cloth_prices.all %}
+                        {{ cloth_price.cloth.id }}: {{ cloth_price.price|default:0 }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+
         function changeQuantity(serviceId, change) {
             const input = document.getElementById(`quantity-${serviceId}`);
             let currentValue = parseInt(input.value);
             currentValue += change;
             if (currentValue < 1) currentValue = 1;
             input.value = currentValue;
+            updateClothSelection();
+            updateTotal();
+        }
+
+        function toggleServiceSelection(serviceId) {
+            updateClothSelection();
+            updateTotal();
+        }
+
+        function updateClothSelection() {
+            const selectedServices = [];
+            const serviceCards = document.querySelectorAll('.service-card');
+
+            serviceCards.forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    const serviceId = card.dataset.serviceId;
+                    const serviceName = card.querySelector('h4').textContent;
+                    const quantity = parseInt(document.getElementById(`quantity-${serviceId}`).value) || 1;
+                    selectedServices.push({
+                        id: serviceId,
+                        name: serviceName,
+                        quantity: quantity
+                    });
+                }
+            });
+
+            const clothSection = document.getElementById('cloth-selection');
+            const clothContent = document.getElementById('cloth-selection-content');
+
+            if (selectedServices.length > 0) {
+                clothSection.style.display = 'block';
+                let html = '';
+
+                selectedServices.forEach(service => {
+                    html += `
+                        <div class="service-cloth-group" style="margin-bottom: 30px; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                            <h4 style="color: var(--primary-color); margin-bottom: 15px;">${service.name} - Select Clothes</h4>
+                            <div class="clothes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    `;
+
+                    availableClothes.forEach(cloth => {
+                        const clothId = `${service.id}_${cloth.replace(/\s+/g, '_')}`;
+                        html += `
+                            <div class="cloth-item" style="display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <input type="checkbox" id="${clothId}" name="clothes_${service.id}" value="${cloth}" class="cloth-checkbox" style="margin-right: 8px;" onchange="updateTotal()">
+                                <label for="${clothId}" style="margin: 0; cursor: pointer;">${cloth}</label>
+                                <input type="number" id="qty_${clothId}" name="quantity_${service.id}_${cloth}" value="1" min="1" style="width: 50px; margin-left: auto; border: 1px solid #ddd; border-radius: 3px; padding: 2px;" onchange="validateQuantity(this); updateTotal()">
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                clothContent.innerHTML = html;
+            } else {
+                clothSection.style.display = 'none';
+                clothContent.innerHTML = '';
+            }
+
+            updateTotal();
+        }
+
+        function validateQuantity(input) {
+            if (parseInt(input.value) < 1) {
+                input.value = 1;
+            }
             updateTotal();
         }
 
@@ -340,13 +499,36 @@
             serviceCards.forEach(card => {
                 const checkbox = card.querySelector('input[type="checkbox"]');
                 if (checkbox.checked) {
-                    const serviceId = card.dataset.serviceId;
-                    const price = parseFloat(card.dataset.price) || 0;
-                    const quantity = parseInt(document.getElementById(`quantity-${serviceId}`).value) || 1;
+                    const serviceId = parseInt(card.dataset.serviceId);
                     const serviceName = card.querySelector('h4').textContent;
 
-                    total += price * quantity;
-                    selectedServices.push(`${serviceName} (x${quantity}) - ₹${(price * quantity).toFixed(2)}`);
+                    // Count selected cloths for this service and calculate total
+                    const clothCheckboxes = document.querySelectorAll(`input[name="clothes_${serviceId}"]:checked`);
+                    let serviceTotal = 0;
+                    let totalCloths = 0;
+
+                    clothCheckboxes.forEach(clothCheckbox => {
+                        const clothName = clothCheckbox.value;
+                        const clothId = clothCheckbox.id.split('_')[1]; // Extract cloth ID from checkbox ID
+                        const quantityInput = document.getElementById(`qty_${serviceId}_${clothName.replace(/\s+/g, '_')}`);
+                        const clothQuantity = parseInt(quantityInput.value) || 1;
+
+                        // Get cloth-specific price
+                        const clothPrice = serviceClothPrices[serviceId] && serviceClothPrices[serviceId][clothId]
+                            ? parseFloat(serviceClothPrices[serviceId][clothId])
+                            : 0;
+
+                        serviceTotal += clothPrice * clothQuantity;
+                        totalCloths += clothQuantity;
+                    });
+
+                    total += serviceTotal;
+
+                    if (totalCloths > 0) {
+                        selectedServices.push(`${serviceName} (${totalCloths} cloth${totalCloths > 1 ? 's' : ''}) - ₹${serviceTotal.toFixed(2)}`);
+                    } else {
+                        selectedServices.push(`${serviceName} (select cloths) - ₹0.00`);
+                    }
                 }
             });
 
@@ -362,14 +544,29 @@
         }
 
         function submitForm() {
-            const form = document.getElementById('service-form');
-            const checkboxes = form.querySelectorAll('input[name="selected_services"]:checked');
+            const selectedServices = document.querySelectorAll('.service-checkbox:checked');
 
-            if (checkboxes.length === 0) {
+            if (selectedServices.length === 0) {
                 alert('Please select at least one service');
                 return;
             }
 
+            // Check if at least one cloth is selected for each service
+            let allServicesHaveClothes = true;
+            selectedServices.forEach(serviceCheckbox => {
+                const serviceId = serviceCheckbox.value;
+                const clothCheckboxes = document.querySelectorAll(`input[name="clothes_${serviceId}"]:checked`);
+                if (clothCheckboxes.length === 0) {
+                    allServicesHaveClothes = false;
+                }
+            });
+
+            if (!allServicesHaveClothes) {
+                alert('Please select at least one type of cloth for each selected service');
+                return;
+            }
+
+            const form = document.getElementById('cloth-form');
             form.submit();
         }
     </script>

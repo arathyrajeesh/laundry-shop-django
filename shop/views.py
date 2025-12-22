@@ -16,7 +16,7 @@ from .forms import CustomPasswordChangeForm
 from django.utils.translation import activate, get_language
 from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm,ShopBankDetailsForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
-from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating
+from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating, Cloth, OrderItem
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Sum, Avg
 from django.db import IntegrityError
@@ -105,20 +105,26 @@ def generate_payment_receipt_pdf(order, order_items):
     story.append(Paragraph("<b>Order Items:</b>", heading_style))
 
     # Table data
-    table_data = [['Service', 'Quantity', 'Price', 'Total']]
+    table_data = [['Service', 'Cloth', 'Quantity', 'Price', 'Total']]
     for item in order_items:
+        service_name = item.get('service_name', 'Service')
+        cloth_name = item.get('cloth_name', '')
+        quantity = item.get('quantity', 1)
+        price = item.get('price', 0)
+        total = item.get('total', 0)
         table_data.append([
-            item.get('service', {}).get('name', item.get('service_name', 'Service')),
-            str(item.get('quantity', 1)),
-            f"₹{item.get('price', item.get('total', order.amount)):.2f}",
-            f"₹{item.get('total', order.amount):.2f}"
+            service_name,
+            cloth_name,
+            str(quantity),
+            f"₹{price:.2f}",
+            f"₹{total:.2f}"
         ])
 
     # Add total row
     table_data.append(['', '', '<b>Total</b>', f"<b>₹{order.amount:.2f}</b>"])
 
     # Create table
-    table = Table(table_data, colWidths=[3*inch, 1*inch, 1*inch, 1*inch])
+    table = Table(table_data, colWidths=[2*inch, 1.5*inch, 1*inch, 1*inch, 1*inch])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -170,18 +176,21 @@ def generate_payment_receipt_pdf(order, order_items):
 # We'll use the user's last 5 orders as a stand-in.
 def get_cloth_status(user):
     # Fetch actual orders and format them
-    # Only show orders with completed payment
-    orders = Order.objects.filter(
-        user=user,
-        payment_status='Completed'  # Only show paid orders
-    ).select_related('shop').order_by('-id')[:5]
+    orders = Order.objects.filter(user=user).select_related('shop').order_by('-id')[:5]
     if orders:
-        return [{
-            'cloth_name': f"Order #{order.id}", 
-            'status': order.cloth_status, 
-            'delivery_date': order.created_at,
-            'shop_name': order.shop.name
-        } for order in orders]
+        result = []
+        for order in orders:
+            if order.payment_status != 'Completed':
+                status = 'Payment Incomplete'
+            else:
+                status = order.cloth_status
+            result.append({
+                'cloth_name': f"Order #{order.id}",
+                'status': status,
+                'delivery_date': order.created_at,
+                'shop_name': order.shop.name
+            })
+        return result
     return [
         {'cloth_name': 'No recent orders', 'status': 'N/A', 'delivery_date': 'N/A', 'shop_name': 'N/A'}
     ]
@@ -769,16 +778,18 @@ def help_view(request):
 @login_required
 def my_orders(request):
     """Renders the My Orders page."""
-    # Only show orders with completed payment
-    user_orders = Order.objects.filter(
-        user=request.user,
-        payment_status='Completed'  # Only show paid orders
-    ).select_related('shop', 'branch').order_by('-created_at')
+    # Show all orders, but modify status display for unpaid ones
+    user_orders = Order.objects.filter(user=request.user).select_related('shop', 'branch').order_by('-created_at')
 
-    # Add branch rating data to each order
+    # Add branch rating data and modify status for unpaid orders
     for order in user_orders:
         if order.branch:
             order.branch_rating = BranchRating.objects.filter(user=request.user, branch=order.branch).first()
+        # Override cloth_status display if payment not completed
+        if order.payment_status != 'Completed':
+            order.display_status = 'Payment Incomplete'
+        else:
+            order.display_status = order.cloth_status
 
     return render(request, 'orders.html', {'orders': user_orders})
 
@@ -903,6 +914,10 @@ def select_services(request, shop_id, branch_id=None):
             'services': services,
         }
 
+    # Get all available clothes
+    clothes = Cloth.objects.all().order_by('name')
+    context['clothes'] = clothes
+
     return render(request, 'select_services.html', context)
 
 
@@ -914,14 +929,14 @@ def create_order(request, shop_id):
 
     shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
     selected_services = request.POST.getlist('selected_services')
-
+    
     if not selected_services:
         messages.error(request, 'Please select at least one service.')
         return redirect('select_services', shop_id=shop_id)
 
-    # Calculate total amount
+    # Calculate total amount and process clothes
     total_amount = 0
-    order_items = []
+    order_items_data = []
     branch = None
 
     for service_id in selected_services:
@@ -938,15 +953,38 @@ def create_order(request, shop_id):
                 messages.error(request, 'All selected services must be from the same branch.')
                 return redirect('select_services', shop_id=shop_id)
 
-            if service.price:
-                item_total = service.price * quantity
-                total_amount += item_total
-                order_items.append({
-                    'service': service,
-                    'quantity': quantity,
-                    'price': service.price,
-                    'total': item_total
-                })
+            # Get selected clothes for this service
+            clothes_list = request.POST.getlist(f'clothes_{service_id}')
+            if not clothes_list:
+                messages.error(request, f'Please select at least one type of cloth for {service.name}.')
+                return redirect('select_services', shop_id=shop_id)
+
+            # Process each cloth for this service
+            service_total = 0
+            for cloth_name in clothes_list:
+                cloth_quantity = int(request.POST.get(f'quantity_{service_id}_{cloth_name}', 1))
+                if cloth_quantity < 1:
+                    cloth_quantity = 1
+
+                try:
+                    cloth = Cloth.objects.get(name=cloth_name)
+                    order_items_data.append({
+                        'service': service,
+                        'cloth': cloth,
+                        'quantity': cloth_quantity
+                    })
+
+                    # Get cloth-specific price
+                    cloth_price_obj = ServiceClothPrice.objects.filter(service=service, cloth=cloth).first()
+                    cloth_price = cloth_price_obj.price if cloth_price_obj else 0
+
+                    service_total += cloth_price * cloth_quantity
+                except Cloth.DoesNotExist:
+                    continue
+
+            # Add service total to overall total
+            total_amount += service_total
+
         except (Service.DoesNotExist, ValueError):
             continue
 
@@ -966,20 +1004,29 @@ def create_order(request, shop_id):
         amount=total_amount,
         cloth_status='Pending'
     )
-    
+
+    # Create OrderItem instances
+    for item_data in order_items_data:
+        OrderItem.objects.create(
+            order=order,
+            service=item_data['service'],
+            cloth=item_data['cloth'],
+            quantity=item_data['quantity']
+        )
+
     # Log shop information for payment tracking
     print(f"Order #{order.id} created for shop: {shop.name} (ID: {shop.id})")
 
-    # Store order items in session for later use
-    request.session['order_items'] = [
-        {
-            'service_id': item['service'].id,
-            'service_name': item['service'].name,
-            'quantity': item['quantity'],
-            'price': float(item['price']),
-            'total': float(item['total'])
-        } for item in order_items
-    ]
+    # Store order items in session for later use (for PDF generation)
+    request.session['order_items'] = []
+    for item_data in order_items_data:
+        request.session['order_items'].append({
+            'service_name': item_data['service'].name,
+            'cloth_name': item_data['cloth'].name,
+            'quantity': item_data['quantity'],
+            'price': float(item_data['service'].price) if item_data['service'].price else 0,
+            'total': float(item_data['service'].price * item_data['quantity']) if item_data['service'].price else 0
+        })
     request.session['order_id'] = order.id
     request.session['shop_id'] = shop.id
 
@@ -993,14 +1040,7 @@ def create_order(request, shop_id):
     # Send order confirmation bill to user
     try:
         # Generate PDF bill
-        order_items = [
-            {
-                'service_name': item['service'].name,
-                'quantity': item['quantity'],
-                'price': float(item['price']),
-                'total': float(item['total'])
-            } for item in order_items
-        ]
+        order_items = request.session.get('order_items', [])
 
         pdf_buffer = generate_payment_receipt_pdf(order, order_items)
 
@@ -1285,12 +1325,16 @@ def payment_success(request):
         # Generate PDF receipt
         order_items = request.session.get('order_items', [])
         if not order_items:
-            order_items = [{
-                'service_name': 'Laundry Service',
-                'quantity': 1,
-                'price': float(order.amount),
-                'total': float(order.amount)
-            }]
+            # Fallback: get from OrderItem model
+            order_items = []
+            for item in order.order_items.all():
+                order_items.append({
+                    'service_name': item.service.name,
+                    'cloth_name': item.cloth.name,
+                    'quantity': item.quantity,
+                    'price': float(item.service.price) if item.service.price else 0,
+                    'total': float(item.service.price * item.quantity) if item.service.price else 0
+                })
 
         pdf_buffer = generate_payment_receipt_pdf(order, order_items)
 
@@ -1993,6 +2037,9 @@ def shop_login(request):
                 if not shop.is_approved:
                     messages.error(request, "Your shop is pending approval. Please wait for admin approval.")
                     return redirect("shop_login")
+                if not shop.is_open:
+                    messages.error(request, "Your shop is currently closed. Please try again later.")
+                    return redirect("shop_login")
                 # Store shop ID in session
                 request.session['shop_id'] = shop.id
                 request.session['shop_name'] = shop.name
@@ -2339,8 +2386,37 @@ def branch_orders(request, branch_id):
         created_at__date=datetime.now().date()
     ).aggregate(total=Sum('amount'))['total'] or 0
 
-    # Recent orders for this branch
-    recent_orders = branch_orders.select_related('user')[:20]  # Show more orders on branch page
+    # Recent orders for this branch with cloth pricing details
+    recent_orders = branch_orders.select_related('user').prefetch_related('order_items__service__cloth_prices', 'order_items__cloth')[:20]  # Show more orders on branch page
+
+    # Get services with cloth prices for display
+    services = branch.services.prefetch_related('cloths', 'cloth_prices').all()
+
+    # Attach prices directly to cloth objects for easy template access
+    for service in services:
+        cloth_prices_dict = {}
+        for cloth_price in service.cloth_prices.all():
+            cloth_prices_dict[cloth_price.cloth.id] = cloth_price.price
+
+        # Attach price to each cloth object
+        for cloth in service.cloths.all():
+            cloth.price = cloth_prices_dict.get(cloth.id)
+
+    # Add cloth pricing details to each order
+    for order in recent_orders:
+        order.cloth_pricing_details = []
+        for item in order.order_items.all():
+            # Get the specific price for this cloth in this service
+            cloth_price_obj = ServiceClothPrice.objects.filter(service=item.service, cloth=item.cloth).first()
+            cloth_price = cloth_price_obj.price if cloth_price_obj else 0
+
+            order.cloth_pricing_details.append({
+                'service_name': item.service.name,
+                'cloth_name': item.cloth.name,
+                'quantity': item.quantity,
+                'unit_price': cloth_price,
+                'total_price': cloth_price * item.quantity
+            })
 
     context = {
         'shop': shop,
@@ -2355,6 +2431,7 @@ def branch_orders(request, branch_id):
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
         'recent_orders': recent_orders,
+        'services': services,
     }
 
     return render(request, 'branch_orders.html', context)

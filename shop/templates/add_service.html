@@ -33,11 +33,14 @@
             cursor: pointer;
             text-decoration: none;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #aaa;
+        }
+        select[multiple] {
+            height: 150px;
         }
         .alert {
             padding: 10px;
@@ -74,6 +77,11 @@
 
         <label>Price (Optional):</label>
         {{ form.price }}
+
+        <br><br>
+
+        <label>Cloths:</label>
+        {{ form.cloths }}
 
         <br><br>
 

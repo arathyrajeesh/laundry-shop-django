@@ -174,15 +174,16 @@
 
         {% if orders %}
             {% for order in orders %}
-            <div class="order-card {% if order.cloth_status == 'Completed' %}completed-highlight{% endif %}">
+            <div class="order-card {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' %}completed-highlight{% endif %}">
                 <div class="order-header">
                     <span>Order #{{ order.id }}</span>
                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
                         <span class="order-status
-                            {% if order.cloth_status == 'Pending' %}status-pending
+                            {% if order.display_status == 'Payment Incomplete' %}status-pending
+                            {% elif order.cloth_status == 'Pending' %}status-pending
                             {% elif order.cloth_status == 'Completed' %}status-completed
                             {% else %}status-processing{% endif %}">
-                            {{ order.get_cloth_status_display }}
+                            {{ order.display_status }}
                         </span>
                     </div>
                 </div>
@@ -207,7 +208,7 @@
                     </div>
                     {% endif %}
 
-                    {% if order.cloth_status == 'Completed' and order.branch %}
+                    {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' and order.branch %}
                     <div class="rating-section">
                         <h4 style="margin: 0 0 10px 0; color: #0f334bff; font-size: 16px;">Rate this Branch</h4>
                         {% if order.branch_rating %}

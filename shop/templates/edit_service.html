@@ -33,11 +33,14 @@
             cursor: pointer;
             text-decoration: none;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #aaa;
+        }
+        select[multiple] {
+            height: 150px;
         }
         .alert {
             padding: 10px;
@@ -55,6 +58,52 @@
             border: 1px solid #c3e6cb;
         }
     </style>
+
+    <script>
+        function updateClothPrices() {
+            const clothSelect = document.querySelector('select[name="cloths"]');
+            const selectedOptions = Array.from(clothSelect.selectedOptions);
+            const pricesSection = document.getElementById('cloth-prices-section');
+            const pricesContainer = document.getElementById('cloth-prices-container');
+
+            if (selectedOptions.length > 0) {
+                pricesSection.style.display = 'block';
+                let html = '';
+
+                selectedOptions.forEach(option => {
+                    const clothId = option.value;
+                    const clothName = option.textContent;
+                    const fieldName = `cloth_price_${clothId}`;
+                    const existingField = document.querySelector(`input[name="${fieldName}"]`);
+
+                    html += `
+                        <div class="cloth-price-item" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+                            <label style="font-weight: bold; color: var(--primary-color);">${clothName} Price:</label>
+                            <input type="number" name="${fieldName}" step="0.01" placeholder="Enter price for ${clothName}"
+                                   class="form-control cloth-price-input" style="margin-top: 5px; width: 200px; display: inline-block;"
+                                   value="${existingField ? existingField.value : ''}" required>
+                            <span style="margin-left: 10px; color: #666;">₹ per cloth</span>
+                        </div>
+                    `;
+                });
+
+                pricesContainer.innerHTML = html;
+            } else {
+                pricesSection.style.display = 'none';
+                pricesContainer.innerHTML = '';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const clothSelect = document.querySelector('select[name="cloths"]');
+            if (clothSelect) {
+                clothSelect.addEventListener('change', updateClothPrices);
+                // Trigger on load to show existing selections
+                updateClothPrices();
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -79,6 +128,20 @@
 
         <label>Price (Optional):</label>
         {{ form.price }}
+
+        <br><br>
+
+        <label>Cloths:</label>
+        {{ form.cloths }}
+
+        <br><br>
+
+        <div id="cloth-prices-section" style="display: none;">
+            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Set Prices for Selected Cloths</h3>
+            <div id="cloth-prices-container">
+                <!-- Dynamic price fields will be inserted here -->
+            </div>
+        </div>
 
         <br><br>
 

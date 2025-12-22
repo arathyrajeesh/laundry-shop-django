@@ -269,6 +269,11 @@
                 padding: 10px 5px;
             }
 
+            .data-table th:nth-child(4),
+            .data-table td:nth-child(4) {
+                display: none; /* Hide cloth details column on mobile */
+            }
+
             .header {
                 padding: 15px 20px;
                 flex-direction: column;
@@ -281,6 +286,26 @@
                 text-align: center;
                 gap: 20px;
             }
+        }
+
+        /* Cloth pricing details styling */
+        .cloth-pricing-item {
+            margin-bottom: 8px;
+            padding: 6px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid var(--primary-color);
+            font-size: 13px;
+        }
+
+        .cloth-pricing-item strong {
+            color: var(--primary-color);
+        }
+
+        .cloth-pricing-item small {
+            color: #666;
+            display: block;
+            margin-top: 2px;
         }
     </style>
 </head>
@@ -429,35 +454,20 @@
 
         <div class="dashboard-section">
             <div class="section-header">
-                <h2><i class="fas fa-concierge-bell"></i> Services for {{ branch.name }}</h2>
+                <h2><i class="fas fa-tags"></i> Cloth Rates for {{ branch.name }}</h2>
                 <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Add Service
                 </a>
             </div>
 
             {% if branch.services.all %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Service Name</th>
-                        <th>Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for service in branch.services.all %}
-                    <tr>
-                        <td>{{ service.name }}</td>
-                        <td>
-                            {% if service.price %}
-                            ₹{{ service.price|floatformat:2 }}
-                            {% else %}
-                            <span style="color: #666;">Not set</span>
-                            {% endif %}
-                        </td>
-                        <td>
+                {% for service in branch.services.all %}
+                <div style="margin-bottom: 30px; padding: 20px; border: 1px solid #eee; border-radius: 10px; background: #f8f9fa;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="color: var(--primary-color); margin: 0;">{{ service.name }}</h4>
+                        <div>
                             <a href="{% url 'edit_service' service.id %}" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">
-                                <i class="fas fa-edit"></i> Edit
+                                <i class="fas fa-edit"></i> Edit Rates
                             </a>
                             <form method="post" action="{% url 'delete_service' service.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this service?')">
                                 {% csrf_token %}
@@ -465,11 +475,36 @@
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+
+                    {% if service.cloths.all %}
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            {% for cloth in service.cloths.all %}
+                                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; text-align: center;">
+                                    <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 8px;">{{ cloth.name }}</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--accent-color);">
+                                        {% if cloth.price %}
+                                            ₹{{ cloth.price|floatformat:2 }}
+                                        {% else %}
+                                            <span style="color: #999; font-size: 14px;">Not set</span>
+                                        {% endif %}
+                                    </div>
+                                    <div style="font-size: 12px; color: #666; margin-top: 5px;">per cloth</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 20px; color: #666;">
+                            <i class="fas fa-tshirt" style="font-size: 24px; margin-bottom: 10px;"></i>
+                            <p>No cloth types configured for this service.</p>
+                            <a href="{% url 'edit_service' service.id %}" class="btn btn-primary" style="margin-top: 10px;">
+                                <i class="fas fa-plus"></i> Configure Cloth Rates
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
             {% else %}
             <div class="empty-state">
                 <i class="fas fa-concierge-bell"></i>
@@ -492,6 +527,7 @@
                         <th>Order ID</th>
                         <th>Customer</th>
                         <th>Customer Details</th>
+                        <th>Cloth Details & Pricing</th>
                         <th>Pickup Date</th>
                         <th>Delivery Date</th>
                         <th>Status</th>
@@ -511,6 +547,18 @@
                             <strong>Email:</strong> {{ order.user.email }}<br>
                             <strong>Address:</strong> {{ order.delivery_address|default:"Not provided"|truncatechars:30 }}<br>
                             <strong>City:</strong> {{ order.user.profile.city|default:"Not provided" }}
+                        </td>
+                        <td>
+                            {% for detail in order.cloth_pricing_details %}
+                                <div style="margin-bottom: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px; border-left: 3px solid var(--primary-color);">
+                                    <strong>{{ detail.service_name }}</strong> - {{ detail.cloth_name }}<br>
+                                    <small style="color: #666;">
+                                        {{ detail.quantity }} × ₹{{ detail.unit_price|floatformat:2 }} = ₹{{ detail.total_price|floatformat:2 }}
+                                    </small>
+                                </div>
+                            {% empty %}
+                                <span style="color: #999;">No cloth details available</span>
+                            {% endfor %}
                         </td>
                         <td>{{ order.pickup_date|date:"M d, Y H:i" }}</td>
                         <td>{{ order.delivery_date|date:"M d, Y H:i" }}</td>
