@@ -150,50 +150,30 @@ class LaundryShopForm(forms.ModelForm):
 
 
 class ShopBankDetailsForm(forms.ModelForm):
-    """Form for shops to manage their bank details."""
+    """Form for shops to manage their Razorpay details."""
     class Meta:
         model = LaundryShop
         fields = [
-            'bank_account_holder_name',
-            'bank_account_number',
-            'bank_ifsc_code',
-            'bank_name',
-            'bank_branch',
-            'bank_account_type',
+            'razorpay_key_id',
+            'razorpay_key_secret',
         ]
         widgets = {
-            'bank_account_holder_name': forms.TextInput(attrs={
+            'razorpay_key_id': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Account holder name (as per bank records)'
+                'placeholder': 'Razorpay Key ID (e.g., rzp_test_...)',
             }),
-            'bank_account_number': forms.TextInput(attrs={
+            'razorpay_key_secret': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Bank account number',
-                'type': 'text'
-            }),
-            'bank_ifsc_code': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'IFSC Code (e.g., HDFC0001234)',
-                'style': 'text-transform: uppercase;'
-            }),
-            'bank_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Bank name (e.g., HDFC Bank, SBI)'
-            }),
-            'bank_branch': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Branch name'
-            }),
-            'bank_account_type': forms.Select(attrs={
-                'class': 'form-control'
+                'placeholder': 'Razorpay Key Secret',
+                'type': 'password'
             }),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make all fields optional
-        for field in self.fields:
-            self.fields[field].required = False
+        # Make Razorpay fields required
+        self.fields['razorpay_key_id'].required = True
+        self.fields['razorpay_key_secret'].required = True
     
     def clean_bank_ifsc_code(self):
         """Validate IFSC code format."""

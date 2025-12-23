@@ -234,7 +234,7 @@
 </head>
 <body>
     <div class="shop-header">
-        <h1><i class="fas fa-university"></i> Bank Details</h1>
+        <h1><i class="fas fa-credit-card"></i> Razorpay Details</h1>
         <div>
             <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
@@ -253,56 +253,40 @@
 
         <div class="card">
             <h2><i class="fas fa-info-circle"></i> Information</h2>
-            {% if has_bank_details %}
+            {% if shop.razorpay_key_id and shop.razorpay_key_secret %}
                 <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> Your bank details are complete and saved.
+                    <i class="fas fa-check-circle"></i> Your Razorpay details are configured and saved.
                 </div>
             {% else %}
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> Please complete your bank details to receive payments.
+                    <i class="fas fa-exclamation-triangle"></i> Please configure your Razorpay details to process payments.
                 </div>
             {% endif %}
 
             <p style="color: #666; line-height: 1.6;">
-                Add your bank account details to receive payments from orders. This information is secure and will be used for transferring payments to your account.
+                Add your Razorpay Key ID and Key Secret to enable payment processing for your shop. This information is secure and will be used for handling payments.
             </p>
         </div>
 
         <div class="card">
-            <h2><i class="fas fa-university"></i> Bank Account Information</h2>
+            <h2><i class="fas fa-credit-card"></i> Razorpay Configuration</h2>
 
-            {% if has_bank_details %}
+            {% if shop.razorpay_key_id and shop.razorpay_key_secret %}
                 <div class="bank-info">
-                    <h3>Current Bank Details</h3>
+                    <h3>Current Razorpay Details</h3>
                     <div class="bank-info-item">
-                        <span class="bank-info-label">Account Holder Name:</span>
-                        <span class="bank-info-value">{{ shop.bank_account_holder_name|default:"Not provided" }}</span>
+                        <span class="bank-info-label">Razorpay Key ID:</span>
+                        <span class="bank-info-value">{{ shop.razorpay_key_id }}</span>
                     </div>
                     <div class="bank-info-item">
-                        <span class="bank-info-label">Account Number:</span>
-                        <span class="bank-info-value">****{{ shop.bank_account_number|slice:"-4"|default:"Not provided" }}</span>
-                    </div>
-                    <div class="bank-info-item">
-                        <span class="bank-info-label">IFSC Code:</span>
-                        <span class="bank-info-value">{{ shop.bank_ifsc_code|default:"Not provided" }}</span>
-                    </div>
-                    <div class="bank-info-item">
-                        <span class="bank-info-label">Bank Name:</span>
-                        <span class="bank-info-value">{{ shop.bank_name|default:"Not provided" }}</span>
-                    </div>
-                    <div class="bank-info-item">
-                        <span class="bank-info-label">Branch:</span>
-                        <span class="bank-info-value">{{ shop.bank_branch|default:"Not provided" }}</span>
-                    </div>
-                    <div class="bank-info-item">
-                        <span class="bank-info-label">Account Type:</span>
-                        <span class="bank-info-value">{{ shop.bank_account_type|default:"Not provided" }}</span>
+                        <span class="bank-info-label">Razorpay Key Secret:</span>
+                        <span class="bank-info-value">****{{ shop.razorpay_key_secret|slice:"-4" }}</span>
                     </div>
                 </div>
             {% else %}
                 <div class="empty-state">
-                    <i class="fas fa-university"></i>
-                    <p>No bank details added yet. Please fill in the form below.</p>
+                    <i class="fas fa-credit-card"></i>
+                    <p>No Razorpay details configured yet. Please fill in the form below.</p>
                 </div>
             {% endif %}
 
@@ -310,64 +294,26 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="{{ form.bank_account_holder_name.id_for_label }}">
-                        Account Holder Name <span class="required">*</span>
+                    <label for="{{ form.razorpay_key_id.id_for_label }}">
+                        Razorpay Key ID <span class="required">*</span>
                     </label>
-                    {{ form.bank_account_holder_name }}
-                    {% if form.bank_account_holder_name.help_text %}
-                        <small class="form-text">{{ form.bank_account_holder_name.help_text }}</small>
-                    {% endif %}
-                    {{ form.bank_account_holder_name.errors }}
+                    {{ form.razorpay_key_id }}
+                    <small class="form-text">Enter your Razorpay Key ID (e.g., rzp_test_...)</small>
+                    {{ form.razorpay_key_id.errors }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.bank_account_number.id_for_label }}">
-                        Account Number <span class="required">*</span>
+                    <label for="{{ form.razorpay_key_secret.id_for_label }}">
+                        Razorpay Key Secret <span class="required">*</span>
                     </label>
-                    {{ form.bank_account_number }}
-                    {% if form.bank_account_number.help_text %}
-                        <small class="form-text">{{ form.bank_account_number.help_text }}</small>
-                    {% endif %}
-                    {{ form.bank_account_number.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.bank_ifsc_code.id_for_label }}">
-                        IFSC Code <span class="required">*</span>
-                    </label>
-                    {{ form.bank_ifsc_code }}
-                    <small class="form-text">Format: HDFC0001234 (4 letters + 0 + 6 alphanumeric)</small>
-                    {{ form.bank_ifsc_code.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.bank_name.id_for_label }}">
-                        Bank Name <span class="required">*</span>
-                    </label>
-                    {{ form.bank_name }}
-                    <small class="form-text">e.g., HDFC Bank, State Bank of India, ICICI Bank</small>
-                    {{ form.bank_name.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.bank_branch.id_for_label }}">
-                        Branch Name
-                    </label>
-                    {{ form.bank_branch }}
-                    {{ form.bank_branch.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.bank_account_type.id_for_label }}">
-                        Account Type
-                    </label>
-                    {{ form.bank_account_type }}
-                    {{ form.bank_account_type.errors }}
+                    {{ form.razorpay_key_secret }}
+                    <small class="form-text">Enter your Razorpay Key Secret</small>
+                    {{ form.razorpay_key_secret.errors }}
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Bank Details
+                        <i class="fas fa-save"></i> Save Razorpay Details
                     </button>
                     <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Cancel
@@ -379,7 +325,7 @@
         <div class="card">
             <h2><i class="fas fa-shield-alt"></i> Security Note</h2>
             <p style="color: #666; line-height: 1.6;">
-                <i class="fas fa-lock"></i> Your bank details are encrypted and stored securely. 
+                <i class="fas fa-lock"></i> Your Razorpay credentials are encrypted and stored securely.
                 Only authorized administrators can view this information for payment processing purposes.
             </p>
         </div>

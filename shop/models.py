@@ -37,6 +37,18 @@ class LaundryShop(models.Model):
         null=True,
         help_text="Razorpay Account ID for marketplace payments"
     )
+    razorpay_key_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Razorpay Key ID for shop payments"
+    )
+    razorpay_key_secret = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Razorpay Key Secret for shop payments"
+    )
     
     # Bank Details
     bank_account_holder_name = models.CharField(
