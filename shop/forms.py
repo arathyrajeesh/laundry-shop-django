@@ -20,54 +20,10 @@ class ProfileForm(forms.ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['name', 'price', 'cloths']
+        fields = ['name']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Service name'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Default price (optional)'}),
-            'cloths': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Add dynamic price fields for each cloth
-        if self.instance and self.instance.pk:
-            for cloth in self.instance.cloths.all():
-                price_field_name = f'cloth_price_{cloth.id}'
-                existing_price = ServiceClothPrice.objects.filter(service=self.instance, cloth=cloth).first()
-                self.fields[price_field_name] = forms.DecimalField(
-                    max_digits=10,
-                    decimal_places=2,
-                    required=False,
-                    initial=existing_price.price if existing_price else None,
-                    widget=forms.NumberInput(attrs={
-                        'class': 'form-control cloth-price-input',
-                        'placeholder': f'Price for {cloth.name}',
-                        'step': '0.01'
-                    })
-                )
-
-    def save(self, commit=True):
-        service = super().save(commit=commit)
-        if commit:
-            # Save cloth-specific prices
-            selected_cloths = self.cleaned_data.get('cloths', [])
-            for cloth in selected_cloths:
-                price_field_name = f'cloth_price_{cloth.id}'
-                price = self.cleaned_data.get(price_field_name)
-                if price is not None:
-                    ServiceClothPrice.objects.update_or_create(
-                        service=service,
-                        cloth=cloth,
-                        defaults={'price': price}
-                    )
-                else:
-                    # Remove price if cloth is still selected but no price set
-                    ServiceClothPrice.objects.filter(service=service, cloth=cloth).delete()
-
-            # Remove prices for cloths that are no longer selected
-            ServiceClothPrice.objects.filter(service=service).exclude(cloth__in=selected_cloths).delete()
-
-        return service
 
 class BranchForm(forms.ModelForm):
     class Meta:

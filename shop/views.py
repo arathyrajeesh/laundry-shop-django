@@ -16,10 +16,11 @@ from .forms import CustomPasswordChangeForm
 from django.utils.translation import activate, get_language
 from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm,ShopBankDetailsForm
 # NOTE: Assuming you have Profile, Order, and LaundryShop models
-from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating, Cloth, OrderItem
+from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating, Cloth, OrderItem, ServiceClothPrice, BranchCloth
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Sum, Avg
 from django.db import IntegrityError
+from django.db.utils import IntegrityError as DjangoIntegrityError
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -914,8 +915,17 @@ def select_services(request, shop_id, branch_id=None):
             'services': services,
         }
 
-    # Get all available clothes
-    clothes = Cloth.objects.all().order_by('name')
+    # Get clothes available for this branch/shop
+    if branch_id:
+        # For specific branch
+        branch = get_object_or_404(Branch, id=branch_id, shop=shop)
+        available_cloth_ids = BranchCloth.objects.filter(branch=branch).values_list('cloth_id', flat=True)
+        clothes = Cloth.objects.filter(id__in=available_cloth_ids).order_by('name')
+    else:
+        # For all branches of the shop
+        available_cloth_ids = BranchCloth.objects.filter(branch__shop=shop).values_list('cloth_id', flat=True).distinct()
+        clothes = Cloth.objects.filter(id__in=available_cloth_ids).order_by('name')
+
     context['clothes'] = clothes
 
     return render(request, 'select_services.html', context)
@@ -2700,6 +2710,141 @@ def delete_service(request, service_id):
     service.delete()
     messages.success(request, 'Service deleted.')
     return redirect('branch_orders', branch_id=branch_id)
+
+
+@shop_login_required
+def manage_service_prices(request):
+    """Manage cloth prices for services."""
+    shop_id = request.session.get('shop_id')
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    # Get all branches for this shop
+    branches = Branch.objects.filter(shop=shop)
+
+    # Get all services for this shop
+    services = Service.objects.filter(branch__shop=shop).select_related('branch').prefetch_related('cloth_prices__cloth')
+
+    # Get all clothes available for this shop's branches
+    available_cloth_ids = BranchCloth.objects.filter(branch__shop=shop).values_list('cloth_id', flat=True).distinct()
+    clothes = Cloth.objects.filter(id__in=available_cloth_ids).order_by('name')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'add_cloth':
+            cloth_name = request.POST.get('cloth_name', '').strip()
+            selected_branches = request.POST.getlist('branches')
+
+            if cloth_name and selected_branches:
+                try:
+                    cloth = Cloth.objects.create(name=cloth_name)
+
+                    # Add cloth to selected branches
+                    for branch_id in selected_branches:
+                        try:
+                            branch = Branch.objects.get(id=branch_id, shop=shop)
+                            BranchCloth.objects.create(branch=branch, cloth=cloth)
+                        except Branch.DoesNotExist:
+                            continue
+
+                    messages.success(request, f'Cloth type "{cloth_name}" added successfully to {len(selected_branches)} branch(es)!')
+                except IntegrityError:
+                    messages.error(request, f'Cloth type "{cloth_name}" already exists!')
+            else:
+                if not cloth_name:
+                    messages.error(request, 'Please enter a cloth name.')
+                if not selected_branches:
+                    messages.error(request, 'Please select at least one branch.')
+            return redirect('manage_service_prices')
+
+        elif action == 'delete_cloth':
+            cloth_id = request.POST.get('cloth_id')
+            if cloth_id:
+                try:
+                    cloth = Cloth.objects.get(id=cloth_id)
+                    cloth_name = cloth.name
+
+                    # Check if cloth is used in any orders
+                    if OrderItem.objects.filter(cloth=cloth).exists():
+                        messages.error(request, f'Cannot delete "{cloth_name}" - it is used in existing orders.')
+                    else:
+                        # Delete associated service cloth prices first
+                        ServiceClothPrice.objects.filter(cloth=cloth).delete()
+                        # Delete branch cloth associations
+                        BranchCloth.objects.filter(cloth=cloth).delete()
+                        cloth.delete()
+                        messages.success(request, f'Cloth type "{cloth_name}" deleted successfully!')
+                except Cloth.DoesNotExist:
+                    messages.error(request, 'Cloth type not found.')
+            return redirect('manage_service_prices')
+        else:
+            # Process price updates
+            for service in services:
+                for cloth in clothes:
+                    price_key = f'price_{service.id}_{cloth.id}'
+                    price_value = request.POST.get(price_key, '').strip()
+
+                    if price_value:
+                        try:
+                            price = float(price_value)
+                            if price >= 0:
+                                # Update or create cloth price
+                                ServiceClothPrice.objects.update_or_create(
+                                    service=service,
+                                    cloth=cloth,
+                                    defaults={'price': price}
+                                )
+                            else:
+                                # Remove if price is 0 or negative
+                                ServiceClothPrice.objects.filter(service=service, cloth=cloth).delete()
+                        except ValueError:
+                            continue
+                    else:
+                        # Remove if empty
+                        ServiceClothPrice.objects.filter(service=service, cloth=cloth).delete()
+
+            messages.success(request, 'Service cloth prices updated successfully!')
+            return redirect('manage_service_prices')
+
+    # Prepare data for template
+    services_data = []
+    for service in services:
+        cloth_prices_dict = {}
+        for cloth_price in service.cloth_prices.all():
+            cloth_prices_dict[cloth_price.cloth.id] = cloth_price.price
+
+        # Create a list of cloth data with prices
+        cloth_data = []
+        for cloth in clothes:
+            cloth_data.append({
+                'cloth': cloth,
+                'price': cloth_prices_dict.get(cloth.id, None)
+            })
+
+        services_data.append({
+            'service': service,
+            'cloth_data': cloth_data,
+        })
+
+    # Prepare cloth data with branch information
+    cloth_data = []
+    for cloth in clothes:
+        available_branches = BranchCloth.objects.filter(cloth=cloth, branch__shop=shop).select_related('branch')
+        branch_names = [bc.branch.name for bc in available_branches]
+        cloth_data.append({
+            'cloth': cloth,
+            'available_branches': branch_names,
+        })
+
+    context = {
+        'shop': shop,
+        'services_data': services_data,
+        'clothes': clothes,
+        'cloth_data': cloth_data,
+        'branches': branches,
+    }
+
+    return render(request, 'manage_service_prices.html', context)
 
 
 @shop_login_required

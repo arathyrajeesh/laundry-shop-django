@@ -147,6 +147,16 @@ class ServiceClothPrice(models.Model):
     def __str__(self):
         return f"{self.service.name} - {self.cloth.name}: ₹{self.price}"
 
+class BranchCloth(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='available_cloths')
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE, related_name='branch_availability')
+
+    class Meta:
+        unique_together = ('branch', 'cloth')
+
+    def __str__(self):
+        return f"{self.branch.name} - {self.cloth.name}"
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),

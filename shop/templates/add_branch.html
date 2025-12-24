@@ -1,79 +1,264 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Branch</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Branch - {{ shop.name }}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial;
-            background: #f4f7ff;
-            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
+
         .container {
-            max-width: 800px;
+            max-width: 600px;
             background: white;
-            padding: 30px;
-            margin: auto;
-            border-radius: 12px;
-            box-shadow: 0 0 10px #ccc;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-primary {
-            background: #4a90e2;
-            padding: 10px 15px;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
-        .btn-secondary {
-            background: #777;
-            padding: 10px 15px;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
         }
-        input, textarea, select {
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #aaa;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-map-marker-alt" style="color: #667eea;"></i> Add New Branch</h1>
+            <p>Expand your business by adding a new branch location</p>
+        </div>
 
-<div class="container">
-    <h2>Add Branch</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-    <form method="post">
-        {% csrf_token %}
+        <form method="post">
+            {% csrf_token %}
 
-        <label>Branch Name:</label>
-        {{ form.name }}
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">
+                    <i class="fas fa-store icon"></i>Branch Name
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <span class="error-message">{{ form.name.errors.0 }}</span>
+                {% endif %}
+            </div>
 
-        <br><br>
+            <div class="form-group">
+                <label for="{{ form.address.id_for_label }}">
+                    <i class="fas fa-map-marker-alt icon"></i>Address
+                </label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                    <span class="error-message">{{ form.address.errors.0 }}</span>
+                {% endif %}
+            </div>
 
-        <label>Address:</label>
-        {{ form.address }}
+            <div class="form-group">
+                <label for="{{ form.phone.id_for_label }}">
+                    <i class="fas fa-phone icon"></i>Phone Number
+                </label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <span class="error-message">{{ form.phone.errors.0 }}</span>
+                {% endif %}
+            </div>
 
-        <br><br>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Branch
+                </button>
+                <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 
-        <label>Phone:</label>
-        {{ form.phone }}
+    <script>
+        // Add focus effects and validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const formControls = document.querySelectorAll('.form-control');
 
-        <br><br>
+            formControls.forEach(control => {
+                control.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
 
-        <label>Services:</label>
-        {{ form.services }}
-        <small>Hold Ctrl to select multiple services</small>
-
-        <br><br>
-
-        <button type="submit" class="btn-primary">Create Branch</button>
-        <a href="{% url 'shop_dashboard' %}" class="btn-secondary">Cancel</a>
-    </form>
-</div>
-
+                control.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('focused');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

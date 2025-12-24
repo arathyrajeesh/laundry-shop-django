@@ -301,9 +301,18 @@
         <!-- Price List Section -->
         <div class="section">
             <h2><i class="fas fa-tags"></i> Service Price List</h2>
+            <div style="margin-bottom: 20px;">
+                <label for="service-select" style="font-weight: 600; color: var(--primary-color); margin-right: 10px;">Select Service:</label>
+                <select id="service-select" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
+                    <option value="">-- Choose a Service --</option>
+                    {% for service in services %}
+                    <option value="price-list-{{ service.id }}">{{ service.name }} - {{ service.branch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <div class="price-list-container">
                 {% for service in services %}
-                <div style="margin-bottom: 30px; border: 1px solid #eee; border-radius: 10px; padding: 20px;">
+                <div id="price-list-{{ service.id }}" class="price-list-item" style="margin-bottom: 30px; border: 1px solid #eee; border-radius: 10px; padding: 20px; display: none;">
                     <h3 style="color: var(--primary-color); margin-bottom: 15px;">{{ service.name }} - {{ service.branch.name }}</h3>
                     <table class="price-table" style="width: 100%; border-collapse: collapse;">
                         <thead>
@@ -398,6 +407,21 @@
     </div>
 
     <script>
+        // Handle service price list dropdown
+        document.getElementById('service-select').addEventListener('change', function() {
+            const selectedValue = this.value;
+            const priceListItems = document.querySelectorAll('.price-list-item');
+            priceListItems.forEach(item => {
+                item.style.display = 'none';
+            });
+            if (selectedValue) {
+                const selectedItem = document.getElementById(selectedValue);
+                if (selectedItem) {
+                    selectedItem.style.display = 'block';
+                }
+            }
+        });
+
         // Available clothes data from server
         const availableClothes = [
             {% for cloth in clothes %}

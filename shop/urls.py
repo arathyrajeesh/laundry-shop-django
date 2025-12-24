@@ -76,6 +76,7 @@ urlpatterns = [
         path("service/add/<int:branch_id>/", views.add_service, name="add_service_branch"),
         path('shop/service/<int:service_id>/edit/', views.edit_service, name='edit_service'),
         path('shop/service/<int:service_id>/delete/', views.delete_service, name='delete_service'),
+        path('shop/manage-service-prices/', views.manage_service_prices, name='manage_service_prices'),
 
         # Shop status toggle
         path('shop/toggle-shop-status/', views.toggle_shop_status, name='toggle_shop_status'),
