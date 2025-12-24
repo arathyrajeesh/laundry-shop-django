@@ -194,7 +194,7 @@
                 <div class="order-items">
                     {% for item in order_items %}
                     <div class="order-item">
-                        <span>{{ item.service.name }} x{{ item.quantity }}</span>
+                        <span>{{ item.service_name }} - {{ item.cloth_name }} x{{ item.quantity }}</span>
                         <span>₹{{ item.total }}</span>
                     </div>
                     {% endfor %}

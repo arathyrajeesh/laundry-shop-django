@@ -33,12 +33,6 @@ DEBUG = True
 
 # ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = []
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-	ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, 'localhost', '127.0.0.1']
-else:
-	ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -111,7 +105,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'laundry_shop.urls'
@@ -184,9 +177,6 @@ STATICFILES_DIRS = [
     BASE_DIR / 'shop' / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Email configuration
 EMAIL_REPLY_TO = ["brightandshine48@gmail.com"]

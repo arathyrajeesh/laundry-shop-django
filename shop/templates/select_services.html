@@ -1,4 +1,4 @@
-{% load static %}
+{% load static custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -302,26 +302,31 @@
         <div class="section">
             <h2><i class="fas fa-tags"></i> Service Price List</h2>
             <div class="price-list-container">
-                <table class="price-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                    <thead>
-                        <tr style="background: var(--primary-color); color: white;">
-                            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Service Name</th>
-                            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Branch</th>
-                            <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Rate per Cloth</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for service in services %}
-                        <tr style="background: #f8f9fa; border: 1px solid #ddd;">
-                            <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">{{ service.name }}</td>
-                            <td style="padding: 12px; border: 1px solid #ddd;">{{ service.branch.name }}</td>
-                            <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: var(--accent-color);">
-                                {% if service.price %}₹{{ service.price }}{% else %}Price on Request{% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% for service in services %}
+                <div style="margin-bottom: 30px; border: 1px solid #eee; border-radius: 10px; padding: 20px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">{{ service.name }} - {{ service.branch.name }}</h3>
+                    <table class="price-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--primary-color); color: white;">
+                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Cloth Type</th>
+                                <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Price per Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cloth in clothes %}
+                            {% with cloth_price=service|get_cloth_price:cloth.id %}
+                            <tr style="background: #f8f9fa; border: 1px solid #ddd;">
+                                <td style="padding: 10px; border: 1px solid #ddd; font-weight: 600;">{{ cloth.name }}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: var(--accent-color);">
+                                    {% if cloth_price %}₹{{ cloth_price }}{% else %}₹{{ service.price|default:"0.00" }}{% endif %}
+                                </td>
+                            </tr>
+                            {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -382,10 +387,10 @@
         </div>
 
         {% if services %}
-            <div class="proceed-section">
+            <div class="proceed-section" id="proceed-section" style="display: none;">
                 <h3>Ready to proceed with your order?</h3>
                 <p>Click below to continue with the selected services</p>
-                <a href="#" onclick="submitForm()" class="proceed-btn">
+                <a href="" onclick="submitForm()" class="proceed-btn" id="proceed-btn">
                     <i class="fas fa-shopping-cart"></i> Proceed to Order
                 </a>
             </div>
@@ -396,7 +401,7 @@
         // Available clothes data from server
         const availableClothes = [
             {% for cloth in clothes %}
-                '{{ cloth.name }}'{% if not forloop.last %},{% endif %}
+                {id: {{ cloth.id }}, name: '{{ cloth.name }}'}{% if not forloop.last %},{% endif %}
             {% endfor %}
         ];
 
@@ -405,7 +410,7 @@
             {% for service in services %}
                 {{ service.id }}: {
                     {% for cloth_price in service.cloth_prices.all %}
-                        {{ cloth_price.cloth.id }}: {{ cloth_price.price|default:0 }}{% if not forloop.last %},{% endif %}
+                        "{{ cloth_price.cloth.id }}": {{ cloth_price.price|default:0 }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 }{% if not forloop.last %},{% endif %}
             {% endfor %}
@@ -459,12 +464,12 @@
                     `;
 
                     availableClothes.forEach(cloth => {
-                        const clothId = `${service.id}_${cloth.replace(/\s+/g, '_')}`;
+                        const clothId = cloth.name.replace(/\s+/g, '_');
                         html += `
                             <div class="cloth-item" style="display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                                <input type="checkbox" id="${clothId}" name="clothes_${service.id}" value="${cloth}" class="cloth-checkbox" style="margin-right: 8px;" onchange="updateTotal()">
-                                <label for="${clothId}" style="margin: 0; cursor: pointer;">${cloth}</label>
-                                <input type="number" id="qty_${clothId}" name="quantity_${service.id}_${cloth}" value="1" min="1" style="width: 50px; margin-left: auto; border: 1px solid #ddd; border-radius: 3px; padding: 2px;" onchange="validateQuantity(this); updateTotal()">
+                                <input type="checkbox" id="${service.id}_${clothId}" name="clothes_${service.id}" value="${cloth.name}" data-cloth-id="${cloth.id}" class="cloth-checkbox" style="margin-right: 8px;" onchange="updateTotal()">
+                                <label for="${service.id}_${clothId}" style="margin: 0; cursor: pointer;">${cloth.name}</label>
+                                <input type="number" id="qty_${service.id}_${clothId}" name="quantity_${service.id}_${cloth.name}" value="1" min="1" style="width: 50px; margin-left: auto; border: 1px solid #ddd; border-radius: 3px; padding: 2px;" onchange="validateQuantity(this); updateTotal()">
                             </div>
                         `;
                     });
@@ -495,6 +500,8 @@
             const serviceCards = document.querySelectorAll('.service-card');
             let total = 0;
             let selectedServices = [];
+            let clothBreakdown = [];
+            let allServicesHaveClothes = true;
 
             serviceCards.forEach(card => {
                 const checkbox = card.querySelector('input[type="checkbox"]');
@@ -506,26 +513,58 @@
                     const clothCheckboxes = document.querySelectorAll(`input[name="clothes_${serviceId}"]:checked`);
                     let serviceTotal = 0;
                     let totalCloths = 0;
+                    let serviceCloths = [];
+
+                    if (clothCheckboxes.length === 0) {
+                        allServicesHaveClothes = false;
+                    }
 
                     clothCheckboxes.forEach(clothCheckbox => {
                         const clothName = clothCheckbox.value;
-                        const clothId = clothCheckbox.id.split('_')[1]; // Extract cloth ID from checkbox ID
+                        const clothId = clothCheckbox.getAttribute('data-cloth-id'); // Get cloth ID from data attribute
                         const quantityInput = document.getElementById(`qty_${serviceId}_${clothName.replace(/\s+/g, '_')}`);
                         const clothQuantity = parseInt(quantityInput.value) || 1;
 
-                        // Get cloth-specific price
-                        const clothPrice = serviceClothPrices[serviceId] && serviceClothPrices[serviceId][clothId]
+                        // Get cloth-specific price, fallback to service default if not set
+                        let clothPrice = serviceClothPrices[serviceId] && serviceClothPrices[serviceId][clothId]
                             ? parseFloat(serviceClothPrices[serviceId][clothId])
                             : 0;
 
-                        serviceTotal += clothPrice * clothQuantity;
+                        // If cloth price is 0 or not set, use service default price
+                        if (clothPrice === 0) {
+                            // Find the service default price from the service card
+                            const serviceCard = document.querySelector(`.service-card[data-service-id="${serviceId}"]`);
+                            if (serviceCard) {
+                                const priceText = serviceCard.querySelector('.service-price');
+                                if (priceText) {
+                                    const priceMatch = priceText.textContent.match(/₹(\d+(?:\.\d+)?)/);
+                                    if (priceMatch) {
+                                        clothPrice = parseFloat(priceMatch[1]);
+                                    }
+                                }
+                            }
+                        }
+
+                        const clothTotal = clothPrice * clothQuantity;
+                        serviceTotal += clothTotal;
                         totalCloths += clothQuantity;
+
+                        // Add to cloth breakdown
+                        clothBreakdown.push({
+                            service: serviceName,
+                            cloth: clothName,
+                            quantity: clothQuantity,
+                            price: clothPrice,
+                            total: clothTotal
+                        });
+
+                        serviceCloths.push(`${clothName} x${clothQuantity} @ ₹${clothPrice} = ₹${clothTotal.toFixed(2)}`);
                     });
 
                     total += serviceTotal;
 
                     if (totalCloths > 0) {
-                        selectedServices.push(`${serviceName} (${totalCloths} cloth${totalCloths > 1 ? 's' : ''}) - ₹${serviceTotal.toFixed(2)}`);
+                        selectedServices.push(`${serviceName}: ${serviceCloths.join(', ')} - Total: ₹${serviceTotal.toFixed(2)}`);
                     } else {
                         selectedServices.push(`${serviceName} (select cloths) - ₹0.00`);
                     }
@@ -536,11 +575,17 @@
 
             const servicesList = document.getElementById('services-list');
             servicesList.innerHTML = selectedServices.length > 0 ?
-                selectedServices.map(service => `<div>${service}</div>`).join('') :
+                selectedServices.map(service => `<div style="margin-bottom: 8px;">${service}</div>`).join('') +
+                (clothBreakdown.length > 0 ? '<br><strong>Detailed Breakdown:</strong>' +
+                clothBreakdown.map(item => `<div style="margin-left: 10px; font-size: 14px;">• ${item.service} - ${item.cloth}: ${item.quantity} x ₹${item.price} = ₹${item.total.toFixed(2)}</div>`).join('') : '') :
                 '<div>No services selected</div>';
 
             const totalSection = document.getElementById('total-section');
             totalSection.style.display = selectedServices.length > 0 ? 'block' : 'none';
+
+            // Show proceed section only when all selected services have clothes selected
+            const proceedSection = document.getElementById('proceed-section');
+            proceedSection.style.display = (selectedServices.length > 0 && allServicesHaveClothes) ? 'block' : 'none';
         }
 
         function submitForm() {
@@ -551,7 +596,7 @@
                 return;
             }
 
-            // Check if at least one cloth is selected for each service
+            // Check if at least one cloth is selected for each service (safety check)
             let allServicesHaveClothes = true;
             selectedServices.forEach(serviceCheckbox => {
                 const serviceId = serviceCheckbox.value;

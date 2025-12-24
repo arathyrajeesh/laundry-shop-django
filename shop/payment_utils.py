@@ -7,9 +7,12 @@ from django.conf import settings
 from decimal import Decimal
 
 
-def get_razorpay_client():
+def get_razorpay_client(shop_key_id=None, shop_key_secret=None):
     """Get Razorpay client instance."""
-    return razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    if shop_key_id and shop_key_secret:
+        return razorpay.Client(auth=(shop_key_id, shop_key_secret))
+    else:
+        return razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
 def calculate_commission(order_amount, commission_percentage=5):
@@ -33,18 +36,20 @@ def calculate_commission(order_amount, commission_percentage=5):
     return commission, shop_amount
 
 
-def create_razorpay_order(amount, shop_account_id=None):
+def create_razorpay_order(amount, shop_account_id=None, shop_key_id=None, shop_key_secret=None):
     """
     Create Razorpay order for payment.
-    
+
     Args:
         amount: Order amount in rupees
         shop_account_id: Shop's Razorpay account ID (for marketplace payments)
-    
+        shop_key_id: Shop's Razorpay key ID (for shop-specific payments)
+        shop_key_secret: Shop's Razorpay key secret (for shop-specific payments)
+
     Returns:
         dict: Razorpay order response
     """
-    client = get_razorpay_client()
+    client = get_razorpay_client(shop_key_id, shop_key_secret)
     
     # Convert amount to paisa (Razorpay uses smallest currency unit)
     amount_in_paisa = int(float(amount) * 100)
@@ -68,23 +73,25 @@ def create_razorpay_order(amount, shop_account_id=None):
         raise Exception(f"Failed to create Razorpay order: {str(e)}")
 
 
-def capture_payment_and_transfer(payment_id, order_amount, shop_account_id, commission_percentage=5):
+def capture_payment_and_transfer(payment_id, order_amount, shop_account_id, commission_percentage=5, shop_key_id=None, shop_key_secret=None):
     """
     Capture payment and transfer to shop account (Razorpay Connect).
-    
+
     Note: Payment is already captured automatically (payment_capture='1' in order creation).
     This function only handles the transfer to shop account.
-    
+
     Args:
         payment_id: Razorpay payment ID
         order_amount: Total order amount
         shop_account_id: Shop's Razorpay account ID
         commission_percentage: Platform commission percentage
-    
+        shop_key_id: Shop's Razorpay key ID
+        shop_key_secret: Shop's Razorpay key secret
+
     Returns:
         dict: Transfer details
     """
-    client = get_razorpay_client()
+    client = get_razorpay_client(shop_key_id, shop_key_secret)
     
     # Calculate amounts
     commission, shop_amount = calculate_commission(order_amount, commission_percentage)
@@ -164,19 +171,21 @@ def capture_payment_and_transfer(payment_id, order_amount, shop_account_id, comm
         }
 
 
-def verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature):
+def verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature, shop_key_id=None, shop_key_secret=None):
     """
     Verify Razorpay payment signature.
-    
+
     Args:
         razorpay_order_id: Razorpay order ID
         razorpay_payment_id: Razorpay payment ID
         razorpay_signature: Razorpay signature
-    
+        shop_key_id: Shop's Razorpay key ID
+        shop_key_secret: Shop's Razorpay key secret
+
     Returns:
         bool: True if signature is valid
     """
-    client = get_razorpay_client()
+    client = get_razorpay_client(shop_key_id, shop_key_secret)
     
     try:
         client.utility.verify_payment_signature({
@@ -191,17 +200,19 @@ def verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_si
         return False
 
 
-def get_payment_details(payment_id):
+def get_payment_details(payment_id, shop_key_id=None, shop_key_secret=None):
     """
     Get payment details from Razorpay.
-    
+
     Args:
         payment_id: Razorpay payment ID
-    
+        shop_key_id: Shop's Razorpay key ID
+        shop_key_secret: Shop's Razorpay key secret
+
     Returns:
         dict: Payment details
     """
-    client = get_razorpay_client()
+    client = get_razorpay_client(shop_key_id, shop_key_secret)
     
     try:
         payment = client.payment.fetch(payment_id)

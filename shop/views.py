@@ -900,7 +900,7 @@ def select_services(request, shop_id, branch_id=None):
     if branch_id:
         # Services for specific branch
         branch = get_object_or_404(Branch, id=branch_id, shop=shop)
-        services = Service.objects.filter(branch=branch)
+        services = Service.objects.filter(branch=branch).prefetch_related('cloth_prices__cloth')
         context = {
             'shop': shop,
             'branch': branch,
@@ -908,7 +908,7 @@ def select_services(request, shop_id, branch_id=None):
         }
     else:
         # Get all services for this shop across all branches (legacy support)
-        services = Service.objects.filter(branch__shop=shop).select_related('branch')
+        services = Service.objects.filter(branch__shop=shop).select_related('branch').prefetch_related('cloth_prices__cloth')
         context = {
             'shop': shop,
             'services': services,
@@ -1020,12 +1020,17 @@ def create_order(request, shop_id):
     # Store order items in session for later use (for PDF generation)
     request.session['order_items'] = []
     for item_data in order_items_data:
+        # Get cloth-specific price
+        cloth_price_obj = ServiceClothPrice.objects.filter(service=item_data['service'], cloth=item_data['cloth']).first()
+        cloth_price = cloth_price_obj.price if cloth_price_obj else (item_data['service'].price if item_data['service'].price else 0)
+        total = cloth_price * item_data['quantity']
+
         request.session['order_items'].append({
             'service_name': item_data['service'].name,
             'cloth_name': item_data['cloth'].name,
             'quantity': item_data['quantity'],
-            'price': float(item_data['service'].price) if item_data['service'].price else 0,
-            'total': float(item_data['service'].price * item_data['quantity']) if item_data['service'].price else 0
+            'price': float(cloth_price),
+            'total': float(total)
         })
     request.session['order_id'] = order.id
     request.session['shop_id'] = shop.id
@@ -1094,8 +1099,25 @@ Shine & Bright Team
         # Log the error but don't fail the order process
         print(f"Failed to send order bill email: {e}")
 
-    # Redirect to user details page
-    return redirect('user_details')
+    # Create Razorpay order for payment
+    shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
+    shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
+    shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
+
+    try:
+        razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
+        razorpay_order_id = razorpay_order['id']
+        request.session['razorpay_order_id'] = razorpay_order_id
+
+        # Store order ID in database for tracking
+        order.razorpay_order_id = razorpay_order_id
+        order.save()
+    except Exception as e:
+        messages.error(request, f'Unable to process payment at this time: {str(e)}')
+        return redirect('select_services', shop_id=shop.id)
+
+    # Redirect to payment page
+    return redirect('payment')
 
 
 @login_required
@@ -1133,12 +1155,16 @@ def payment(request):
     else:
         print(f"Shop Razorpay account not linked - Payment will stay with platform")
 
+    # Get shop's Razorpay credentials if available
+    shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
+    shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
+
     try:
         # Create Razorpay order using utility function
-        razorpay_order = create_razorpay_order(total_amount, shop_account_id)
+        razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
         razorpay_order_id = razorpay_order['id']
         request.session['razorpay_order_id'] = razorpay_order_id
-        
+
         # Store order ID in database for tracking
         order.razorpay_order_id = razorpay_order_id
         order.save()
@@ -1146,12 +1172,15 @@ def payment(request):
         messages.error(request, f'Unable to process payment at this time: {str(e)}')
         return redirect('dashboard')
 
+    # Use shop's Razorpay key if available, otherwise use global key
+    razorpay_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else settings.RAZORPAY_KEY_ID
+
     context = {
         'order': order,
         'order_items': order_items,
         'total_amount': total_amount,
         'razorpay_order_id': razorpay_order_id,
-        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'razorpay_key_id': razorpay_key_id,
         'shop': order.shop,
     }
 
@@ -1183,12 +1212,14 @@ def user_details(request):
             
             # Create Razorpay order
             shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
-            
+            shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
+            shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
+
             try:
-                razorpay_order = create_razorpay_order(total_amount, shop_account_id)
+                razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
                 razorpay_order_id = razorpay_order['id']
                 request.session['razorpay_order_id'] = razorpay_order_id
-                
+
                 # Store order ID in database for tracking
                 order.razorpay_order_id = razorpay_order_id
                 order.save()
@@ -1208,8 +1239,10 @@ def user_details(request):
             # Create Razorpay order if not exists
             if not order.razorpay_order_id:
                 shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
+                shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
+                shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
                 try:
-                    razorpay_order = create_razorpay_order(total_amount, shop_account_id)
+                    razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
                     razorpay_order_id = razorpay_order['id']
                     request.session['razorpay_order_id'] = razorpay_order_id
                     order.razorpay_order_id = razorpay_order_id
@@ -1232,6 +1265,9 @@ def user_details(request):
             'total': total_amount
         }]
 
+    # Use shop's Razorpay key if available, otherwise use global key
+    razorpay_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else settings.RAZORPAY_KEY_ID
+
     context = {
         'form': form,
         'order': order,
@@ -1239,7 +1275,7 @@ def user_details(request):
         'order_items': order_items,
         'total_amount': total_amount,
         'razorpay_order_id': razorpay_order_id,
-        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'razorpay_key_id': razorpay_key_id,
         'shop': order.shop,
     }
 
@@ -1253,13 +1289,17 @@ def payment_success(request):
     razorpay_order_id = request.POST.get('razorpay_order_id')
     razorpay_signature = request.POST.get('razorpay_signature')
 
-    # Check if Razorpay keys are configured
-    if not settings.RAZORPAY_KEY_ID or settings.RAZORPAY_KEY_ID == 'your-razorpay-key-id':
+    # Get shop's Razorpay credentials if available
+    shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
+    shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
+
+    # Check if Razorpay keys are configured (either global or shop-specific)
+    if not shop_key_id and (not settings.RAZORPAY_KEY_ID or settings.RAZORPAY_KEY_ID == 'your-razorpay-key-id'):
         messages.error(request, 'Payment service is not configured. Please contact support.')
         return redirect('dashboard')
 
     # Verify payment signature
-    if not verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature):
+    if not verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature, shop_key_id, shop_key_secret):
         messages.error(request, 'Payment verification failed. Please contact support.')
         return redirect('dashboard')
 
@@ -1295,7 +1335,9 @@ def payment_success(request):
                     razorpay_payment_id,
                     order.amount,
                     shop_account_id,  # Payment goes to the selected shop's account
-                    commission_percentage=5  # 5% platform commission
+                    commission_percentage=5,  # 5% platform commission
+                    shop_key_id=shop_key_id,
+                    shop_key_secret=shop_key_secret
                 )
                 
                 if transfer_result['success']:
