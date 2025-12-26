@@ -270,7 +270,8 @@ def index(request):
     return render(request, 'index.html')
 
 def hero(request):
-    return render(request, 'home.html')
+    shops = LaundryShop.objects.filter(is_approved=True)
+    return render(request, 'home.html', {'shops': shops})
 
 def login_page(request):
     if request.method == "POST":
@@ -1109,13 +1110,9 @@ Shine & Bright Team
         # Log the error but don't fail the order process
         print(f"Failed to send order bill email: {e}")
 
-    # Create Razorpay order for payment
-    shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
-    shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
-    shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
-
+    # Create Razorpay order for payment using main Razorpay credentials
     try:
-        razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
+        razorpay_order = create_razorpay_order(total_amount, None, settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
         razorpay_order_id = razorpay_order['id']
         request.session['razorpay_order_id'] = razorpay_order_id
 
@@ -1299,17 +1296,13 @@ def payment_success(request):
     razorpay_order_id = request.POST.get('razorpay_order_id')
     razorpay_signature = request.POST.get('razorpay_signature')
 
-    # Get shop's Razorpay credentials if available
-    shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
-    shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
-
-    # Check if Razorpay keys are configured (either global or shop-specific)
-    if not shop_key_id and (not settings.RAZORPAY_KEY_ID or settings.RAZORPAY_KEY_ID == 'your-razorpay-key-id'):
+    # Check if main Razorpay keys are configured
+    if not settings.RAZORPAY_KEY_ID or settings.RAZORPAY_KEY_ID == 'your-razorpay-key-id':
         messages.error(request, 'Payment service is not configured. Please contact support.')
         return redirect('dashboard')
 
-    # Verify payment signature
-    if not verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature, shop_key_id, shop_key_secret):
+    # Verify payment signature using main keys
+    if not verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature, settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET):
         messages.error(request, 'Payment verification failed. Please contact support.')
         return redirect('dashboard')
 

@@ -907,39 +907,25 @@
     
     <section class="branches-section" id="branches">
         <div class="container">
-            <h2 class="section-title">Our Branches</h2>
+            <h2 class="section-title">Our Shops</h2>
             <div class="branches-grid">
-                
+                {% for shop in shops %}
                 <div class="branch-card">
                     <div class="branch-info">
                         <i class="fas fa-map-marker-alt branch-icon"></i>
-                        <h3>Main City Center</h3>
-                        <p>123 Laundry Lane, Downtown Mall, Kerala</p>
-                        <p class="branch-timing"><i class="far fa-clock"></i> 8:00 AM - 9:00 PM</p>
-                        <a href="https://maps.google.com" target="_blank" class="branch-link">View on Maps</a>
+                        <h3>{{ shop.name }}</h3>
+                        <p>{{ shop.address|default:"Address not available" }}</p>
+                        <p class="branch-timing"><i class="far fa-clock"></i> {% if shop.is_open %}Open{% else %}Closed{% endif %}</p>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'shop_detail' shop.id %}" class="branch-link">View Details</a>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'shop_detail' shop.id %}" class="branch-link">View Details</a>
+                        {% endif %}
                     </div>
                 </div>
-
-                <div class="branch-card">
-                    <div class="branch-info">
-                        <i class="fas fa-map-marker-alt branch-icon"></i>
-                        <h3>Riverside Plaza</h3>
-                        <p>Shop No. 45, Riverside Road, Kochi</p>
-                        <p class="branch-timing"><i class="far fa-clock"></i> 9:00 AM - 8:00 PM</p>
-                        <a href="https://maps.google.com" target="_blank" class="branch-link">View on Maps</a>
-                    </div>
-                </div>
-
-                <div class="branch-card">
-                    <div class="branch-info">
-                        <i class="fas fa-map-marker-alt branch-icon"></i>
-                        <h3>Suburban Point</h3>
-                        <p>Green Valley Complex, Kozhikode</p>
-                        <p class="branch-timing"><i class="far fa-clock"></i> 8:00 AM - 8:00 PM</p>
-                        <a href="https://maps.google.com" target="_blank" class="branch-link">View on Maps</a>
-                    </div>
-                </div>
-
+                {% empty %}
+                <p>No shops available at the moment.</p>
+                {% endfor %}
             </div>
         </div>
     </section>
