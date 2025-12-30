@@ -1,4 +1,4 @@
-{% load static custom_filters %}
+{% comment %} {% load static custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -261,6 +261,8 @@
 </head>
 <body>
     <div class="header">
+         <form id="cloth-form" method="post" action="{% url 'create_order' shop.id %}">
+                {% csrf_token %}
         <div>
             <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
             {% if branch %}
@@ -376,12 +378,11 @@
         <!-- Cloth Selection Section -->
         <div class="section" id="cloth-selection" style="display: none;">
             <h2><i class="fas fa-tshirt"></i> Select Clothes for Selected Services</h2>
-            <form id="cloth-form" method="post" action="{% url 'create_order' shop.id %}">
-                {% csrf_token %}
+           
                 <div id="cloth-selection-content">
                     <!-- Dynamic content will be inserted here -->
                 </div>
-            </form>
+            
         </div>
 
         <div class="section" id="total-section" style="display: none;">
@@ -399,13 +400,20 @@
             <div class="proceed-section" id="proceed-section" style="display: none;">
                 <h3>Ready to proceed with your order?</h3>
                 <p>Click below to continue with the selected services</p>
-                <a href="" onclick="submitForm()" class="proceed-btn" id="proceed-btn">
+                {% comment %} <a href="" onclick="submitForm()" class="proceed-btn" id="proceed-btn">
                     <i class="fas fa-credit-card"></i> Proceed to Payment
-                </a>
+                </a> {% endcomment %}
+                {% comment %} <div style="text-align:center; margin-top:30px">
+                    <button type="button"
+                            class="proceed-btn"
+                            onclick="submitForm()">
+                        Proceed to Payment
+                    </button>
+                </div>
             </div>
         {% endif %}
     </div>
-
+</form>
     <script>
         // Handle service price list dropdown
         document.getElementById('service-select').addEventListener('change', function() {
@@ -613,31 +621,176 @@
         }
 
         function submitForm() {
-            const selectedServices = document.querySelectorAll('.service-checkbox:checked');
+    alert("success"); // debug (you can remove later)
 
-            if (selectedServices.length === 0) {
-                alert('Please select at least one service');
-                return;
-            }
+    const selectedServices = document.querySelectorAll('.service-checkbox:checked');
 
-            // Check if at least one cloth is selected for each service (safety check)
-            let allServicesHaveClothes = true;
-            selectedServices.forEach(serviceCheckbox => {
-                const serviceId = serviceCheckbox.value;
-                const clothCheckboxes = document.querySelectorAll(`input[name="clothes_${serviceId}"]:checked`);
-                if (clothCheckboxes.length === 0) {
-                    allServicesHaveClothes = false;
-                }
-            });
+    if (selectedServices.length === 0) {
+        alert('Please select at least one service');
+        return;
+    }
 
-            if (!allServicesHaveClothes) {
-                alert('Please select at least one type of cloth for each selected service');
-                return;
-            }
-
-            const form = document.getElementById('cloth-form');
-            form.submit();
+    let allServicesHaveClothes = true;
+    selectedServices.forEach(serviceCheckbox => {
+        const serviceId = serviceCheckbox.value;
+        const clothCheckboxes = document.querySelectorAll(
+            `input[name="clothes_${serviceId}"]:checked`
+        );
+        if (clothCheckboxes.length === 0) {
+            allServicesHaveClothes = false;
         }
+    });
+
+    if (!allServicesHaveClothes) {
+        alert('Please select at least one type of cloth for each selected service');
+        return;
+    }
+
+    // ✅ ONLY SUBMIT FORM
+    // Django will handle redirection
+    document.getElementById('cloth-form').submit();
+}
+
     </script>
+</body>
+</html> {% endcomment %}
+
+
+{% load static custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Services - {{ shop.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body { background:#f7f7f7; font-family:Poppins,sans-serif }
+        .header { background:#fff; padding:20px 40px; display:flex; justify-content:space-between }
+        .container { max-width:1200px; margin:auto; padding:30px }
+        .section { background:#fff; padding:30px; border-radius:15px; margin-bottom:30px }
+        .services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px }
+        .service-card { border:1px solid #eee; padding:20px; border-radius:10px }
+        .proceed-btn { background:#2ecc71; color:#fff; padding:15px 40px; border:none; border-radius:10px; font-size:18px; cursor:pointer }
+    </style>
+</head>
+
+<body>
+
+<form id="cloth-form" method="post" action="{% url 'create_order' shop.id %}">
+    {% csrf_token %}
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
+        <a href="{% url 'dashboard' %}">Back</a>
+    </div>
+
+    <div class="container">
+
+        <!-- SERVICES -->
+        <div class="section">
+            <h2>Select Services</h2>
+
+            <div class="services-grid">
+                {% for service in services %}
+                <div class="service-card">
+                    <label>
+                        <input type="checkbox"
+                               class="service-checkbox"
+                               value="{{ service.id }}"
+                               onchange="updateSelections()">
+                        <strong>{{ service.name }}</strong> – ₹{{ service.price }}
+                    </label>
+
+                    <br><br>
+
+                    Qty:
+                    <input type="number"
+                           id="quantity-{{ service.id }}"
+                           value="1" min="1">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- HIDDEN INPUTS (CRITICAL FIX) -->
+        <div id="hidden-inputs"></div>
+
+        <!-- CLOTH SELECTION -->
+        <div class="section" id="cloth-section" style="display:none">
+            <h2>Select Clothes</h2>
+            <div id="cloth-content"></div>
+        </div>
+
+        <!-- PROCEED -->
+        <div class="section" id="proceed-section" style="display:none;text-align:center">
+            <button type="button" class="proceed-btn" onclick="submitForm()">
+                Proceed to Payment
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+const clothes = [
+    {% for cloth in clothes %}
+    { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+function updateSelections() {
+    const checked = document.querySelectorAll('.service-checkbox:checked');
+    const hidden = document.getElementById('hidden-inputs');
+    const clothSection = document.getElementById('cloth-section');
+    const clothContent = document.getElementById('cloth-content');
+    const proceed = document.getElementById('proceed-section');
+
+    hidden.innerHTML = '';
+    clothContent.innerHTML = '';
+
+    if (checked.length === 0) {
+        clothSection.style.display = 'none';
+        proceed.style.display = 'none';
+        return;
+    }
+
+    clothSection.style.display = 'block';
+    proceed.style.display = 'block';
+
+    checked.forEach(cb => {
+        const serviceId = cb.value;
+        const qty = document.getElementById(`quantity-${serviceId}`).value || 1;
+
+        /* 🔑 THIS IS THE MOST IMPORTANT PART */
+        hidden.innerHTML += `
+            <input type="hidden" name="selected_services" value="${serviceId}">
+            <input type="hidden" name="quantity_${serviceId}" value="${qty}">
+        `;
+
+        clothContent.innerHTML += `<h4>Service ${serviceId}</h4>`;
+
+        clothes.forEach(c => {
+            clothContent.innerHTML += `
+                <label>
+                    <input type="checkbox" name="clothes_${serviceId}" value="${c.name}">
+                    ${c.name}
+                </label>
+                <input type="number"
+                       name="quantity_${serviceId}_${c.name}"
+                       value="1" min="1"><br>
+            `;
+        });
+    });
+}
+
+function submitForm() {
+    document.getElementById('cloth-form').submit();
+}
+</script>
+
 </body>
 </html>
