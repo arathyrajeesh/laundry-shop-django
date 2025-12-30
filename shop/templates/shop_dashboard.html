@@ -415,6 +415,49 @@
             color: #e74c3c;
             font-weight: 700;
         }
+        .order-dropdown-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .order-item {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .order-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .order-header i {
+            margin-left: 10px;
+            transition: transform 0.3s;
+        }
+
+        .order-body {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .order-item.open .order-body {
+            display: block;
+        }
+
+        .order-item.open .order-header i {
+            transform: rotate(180deg);
+        }
 
         .status-pending {
             background: #fff3cd; 
@@ -768,66 +811,67 @@
         </div>
 
         <div class="dashboard-section">
+            <!-- MAIN HEADER -->
             <div class="section-header">
-                <h2><i class="fas fa-receipt"></i> Recent Orders (All Branches)</h2>
+                <h2>
+                    <i class="fas fa-receipt"></i>
+                    All Orders
+                </h2>
             </div>
+
             {% if recent_orders %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Branch</th>
-                        <th>Pickup Date</th>
-                        <th>Delivery Date</th>
-                        <th>Status</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in recent_orders %}
-                    <tr>
-                        <td>#{{ order.id }}</td>
-                        <td>{{ order.user.username }}</td>
-                        <td>{{ order.branch.name }}</td>
-                        <td>{{ order.pickup_date|date:"M d, Y H:i" }}</td>
-                        <td>{{ order.delivery_date|date:"M d, Y H:i" }}</td>
-                        <td>
-                            <span class="status-badge status-{{ order.cloth_status|lower }}">{{ order.cloth_status }}</span>
-                        </td>
-                        <td>₹{{ order.amount|floatformat:2 }}</td>
-                        <td>{{ order.created_at|date:"M d, Y" }}</td>
-                        <td>
-                            <select 
-                                class="status-select"
-                                id="status-{{ order.id }}"
-                                data-original="{{ order.cloth_status }}"
-                                onchange="handleStatusChange({{ order.id }})"
-                                {% if order.cloth_status == "Completed" %}disabled{% endif %}>
-                                <option value="Pending" {% if order.cloth_status == "Pending" %}selected{% endif %}>Pending</option>
-                                <option value="Washing" {% if order.cloth_status == "Washing" %}selected{% endif %}>Washing</option>
-                                <option value="Drying" {% if order.cloth_status == "Drying" %}selected{% endif %}>Drying</option>
-                                <option value="Ironing" {% if order.cloth_status == "Ironing" %}selected{% endif %}>Ironing</option>
-                                <option value="Ready" {% if order.cloth_status == "Ready" %}selected{% endif %}>Ready for Pickup</option>
-                                <option value="Completed" {% if order.cloth_status == "Completed" %}selected{% endif %}>Completed</option>
+            <div class="order-dropdown-list">
+                {% for order in recent_orders %}
+                <div class="order-item">
+                    <!-- ORDER HEADER -->
+                    <div class="order-header" onclick="toggleOrder('{{ order.id }}')">
+                        <div>
+                            <strong>#{{ order.id }}</strong>
+                            <span style="color:#777; font-size:13px;">
+                                — {{ order.user.username }} ({{ order.branch.name }})
+                            </span>
+                        </div>
+
+                        <div>
+                            ₹{{ order.amount|floatformat:2 }}
+                            <span class="status-badge status-{{ order.cloth_status|lower }}">
+                                {{ order.cloth_status }}
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+
+                    <!-- DROPDOWN BODY -->
+                    <div class="order-body" id="order-{{ order.id }}">
+                        <p><strong>Pickup:</strong> {{ order.pickup_date|date:"M d, Y H:i" }}</p>
+                        <p><strong>Delivery:</strong> {{ order.delivery_date|date:"M d, Y H:i" }}</p>
+
+                        <div style="margin-top: 12px;">
+                            <select class="status-select" id="status-{{ order.id }}">
+                                {% for status, label in order.STATUS_CHOICES %}
+                                    <option value="{{ status }}" {% if order.cloth_status == status %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
                             </select>
+
                             <button class="update-btn" onclick="updateOrderStatus({{ order.id }})">
                                 Update
                             </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <p>No orders yet</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No orders found</p>
+                </div>
             {% endif %}
         </div>
+
+
 
         <div class="dashboard-section">
             <div class="section-header">
@@ -1146,6 +1190,11 @@
                 showMessage(`Status changed to "${newStatus}". Click Update to save.`, "success");
             }
         }
+        function toggleOrder(orderId) {
+            const item = document.getElementById(`order-${orderId}`).parentElement;
+            item.classList.toggle("open");
+        }
+
 
     </script>
 </body>

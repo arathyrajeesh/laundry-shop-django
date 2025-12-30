@@ -1421,7 +1421,15 @@ def user_details(request):
 
     return render(request, 'user_details.html', context)
     
-
+def create_status_update_notification(user, title, message, notification_type="payment"):
+    Notification.objects.create(
+        user=user,
+        title=title,
+        message=message,
+        notification_type=notification_type,
+        icon="fas fa-check-circle",
+        color="#2ecc71"
+    )
 @login_required
 def payment_success(request):
     """Handle successful payment."""
@@ -1470,11 +1478,12 @@ def payment_success(request):
                 transfer_result = capture_payment_and_transfer(
                     razorpay_payment_id,
                     order.amount,
-                    shop_account_id,  # Payment goes to the selected shop's account
-                    commission_percentage=5,  # 5% platform commission
-                    shop_key_id=shop_key_id,
-                    shop_key_secret=shop_key_secret
+                    shop_account_id,
+                    commission_percentage=5,
+                    shop_key_id=order.shop.razorpay_key_id if order.shop.razorpay_key_id else settings.RAZORPAY_KEY_ID,
+                    shop_key_secret=order.shop.razorpay_key_secret if order.shop.razorpay_key_secret else settings.RAZORPAY_KEY_SECRET,
                 )
+
                 
                 if transfer_result['success']:
                     order.transfer_id = transfer_result.get('transfer_id')
@@ -1498,7 +1507,11 @@ def payment_success(request):
         order.save()
 
         # Create notification for user
-        create_status_update_notification(order, 'Washing')
+        create_status_update_notification(
+            user=order.user,
+            title="Payment Successful",
+            message=f"Your payment for Order #{order.id} was successful. Laundry is now in Washing stage."
+        )
 
         # Generate PDF receipt
         order_items = request.session.get('order_items', [])
@@ -1658,11 +1671,15 @@ def admin_dashboard(request):
     ready_orders = Order.objects.filter(cloth_status="Ready").count()
     
     # Revenue
-    total_revenue = Order.objects.aggregate(total=Sum('amount'))['total'] or 0
+    total_revenue = Order.objects.filter(payment_status="Completed").aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
     today_revenue = Order.objects.filter(
+        payment_status="Completed",
         created_at__date=datetime.now().date()
     ).aggregate(total=Sum('amount'))['total'] or 0
-    
+
     # Users
     total_users = User.objects.count()
     new_users_today = User.objects.filter(
@@ -1675,7 +1692,12 @@ def admin_dashboard(request):
     pending_approvals = LaundryShop.objects.filter(is_approved=False).count()
     
     # Recent orders (last 10)
-    recent_orders = Order.objects.select_related('user', 'shop').order_by('-created_at')[:10]
+    recent_orders = (
+        Order.objects
+        .filter(payment_status="Completed")
+        .order_by('-created_at')[:10]
+    )
+
     
     # Orders by status
     orders_by_status = Order.objects.values('cloth_status').annotate(count=Count('id')).order_by('cloth_status')
@@ -1763,7 +1785,12 @@ def admin_update_order_status(request, order_id):
             order.save()
 
             # Create notification for user
-            create_status_update_notification(order, new_status)
+            create_status_update_notification(
+                user=order.user,
+                title="Order Status Updated",
+                message=f"Your Order #{order.id} status changed to {order.cloth_status}."
+            )
+            (order, new_status)
 
             # Send notification emails
             try:
