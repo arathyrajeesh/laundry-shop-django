@@ -20,10 +20,10 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(LaundryShop)
 class LaundryShopAdmin(admin.ModelAdmin):
-    list_display = ['name', 'address', 'phone', 'is_open']
-    list_filter = ['is_open']
+    list_display = ['name', 'address', 'phone', 'is_approved']
+    list_filter = ['is_approved']
     search_fields = ['name', 'address', 'phone']
-    list_editable = ['is_open']
+    readonly_fields = ['is_open']
 
 
 @admin.register(Service)

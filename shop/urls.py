@@ -62,7 +62,6 @@ urlpatterns = [
         path("shop/logout/", views.shop_logout, name="shop_logout"),
         path("shop/dashboard/", views.shop_dashboard, name="shop_dashboard"),
         path("shop/notifications/", views.shop_notifications, name="shop_notifications"),
-        path("shop/bank-details/", views.shop_bank_details, name="shop_bank_details"),
         path("shop/select-branch/", views.select_branch, name="select_branch"),
         path("shop/branch/<int:branch_id>/orders/", views.branch_orders, name="branch_orders"),
         path("shop/order/<int:order_id>/update-status/", views.shop_update_order_status, name="shop_update_order_status"),

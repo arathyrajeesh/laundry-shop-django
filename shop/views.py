@@ -2215,9 +2215,10 @@ def shop_login(request):
                 if not shop.is_approved:
                     messages.error(request, "Your shop is pending approval. Please wait for admin approval.")
                     return redirect("shop_login")
-                if not shop.is_open:
-                    messages.error(request, "Your shop is currently closed. Please try again later.")
+                if not shop.is_approved:
+                    messages.error(request, "Shop not approved by admin")
                     return redirect("shop_login")
+
                 # Store shop ID in session
                 request.session['shop_id'] = shop.id
                 request.session['shop_name'] = shop.name
@@ -3195,36 +3196,3 @@ def update_order_status(request, order_id):
         "success": True
     })
 
-
-@shop_login_required
-def shop_bank_details(request):
-    """Shop can view and edit their bank details."""
-    shop_id = request.session.get('shop_id')
-    shop = get_object_or_404(LaundryShop, id=shop_id)
-
-    if request.method == 'POST':
-        form = ShopBankDetailsForm(request.POST, instance=shop)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Bank details updated successfully!')
-            return redirect('shop_bank_details')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = ShopBankDetailsForm(instance=shop)
-
-    # Check if bank details are complete
-    has_bank_details = all([
-        shop.bank_account_holder_name,
-        shop.bank_account_number,
-        shop.bank_ifsc_code,
-        shop.bank_name,
-    ])
-
-    context = {
-        'shop': shop,
-        'form': form,
-        'has_bank_details': has_bank_details,
-    }
-
-    return render(request, 'shop_bank_details.html', context)
