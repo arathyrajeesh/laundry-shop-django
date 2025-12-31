@@ -927,7 +927,13 @@ def select_services(request, shop_id, branch_id=None):
         available_cloth_ids = BranchCloth.objects.filter(branch__shop=shop).values_list('cloth_id', flat=True).distinct()
         clothes = Cloth.objects.filter(id__in=available_cloth_ids).order_by('name')
 
+    # Prepare cloth prices for each service
+    cloth_prices = {}
+    for service in services:
+        cloth_prices[service.id] = {cp.cloth.id: cp.price for cp in service.cloth_prices.all()}
+
     context['clothes'] = clothes
+    context['cloth_prices'] = cloth_prices
 
     return render(request, 'select_services.html', context)
 

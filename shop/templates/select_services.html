@@ -1,795 +1,389 @@
-{% comment %} {% load static custom_filters %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Services - {{ shop.name }}</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            font-family: "Poppins", sans-serif;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #f7f7f7;
-        }
-
-        :root {
-            --primary-color: #0f334bff;
-            --accent-color: #2ecc71;
-            --secondary-color: #6c757d;
-        }
-
-        .header {
-            background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 24px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #0a2538;
-        }
-
-        .btn-secondary {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        .shop-header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .shop-header h1 {
-            color: var(--primary-color);
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .section h2 {
-            color: var(--primary-color);
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .service-card {
-            border: 1px solid #eee;
-            border-radius: 10px;
-            padding: 20px;
-            transition: all 0.3s;
-            background: #f8f9fa;
-        }
-
-        .service-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .service-card h4 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .service-branch {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .service-price {
-            font-weight: 600;
-            color: var(--accent-color);
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .quantity-btn {
-            width: 30px;
-            height: 30px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px;
-        }
-
-        .service-checkbox {
-            margin-right: 10px;
-        }
-
-        .proceed-section {
-            text-align: center;
-            padding: 30px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .proceed-btn {
-            background: var(--accent-color);
-            color: white;
-            padding: 15px 40px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 600;
-            display: inline-block;
-            margin-top: 20px;
-            transition: background 0.3s;
-        }
-
-        .proceed-btn:hover {
-            background: #27ae60;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .price-table {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .price-table th {
-            background: var(--primary-color) !important;
-            color: white !important;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
-
-        .price-table td {
-            background: white;
-            transition: background 0.3s;
-        }
-
-        .price-table tr:nth-child(even) td {
-            background: #f8f9fa;
-        }
-
-        .price-table tr:hover td {
-            background: #e3f2fd;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-            .price-table {
-                font-size: 14px;
-            }
-            .price-table th,
-            .price-table td {
-                padding: 8px 6px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-         <form id="cloth-form" method="post" action="{% url 'create_order' shop.id %}">
-                {% csrf_token %}
-        <div>
-            <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
-            {% if branch %}
-                <div style="color: #666; font-size: 14px; margin-top: 5px;">
-                    <i class="fas fa-map-marker-alt"></i> Ordering from: {{ branch.name }}
-                </div>
-            {% endif %}
-        </div>
-        <div>
-            {% if branch %}
-                <a href="{% url 'select_branch_for_order' shop.id %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Change Branch
-                </a>
-            {% else %}
-                <a href="{% url 'shop_detail' shop.id %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Shop
-                </a>
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
-                </a>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="shop-header">
-            <h1>Select Your Services</h1>
-            {% if branch %}
-                <p>Choose the services you need from {{ branch.name }} branch</p>
-                <div style="margin-top: 15px; font-size: 14px; color: #666;">
-                    <i class="fas fa-map-marker-alt"></i> {{ branch.address }}
-                </div>
-            {% else %}
-                <p>Choose the services you need from {{ shop.name }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Price List Section -->
-        <div class="section">
-            <h2><i class="fas fa-tags"></i> Service Price List</h2>
-            <div style="margin-bottom: 20px;">
-                <label for="service-select" style="font-weight: 600; color: var(--primary-color); margin-right: 10px;">Select Service:</label>
-                <select id="service-select" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px;">
-                    <option value="">-- Choose a Service --</option>
-                    {% for service in services %}
-                    <option value="price-list-{{ service.id }}">{{ service.name }} - {{ service.branch.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="price-list-container">
-                {% for service in services %}
-                <div id="price-list-{{ service.id }}" class="price-list-item" style="margin-bottom: 30px; border: 1px solid #eee; border-radius: 10px; padding: 20px; display: none;">
-                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">{{ service.name }} - {{ service.branch.name }}</h3>
-                    <table class="price-table" style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: var(--primary-color); color: white;">
-                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Cloth Type</th>
-                                <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Price per Item</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cloth in clothes %}
-                            {% with cloth_price=service|get_cloth_price:cloth.id %}
-                            <tr style="background: #f8f9fa; border: 1px solid #ddd;">
-                                <td style="padding: 10px; border: 1px solid #ddd; font-weight: 600;">{{ cloth.name }}</td>
-                                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: var(--accent-color);">
-                                    {% if cloth_price %}₹{{ cloth_price }}{% else %}₹{{ service.price|default:"0.00" }}{% endif %}
-                                </td>
-                            </tr>
-                            {% endwith %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="section">
-            <h2><i class="fas fa-concierge-bell"></i> Select Your Services</h2>
-            {% if services %}
-                <div class="services-grid">
-                    {% for service in services %}
-                        <div class="service-card" data-service-id="{{ service.id }}">
-                            <input type="checkbox" id="service-{{ service.id }}" name="selected_services" value="{{ service.id }}" class="service-checkbox" onchange="toggleServiceSelection({{ service.id }})">
-                            <label for="service-{{ service.id }}">
-                                <h4>{{ service.name }}</h4>
-                                <div class="service-branch">
-                                    <i class="fas fa-map-marker-alt"></i> {{ service.branch.name }}
-                                </div>
-                                {% if service.price %}
-                                    <div class="service-price">₹{{ service.price }}</div>
-                                {% else %}
-                                    <div class="service-price">Price on Request</div>
-                                {% endif %}
-                            </label>
-                            <div class="quantity-selector">
-                                <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, -1)">-</button>
-                                <input type="number" id="quantity-{{ service.id }}" name="quantity_{{ service.id }}" value="1" min="1" class="quantity-input" readonly onchange="updateTotal()">
-                                <button type="button" class="quantity-btn" onclick="changeQuantity({{ service.id }}, 1)">+</button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-concierge-bell"></i>
-                    <p>No services available yet</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Cloth Selection Section -->
-        <div class="section" id="cloth-selection" style="display: none;">
-            <h2><i class="fas fa-tshirt"></i> Select Clothes for Selected Services</h2>
-           
-                <div id="cloth-selection-content">
-                    <!-- Dynamic content will be inserted here -->
-                </div>
-            
-        </div>
-
-        <div class="section" id="total-section" style="display: none;">
-            <h2><i class="fas fa-calculator"></i> Order Summary</h2>
-            <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 18px; margin-bottom: 10px;">Total Amount: <span id="total-amount" style="font-weight: bold; color: var(--accent-color); font-size: 24px;">₹0</span></div>
-                <div id="selected-services-list" style="margin-top: 15px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
-                    <strong>Selected Services:</strong>
-                    <div id="services-list" style="margin-top: 10px;"></div>
-                </div>
-            </div>
-        </div>
-
-        {% if services %}
-            <div class="proceed-section" id="proceed-section" style="display: none;">
-                <h3>Ready to proceed with your order?</h3>
-                <p>Click below to continue with the selected services</p>
-                {% comment %} <a href="" onclick="submitForm()" class="proceed-btn" id="proceed-btn">
-                    <i class="fas fa-credit-card"></i> Proceed to Payment
-                </a> {% endcomment %}
-                {% comment %} <div style="text-align:center; margin-top:30px">
-                    <button type="button"
-                            class="proceed-btn"
-                            onclick="submitForm()">
-                        Proceed to Payment
-                    </button>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</form>
-    <script>
-        // Handle service price list dropdown
-        document.getElementById('service-select').addEventListener('change', function() {
-            const selectedValue = this.value;
-            const priceListItems = document.querySelectorAll('.price-list-item');
-            priceListItems.forEach(item => {
-                item.style.display = 'none';
-            });
-            if (selectedValue) {
-                const selectedItem = document.getElementById(selectedValue);
-                if (selectedItem) {
-                    selectedItem.style.display = 'block';
-                }
-            }
-        });
-
-        // Available clothes data from server
-        const availableClothes = [
-            {% for cloth in clothes %}
-                {id: {{ cloth.id }}, name: '{{ cloth.name }}'}{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-
-        // Service cloth prices data
-        const serviceClothPrices = {
-            {% for service in services %}
-                {{ service.id }}: {
-                    {% for cloth_price in service.cloth_prices.all %}
-                        "{{ cloth_price.cloth.id }}": {{ cloth_price.price|default:0 }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        };
-
-        function changeQuantity(serviceId, change) {
-            const input = document.getElementById(`quantity-${serviceId}`);
-            let currentValue = parseInt(input.value);
-            currentValue += change;
-            if (currentValue < 1) currentValue = 1;
-            input.value = currentValue;
-            updateClothSelection();
-            updateTotal();
-        }
-
-        function toggleServiceSelection(serviceId) {
-            updateClothSelection();
-            updateTotal();
-        }
-
-        function updateClothSelection() {
-            const selectedServices = [];
-            const serviceCards = document.querySelectorAll('.service-card');
-
-            serviceCards.forEach(card => {
-                const checkbox = card.querySelector('input[type="checkbox"]');
-                if (checkbox.checked) {
-                    const serviceId = card.dataset.serviceId;
-                    const serviceName = card.querySelector('h4').textContent;
-                    const quantity = parseInt(document.getElementById(`quantity-${serviceId}`).value) || 1;
-                    selectedServices.push({
-                        id: serviceId,
-                        name: serviceName,
-                        quantity: quantity
-                    });
-                }
-            });
-
-            const clothSection = document.getElementById('cloth-selection');
-            const clothContent = document.getElementById('cloth-selection-content');
-
-            if (selectedServices.length > 0) {
-                clothSection.style.display = 'block';
-                let html = '';
-
-                selectedServices.forEach(service => {
-                    html += `
-                        <div class="service-cloth-group" style="margin-bottom: 30px; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                            <h4 style="color: var(--primary-color); margin-bottom: 15px;">${service.name} - Select Clothes</h4>
-                            <div class="clothes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                    `;
-
-                    availableClothes.forEach(cloth => {
-                        const clothId = cloth.name.replace(/\s+/g, '_');
-                        html += `
-                            <div class="cloth-item" style="display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                                <input type="checkbox" id="${service.id}_${clothId}" name="clothes_${service.id}" value="${cloth.name}" data-cloth-id="${cloth.id}" class="cloth-checkbox" style="margin-right: 8px;" onchange="updateTotal()">
-                                <label for="${service.id}_${clothId}" style="margin: 0; cursor: pointer;">${cloth.name}</label>
-                                <input type="number" id="qty_${service.id}_${clothId}" name="quantity_${service.id}_${cloth.name}" value="1" min="1" style="width: 50px; margin-left: auto; border: 1px solid #ddd; border-radius: 3px; padding: 2px;" onchange="validateQuantity(this); updateTotal()">
-                            </div>
-                        `;
-                    });
-
-                    html += `
-                            </div>
-                        </div>
-                    `;
-                });
-
-                clothContent.innerHTML = html;
-            } else {
-                clothSection.style.display = 'none';
-                clothContent.innerHTML = '';
-            }
-
-            updateTotal();
-        }
-
-        function validateQuantity(input) {
-            if (parseInt(input.value) < 1) {
-                input.value = 1;
-            }
-            updateTotal();
-        }
-
-        function updateTotal() {
-            const serviceCards = document.querySelectorAll('.service-card');
-            let total = 0;
-            let selectedServices = [];
-            let clothBreakdown = [];
-            let allServicesHaveClothes = true;
-
-            serviceCards.forEach(card => {
-                const checkbox = card.querySelector('input[type="checkbox"]');
-                if (checkbox.checked) {
-                    const serviceId = parseInt(card.dataset.serviceId);
-                    const serviceName = card.querySelector('h4').textContent;
-
-                    // Count selected cloths for this service and calculate total
-                    const clothCheckboxes = document.querySelectorAll(`input[name="clothes_${serviceId}"]:checked`);
-                    let serviceTotal = 0;
-                    let totalCloths = 0;
-                    let serviceCloths = [];
-
-                    if (clothCheckboxes.length === 0) {
-                        allServicesHaveClothes = false;
-                    }
-
-                    clothCheckboxes.forEach(clothCheckbox => {
-                        const clothName = clothCheckbox.value;
-                        const clothId = clothCheckbox.getAttribute('data-cloth-id'); // Get cloth ID from data attribute
-                        const quantityInput = document.getElementById(`qty_${serviceId}_${clothName.replace(/\s+/g, '_')}`);
-                        const clothQuantity = parseInt(quantityInput.value) || 1;
-
-                        // Get cloth-specific price, fallback to service default if not set
-                        let clothPrice = serviceClothPrices[serviceId] && serviceClothPrices[serviceId][clothId]
-                            ? parseFloat(serviceClothPrices[serviceId][clothId])
-                            : 0;
-
-                        // If cloth price is 0 or not set, use service default price
-                        if (clothPrice === 0) {
-                            // Find the service default price from the service card
-                            const serviceCard = document.querySelector(`.service-card[data-service-id="${serviceId}"]`);
-                            if (serviceCard) {
-                                const priceText = serviceCard.querySelector('.service-price');
-                                if (priceText) {
-                                    const priceMatch = priceText.textContent.match(/₹(\d+(?:\.\d+)?)/);
-                                    if (priceMatch) {
-                                        clothPrice = parseFloat(priceMatch[1]);
-                                    }
-                                }
-                            }
-                        }
-
-                        const clothTotal = clothPrice * clothQuantity;
-                        serviceTotal += clothTotal;
-                        totalCloths += clothQuantity;
-
-                        // Add to cloth breakdown
-                        clothBreakdown.push({
-                            service: serviceName,
-                            cloth: clothName,
-                            quantity: clothQuantity,
-                            price: clothPrice,
-                            total: clothTotal
-                        });
-
-                        serviceCloths.push(`${clothName} x${clothQuantity} @ ₹${clothPrice} = ₹${clothTotal.toFixed(2)}`);
-                    });
-
-                    total += serviceTotal;
-
-                    if (totalCloths > 0) {
-                        selectedServices.push(`${serviceName}: ${serviceCloths.join(', ')} - Total: ₹${serviceTotal.toFixed(2)}`);
-                    } else {
-                        selectedServices.push(`${serviceName} (select cloths) - ₹0.00`);
-                    }
-                }
-            });
-
-            document.getElementById('total-amount').textContent = `₹${total.toFixed(2)}`;
-
-            const servicesList = document.getElementById('services-list');
-            servicesList.innerHTML = selectedServices.length > 0 ?
-                selectedServices.map(service => `<div style="margin-bottom: 8px;">${service}</div>`).join('') +
-                (clothBreakdown.length > 0 ? '<br><strong>Detailed Breakdown:</strong>' +
-                clothBreakdown.map(item => `<div style="margin-left: 10px; font-size: 14px;">• ${item.service} - ${item.cloth}: ${item.quantity} x ₹${item.price} = ₹${item.total.toFixed(2)}</div>`).join('') : '') :
-                '<div>No services selected</div>';
-
-            const totalSection = document.getElementById('total-section');
-            totalSection.style.display = selectedServices.length > 0 ? 'block' : 'none';
-
-            // Show proceed section only when all selected services have clothes selected
-            const proceedSection = document.getElementById('proceed-section');
-            proceedSection.style.display = (selectedServices.length > 0 && allServicesHaveClothes) ? 'block' : 'none';
-        }
-
-        function submitForm() {
-    alert("success"); // debug (you can remove later)
-
-    const selectedServices = document.querySelectorAll('.service-checkbox:checked');
-
-    if (selectedServices.length === 0) {
-        alert('Please select at least one service');
-        return;
-    }
-
-    let allServicesHaveClothes = true;
-    selectedServices.forEach(serviceCheckbox => {
-        const serviceId = serviceCheckbox.value;
-        const clothCheckboxes = document.querySelectorAll(
-            `input[name="clothes_${serviceId}"]:checked`
-        );
-        if (clothCheckboxes.length === 0) {
-            allServicesHaveClothes = false;
-        }
-    });
-
-    if (!allServicesHaveClothes) {
-        alert('Please select at least one type of cloth for each selected service');
-        return;
-    }
-
-    // ✅ ONLY SUBMIT FORM
-    // Django will handle redirection
-    document.getElementById('cloth-form').submit();
-}
-
-    </script>
-</body>
-</html> {% endcomment %}
-
-
 {% load static custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Select Services - {{ shop.name }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Order Services - {{ shop.name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { background:#f7f7f7; font-family:Poppins,sans-serif }
-        .header { background:#fff; padding:20px 40px; display:flex; justify-content:space-between }
-        .container { max-width:1200px; margin:auto; padding:30px }
-        .section { background:#fff; padding:30px; border-radius:15px; margin-bottom:30px }
-        .services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px }
-        .service-card { border:1px solid #eee; padding:20px; border-radius:10px }
-        .proceed-btn { background:#2ecc71; color:#fff; padding:15px 40px; border:none; border-radius:10px; font-size:18px; cursor:pointer }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent-green: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 120px;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h1 { font-size: 1.1rem; margin: 0; font-weight: 700; }
+        .back-link { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; }
+
+        .container { max-width: 850px; margin: 2rem auto; padding: 0 1rem; }
+
+        .section { margin-bottom: 2.5rem; }
+        h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+
+        /* SERVICE GRID */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            padding: 1.25rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .service-card.active {
+            border-color: var(--primary);
+            background-color: #f5f7ff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .price-tag { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+
+        /* CLOTH SELECTION AREA */
+        .cloth-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .service-title-bar {
+            background: #f1f5f9;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .cloth-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cloth-item .price-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* PRICE SUMMARY AREA */
+        .summary-box {
+            background: #1e293b;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .total-row {
+            border-top: 1px solid #334155;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            color: var(--accent-green);
+        }
+
+        /* STICKY FOOTER */
+        .footer-action {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: white;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .btn-proceed {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            max-width: 500px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.1s;
+        }
+
+        .btn-proceed:active { transform: scale(0.98); }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+        }
     </style>
 </head>
-
 <body>
 
-<form id="cloth-form" method="post" action="{% url 'create_order' shop.id %}">
+<form id="order-form" method="post" action="{% url 'create_order' shop.id %}">
     {% csrf_token %}
 
-    <!-- HEADER -->
     <div class="header">
         <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
-        <a href="{% url 'dashboard' %}">Back</a>
+        <a href="{% url 'dashboard' %}" class="back-link"><i class="fas fa-times"></i></a>
     </div>
 
     <div class="container">
-
-        <!-- SERVICES -->
         <div class="section">
-            <h2>Select Services</h2>
-
+            <h2>1. Choose Services</h2>
             <div class="services-grid">
                 {% for service in services %}
-                <div class="service-card">
-                    <label>
-                        <input type="checkbox"
-                               class="service-checkbox"
-                               value="{{ service.id }}"
-                               onchange="updateSelections()">
-                        <strong>{{ service.name }}</strong> – ₹{{ service.price }}
-                    </label>
-
-                    <br><br>
-
-                    Qty:
-                    <input type="number"
-                           id="quantity-{{ service.id }}"
-                           value="1" min="1">
+                <div class="service-card" onclick="toggleCard('{{ service.id }}')">
+                    <div class="card-top">
+                        <div style="display:flex; gap:10px; align-items:center">
+                            <input type="checkbox" 
+                                    id="cb-{{ service.id }}" 
+                                    class="service-checkbox" 
+                                    value="{{ service.id }}" 
+                                    data-name="{{ service.name }}"
+                                    data-price="{{ service.price }}"
+                                    onclick="event.stopPropagation(); updateSelections();">
+                            <span style="font-weight:600">{{ service.name }}</span>
+                        </div>
+                        <span class="price-tag">₹{{ service.price }}</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 10px;">
+                        Count: 
+                        <input type="number" 
+                                id="qty-{{ service.id }}" 
+                                value="1" min="1" 
+                                onclick="event.stopPropagation();"
+                                oninput="updateSelections()">
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- HIDDEN INPUTS (CRITICAL FIX) -->
-        <div id="hidden-inputs"></div>
-
-        <!-- CLOTH SELECTION -->
         <div class="section" id="cloth-section" style="display:none">
-            <h2>Select Clothes</h2>
+            <h2>2. Item Breakdown</h2>
             <div id="cloth-content"></div>
         </div>
 
-        <!-- PROCEED -->
-        <div class="section" id="proceed-section" style="display:none;text-align:center">
-            <button type="button" class="proceed-btn" onclick="submitForm()">
-                Proceed to Payment
-            </button>
+        <div class="section" id="summary-section" style="display:none">
+            <h2>3. Billing Summary</h2>
+            <div class="summary-box">
+                <div id="summary-items"></div>
+                <div class="total-row">
+                    <span>Amount Payable</span>
+                    <span id="grand-total">₹0.00</span>
+                </div>
+            </div>
         </div>
 
+        <div id="hidden-inputs"></div>
+    </div>
+
+    <div class="footer-action" id="footer-action" style="display:none">
+        <button type="submit" class="btn-proceed">
+            Proceed to Payment <i class="fas fa-chevron-right" style="margin-left:10px"></i>
+        </button>
     </div>
 </form>
 
 <script>
-const clothes = [
-    {% for cloth in clothes %}
-    { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-];
+    function calculateBillingSummary() {
+        const summaryItems = document.getElementById('summary-items');
+        let totalAmount = 0;
 
-function updateSelections() {
-    const checked = document.querySelectorAll('.service-checkbox:checked');
-    const hidden = document.getElementById('hidden-inputs');
-    const clothSection = document.getElementById('cloth-section');
-    const clothContent = document.getElementById('cloth-content');
-    const proceed = document.getElementById('proceed-section');
+        summaryItems.innerHTML = '';
 
-    hidden.innerHTML = '';
-    clothContent.innerHTML = '';
+        document.querySelectorAll('.service-checkbox:checked').forEach(cb => {
+            const sId = cb.value;
+            const sName = cb.getAttribute('data-name');
 
-    if (checked.length === 0) {
-        clothSection.style.display = 'none';
-        proceed.style.display = 'none';
-        return;
+            document
+                .querySelectorAll(`input[name="clothes_${sId}"]:checked`)
+                .forEach(clothCb => {
+                    const clothName = clothCb.value;
+                    const qtyInput = document.querySelector(
+                        `input[name="quantity_${sId}_${clothName}"]`
+                    );
+
+                    const qty = parseInt(qtyInput?.value || 0);
+                    if (qty <= 0) return;
+
+                    const clothId = clothes.find(c => c.name === clothName)?.id;
+                    const price = clothPrices[sId]?.[clothId] || 0;
+
+                    const subtotal = price * qty;
+                    totalAmount += subtotal;
+
+                    summaryItems.innerHTML += `
+                        <div class="summary-row">
+                            <span>${sName} - ${clothName} (x${qty})</span>
+                            <span>₹${subtotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+        });
+
+        document.getElementById('grand-total').innerText =
+            `₹${totalAmount.toFixed(2)}`;
+    }
+    const clothes = [
+        {% for cloth in clothes %}
+        { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const clothPrices = {
+        {% for service_id, prices in cloth_prices.items %}
+        {{ service_id }}: {
+            {% for cloth_id, price in prices.items %}
+            {{ cloth_id }}: {{ price|floatformat:2 }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    function toggleCard(id) {
+        const cb = document.getElementById('cb-' + id);
+        cb.checked = !cb.checked;
+        updateSelections();
     }
 
-    clothSection.style.display = 'block';
-    proceed.style.display = 'block';
+    function updateSelections() {
+        const checkboxes = document.querySelectorAll('.service-checkbox');
+        const hidden = document.getElementById('hidden-inputs');
+        const clothContent = document.getElementById('cloth-content');
+        const summaryItems = document.getElementById('summary-items');
 
-    checked.forEach(cb => {
-        const serviceId = cb.value;
-        const qty = document.getElementById(`quantity-${serviceId}`).value || 1;
+        let totalAmount = 0;
+        let anySelected = false;
 
-        /* 🔑 THIS IS THE MOST IMPORTANT PART */
-        hidden.innerHTML += `
-            <input type="hidden" name="selected_services" value="${serviceId}">
-            <input type="hidden" name="quantity_${serviceId}" value="${qty}">
-        `;
+        hidden.innerHTML = '';
+        clothContent.innerHTML = '';
+        summaryItems.innerHTML = '';
 
-        clothContent.innerHTML += `<h4>Service ${serviceId}</h4>`;
+        checkboxes.forEach(cb => {
+            const card = cb.closest('.service-card');
+            if (cb.checked) {
+                anySelected = true;
+                card.classList.add('active');
 
-        clothes.forEach(c => {
-            clothContent.innerHTML += `
-                <label>
-                    <input type="checkbox" name="clothes_${serviceId}" value="${c.name}">
-                    ${c.name}
-                </label>
-                <input type="number"
-                       name="quantity_${serviceId}_${c.name}"
-                       value="1" min="1"><br>
-            `;
+                const sId = cb.value;
+                const sName = cb.getAttribute('data-name');
+                const sPrice = parseFloat(cb.getAttribute('data-price'));
+                const sQty = parseInt(document.getElementById('qty-' + sId).value) || 1;
+
+                // POST Data
+                hidden.innerHTML += `
+                    <input type="hidden" name="selected_services" value="${sId}">
+                    <input type="hidden" name="quantity_${sId}" value="${sQty}">
+                `;
+
+                // Summary Rows - show cloth breakdown
+                    clothes.forEach(c => {
+                        const clothPrice = clothPrices[sId] && clothPrices[sId][c.id] !== undefined ? clothPrices[sId][c.id] : 0.00;
+                        const clothQty = parseInt(document.querySelector(`input[name="quantity_${sId}_${c.name}"]`)?.value) || 0;
+                        if (clothQty > 0) {
+                            const clothSubtotal = clothPrice * clothQty;
+                            totalAmount += clothSubtotal;
+                            summaryItems.innerHTML += `
+                                <div class="summary-row">
+                                    <span>${sName} - ${c.name} (x${clothQty})</span>
+                                    <span>₹${clothSubtotal.toFixed(2)}</span>
+                                </div>
+                            `;
+                        }
+                    });
+
+                // Cloth Breakdown UI
+                    let clothHTML = `<div class="cloth-card">
+                        <div class="service-title-bar">${sName} - Select Items</div>`;
+
+                    clothes.forEach(c => {
+                        const price = clothPrices[sId] && clothPrices[sId][c.id] !== undefined ? clothPrices[sId][c.id] : 0.00;
+                        clothHTML += `
+                            <div class="cloth-item">
+                                <label style="cursor:pointer; display:flex; align-items:center; gap:8px">
+                                <input type="checkbox"
+                                    name="clothes_${sId}"
+                                    value="${c.name}"
+                                    onchange="calculateBillingSummary()">
+                                    ${c.name}
+                                </label>
+                                <div class="price-quantity">
+                                    <span style="color: var(--primary); font-weight:600">₹${price}</span>
+                                    <input type="number"
+                                        name="quantity_${sId}_${c.name}"
+                                        value="1" min="1"
+                                        oninput="calculateBillingSummary()">
+                                </div>
+                            </div>`;
+                    });
+                    clothHTML += `</div>`;
+                clothContent.insertAdjacentHTML('beforeend', clothHTML);
+
+            } else {
+                card.classList.remove('active');
+            }
         });
-    });
-}
 
-function submitForm() {
-    document.getElementById('cloth-form').submit();
-}
+        // Visibility Toggles
+        document.getElementById('cloth-section').style.display = anySelected ? 'block' : 'none';
+        document.getElementById('summary-section').style.display = anySelected ? 'block' : 'none';
+        document.getElementById('footer-action').style.display = anySelected ? 'flex' : 'none';
+        document.getElementById('grand-total').innerText = `₹${totalAmount.toFixed(2)}`;
+        setTimeout(calculateBillingSummary, 0);
+    }
 </script>
 
 </body>
