@@ -156,7 +156,7 @@
             <div class="service-group">
                 <div class="service-title">
                     <i class="fas fa-check-circle"></i> {{ service.name }}
-                    <a href="{% url 'edit_service' service.id %}" style="font-size: 0.7rem; color: var(--text-muted);">[Edit Rates]</a>
+                    <a href="{% url 'edit_service' service.id %}" style="font-size: 0.7rem; color: var(--text-muted);">[Edit Service]</a>
                 </div>
                 <div class="cloth-grid">
                     {% for cloth in service.cloths.all %}

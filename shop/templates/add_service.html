@@ -4,234 +4,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Service - {{ shop.name }}</title>
+    <title>Add Service | {{ shop.name }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+        :root {
+            --brand-indigo: #4f46e5;
+            --brand-hover: #4338ca;
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-ui: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
         * {
             margin: 0;
             padding: 0;
-            font-family: "Poppins", sans-serif;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
+            background-color: var(--bg-canvas);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
         }
 
-        .container {
-            max-width: 500px;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            position: relative;
+        .service-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-ui);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             overflow: hidden;
         }
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+        .card-header {
+            padding: 32px 32px 24px 32px;
+            border-bottom: 1px solid var(--border-ui);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
+        .card-header h1 {
+            font-size: 1.25rem;
             font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .header p {
-            color: #666;
-            font-size: 16px;
+        .card-header p {
+            margin-top: 4px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
         }
+
+        .card-body {
+            padding: 32px;
+        }
+
+        /* Message Styling */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+        .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 8px;
         }
 
         .form-group label {
             display: block;
-            color: #333;
+            font-size: 0.875rem;
             font-weight: 600;
+            color: var(--text-main);
             margin-bottom: 8px;
-            font-size: 14px;
         }
 
-        .form-control {
+        /* Generic styling for Django's auto-generated input */
+        input[type="text"], .form-control {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .form-control:focus {
+            padding: 12px 16px;
+            border: 1px solid var(--border-ui);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
             outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: #ffffff;
         }
 
-        .form-control::placeholder {
-            color: #adb5bd;
+        input:focus {
+            border-color: var(--brand-indigo);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .error-hint {
+            color: var(--danger);
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .card-footer {
+            background: #f8fafc;
+            padding: 24px 32px;
+            border-top: 1px solid var(--border-ui);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
         }
 
         .btn {
-            padding: 15px 30px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.875rem;
             font-weight: 600;
-            font-size: 16px;
             text-decoration: none;
-            display: inline-block;
             cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            min-width: 140px;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--brand-indigo);
             color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
+            background-color: var(--brand-hover);
             transform: translateY(-1px);
         }
 
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
+        .btn-secondary {
+            background-color: white;
+            border-color: var(--border-ui);
+            color: var(--text-main);
         }
 
-        .icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            color: #667eea;
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
         }
 
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            display: block;
-        }
-
-        .success-message {
-            color: #28a745;
-            font-size: 14px;
-            margin-top: 5px;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-                margin: 20px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .button-group {
+        @media (max-width: 480px) {
+            .card-footer {
                 flex-direction: column;
-                align-items: center;
             }
-
-            .btn {
-                width: 100%;
-                max-width: 200px;
-            }
+            .btn { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-concierge-bell" style="color: #667eea;"></i> Add New Service</h1>
-            <p>Add a new laundry service to your branch</p>
-        </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+    <div class="service-card">
+        <header class="card-header">
+            <h1><i class="fas fa-plus-circle" style="color: var(--brand-indigo);"></i> New Service</h1>
+            <p>Define a new offering for the <strong>{{ branch.name }}</strong> location.</p>
+        </header>
 
         <form method="post">
             {% csrf_token %}
-
-            <div class="form-group">
-                <label for="{{ form.name.id_for_label }}">
-                    <i class="fas fa-tag icon"></i>Service Name
-                </label>
-                {{ form.name }}
-                {% if form.name.errors %}
-                    <span class="error-message">{{ form.name.errors.0 }}</span>
+            
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                            <i class="fas {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Service Identification</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <span class="error-hint">{{ form.name.errors.0 }}</span>
+                    {% endif %}
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
+                        e.g., Dry Cleaning, Steam Press, or Premium Wash.
+                    </p>
+                </div>
             </div>
 
-            <div class="button-group">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add Service
-                </button>
+            <footer class="card-footer">
                 <a href="{% url 'branch_orders' branch.id %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancel
+                    Cancel
                 </a>
-            </div>
+                <button type="submit" class="btn btn-primary">
+                    Create Service
+                </button>
+            </footer>
         </form>
     </div>
 
     <script>
-        // Add focus effects
+        // UX: Auto-apply form control classes to Django fields
         document.addEventListener('DOMContentLoaded', function() {
-            const formControls = document.querySelectorAll('.form-control');
-
-            formControls.forEach(control => {
-                control.addEventListener('focus', function() {
-                    this.parentElement.classList.add('focused');
-                });
-
-                control.addEventListener('blur', function() {
-                    this.parentElement.classList.remove('focused');
-                });
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.placeholder = "Enter service name...";
+                if (!input.classList.contains('form-control')) {
+                    input.classList.add('form-control');
+                }
             });
         });
     </script>

@@ -4,259 +4,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Branch - {{ branch.name }}</title>
+    <title>Edit Settings | {{ branch.name }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-color: #0f334b;
+            --primary-dark: #0a2538;
+            --accent-color: #2ecc71;
+            --accent-dark: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --secondary-color: #6c757d;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --brand-primary: var(--primary-color);
+            --brand-hover: var(--primary-dark);
+            --bg-main: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --text-heading: #0f172a;
+            --text-body: #475569;
+            --border-color: #e2e8f0;
+            --input-focus: rgba(15, 51, 75, 0.1);
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
         * {
             margin: 0;
             padding: 0;
-            font-family: "Poppins", sans-serif;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
+            background-color: var(--bg-main);
+            color: var(--text-body);
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
+            align-items: center;
+            padding: 24px;
         }
 
-        .container {
-            max-width: 600px;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            position: relative;
+        .settings-card {
+            width: 100%;
+            max-width: 540px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
             overflow: hidden;
         }
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+        .card-header {
+            padding: 32px 32px 24px 32px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
+        .card-header h1 {
+            color: var(--text-heading);
+            font-size: 20px;
             font-weight: 700;
+            letter-spacing: -0.025em;
         }
 
-        .header p {
-            color: #666;
-            font-size: 16px;
+        .card-header p {
+            font-size: 14px;
+            color: var(--text-body);
+            margin-top: 4px;
         }
 
+        .card-body {
+            padding: 32px;
+        }
+
+        /* Message Styling */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fee2e2;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #dcfce7;
+        }
+
+        /* Form Styling */
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            color: #333;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
+            color: var(--text-heading);
+            margin-bottom: 6px;
         }
 
-        .form-control {
+        /* Targetting Django's automatically rendered inputs */
+        input[type="text"], 
+        input[type="tel"], 
+        input[type="email"], 
+        textarea {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .form-control:focus {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-heading);
+            transition: all 0.2s ease;
             outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: #ffffff;
         }
 
-        .form-control::placeholder {
-            color: #adb5bd;
+        input:focus, textarea:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px var(--input-focus);
         }
 
-        textarea.form-control {
-            resize: vertical;
+        textarea {
             min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .field-error {
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Button Styling */
+        .card-footer {
+            padding: 24px 32px;
+            background-color: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
         }
 
         .btn {
-            padding: 15px 30px;
-            border-radius: 12px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 16px;
-            text-decoration: none;
-            display: inline-block;
             cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            min-width: 140px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            text-decoration: none;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        .btn-save {
+            background-color: var(--brand-primary);
+            color: #ffffff;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        .btn-save:hover {
+            background-color: var(--brand-hover);
         }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
+        .btn-cancel {
+            background-color: #ffffff;
+            color: var(--text-heading);
+            border-color: var(--border-color);
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-1px);
+        .btn-cancel:hover {
+            background-color: #f1f5f9;
         }
 
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            color: #667eea;
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            display: block;
-        }
-
-        .success-message {
-            color: #28a745;
-            font-size: 14px;
-            margin-top: 5px;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-                margin: 20px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .button-group {
+        @media (max-width: 480px) {
+            .card-footer {
                 flex-direction: column;
-                align-items: center;
             }
-
             .btn {
                 width: 100%;
-                max-width: 200px;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-edit" style="color: #667eea;"></i> Edit Branch</h1>
-            <p>Update branch information for {{ branch.name }}</p>
+
+    <div class="settings-card">
+        <div class="card-header">
+            <h1>Update Branch Configuration</h1>
+            <p>Modifying details for the <strong>{{ branch.name }}</strong> location.</p>
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="post">
+        <form method="post" novalidate>
             {% csrf_token %}
-
-            <div class="form-group">
-                <label for="{{ form.name.id_for_label }}">
-                    <i class="fas fa-store icon"></i>Branch Name
-                </label>
-                {{ form.name }}
-                {% if form.name.errors %}
-                    <span class="error-message">{{ form.name.errors.0 }}</span>
+            
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                            <i class="fas {% if message.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Display Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ form.name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.address.id_for_label }}">Physical Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ form.address.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}">Contact Number</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ form.phone.errors.0 }}</div>
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="{{ form.address.id_for_label }}">
-                    <i class="fas fa-map-marker-alt icon"></i>Address
-                </label>
-                {{ form.address }}
-                {% if form.address.errors %}
-                    <span class="error-message">{{ form.address.errors.0 }}</span>
-                {% endif %}
-            </div>
-
-            <div class="form-group">
-                <label for="{{ form.phone.id_for_label }}">
-                    <i class="fas fa-phone icon"></i>Phone Number
-                </label>
-                {{ form.phone }}
-                {% if form.phone.errors %}
-                    <span class="error-message">{{ form.phone.errors.0 }}</span>
-                {% endif %}
-            </div>
-
-            <div class="button-group">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-                <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Cancel
+            <div class="card-footer">
+                <a href="{% url 'branch_orders' branch.id %}" class="btn btn-cancel">
+                    Cancel
                 </a>
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-check"></i> Save Changes
+                </button>
             </div>
         </form>
     </div>
 
     <script>
-        // Add focus effects and validation
+        // Professional UX: Ensure Django inputs have the correct CSS class
         document.addEventListener('DOMContentLoaded', function() {
-            const formControls = document.querySelectorAll('.form-control');
-
-            formControls.forEach(control => {
-                control.addEventListener('focus', function() {
-                    this.parentElement.classList.add('focused');
-                });
-
-                control.addEventListener('blur', function() {
-                    this.parentElement.classList.remove('focused');
-                });
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(el => {
+                if (!el.classList.contains('btn')) {
+                    el.classList.add('form-control');
+                }
             });
         });
     </script>
