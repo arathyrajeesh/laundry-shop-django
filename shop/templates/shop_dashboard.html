@@ -483,6 +483,10 @@
             background: #d4edda; 
             color: #155724; 
         }
+        .status-pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
         .status-select {
             padding: 5px 10px;
@@ -750,9 +754,16 @@
                             {{ order.delivery_date|date:"M d, Y H:i" }}
                         </td>
                         <td>
-                            <span class="status-badge status-delayed">
-                                {{ order.cloth_status }}
-                            </span>
+                            {% if order.payment_status != "Completed" %}
+                                <span class="status-badge status-pending">
+                                    Payment Incomplete
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-delayed">
+                                    {{ order.cloth_status }}
+                                </span>
+                            {% endif %}
+
                         </td>
                         <td>₹{{ order.amount|floatformat:2 }}</td>
                     </tr>
@@ -834,9 +845,15 @@
 
                         <div>
                             ₹{{ order.amount|floatformat:2 }}
-                            <span class="status-badge status-{{ order.cloth_status|lower }}">
-                                {{ order.cloth_status }}
-                            </span>
+                            {% if order.payment_status != "Completed" %}
+                                <span class="status-badge status-pending">
+                                    Payment Incomplete
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-{{ order.cloth_status|lower }}">
+                                    {{ order.cloth_status }}
+                                </span>
+                            {% endif %}
                             <i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
@@ -847,19 +864,38 @@
                         <p><strong>Delivery:</strong> {{ order.delivery_date|date:"M d, Y H:i" }}</p>
 
                         <div style="margin-top: 12px;">
-                            <select class="status-select" id="status-{{ order.id }}">
-                                {% for status, label in order.STATUS_CHOICES %}
-                                    <option value="{{ status }}" {% if order.cloth_status == status %}selected{% endif %}>
-                                        {{ label }}
-                                    </option>
-                                {% endfor %}
-                            </select>
 
-                            <button class="update-btn" onclick="updateOrderStatus({{ order.id }})">
-                                Update
-                            </button>
+                            {% if order.payment_status != "Completed" %}
+                                <!-- 🔴 PAYMENT INCOMPLETE -->
+                                <select class="status-select" disabled>
+                                    <option>Payment Incomplete</option>
+                                </select>
+
+                                <button class="update-btn" disabled
+                                    style="background:#ccc; cursor:not-allowed;">
+                                    Update
+                                </button>
+
+                            {% else %}
+                                <!-- 🟢 PAYMENT COMPLETED -->
+                                <select class="status-select" id="status-{{ order.id }}">
+                                    {% for status, label in order.STATUS_CHOICES %}
+                                        <option value="{{ status }}"
+                                            {% if order.cloth_status == status %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                                <button class="update-btn"
+                                    onclick="updateOrderStatus({{ order.id }})">
+                                    Update
+                                </button>
+                            {% endif %}
+
                         </div>
                     </div>
+
                 </div>
                 {% endfor %}
             </div>
@@ -870,8 +906,7 @@
                 </div>
             {% endif %}
         </div>
-
-
+        
 
         <div class="dashboard-section">
             <div class="section-header">
@@ -964,6 +999,52 @@
             </div>
             {% endif %}
         </div>
+        {% if incomplete_payment_count > 0 %}
+        <div class="dashboard-section" style="border-left: 6px solid #e74c3c;">
+            <div class="section-header">
+                <h2 style="color:#e74c3c;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Incomplete Payments ({{ incomplete_payment_count }})
+                </h2>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Branch</th>
+                        <th>Amount</th>
+                        <th>Payment Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in incomplete_payment_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>
+                            {{ order.user.username }}<br>
+                            <small style="color:#777;">{{ order.user.email }}</small>
+                        </td>
+                        <td>{{ order.branch.name }}</td>
+                        <td>₹{{ order.amount|floatformat:2 }}</td>
+                        <td>
+                            <span class="status-badge status-pending">
+                                Payment Incomplete
+                            </span>
+                        </td>
+                        <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <p style="margin-top:15px; color:#777; font-size:13px;">
+                ⚠ These orders cannot be processed until payment is completed.
+            </p>
+        </div>
+        {% endif %}
 
         <div class="dashboard-section">
             <div class="section-header">

@@ -788,10 +788,12 @@ def my_orders(request):
         if order.branch:
             order.branch_rating = BranchRating.objects.filter(user=request.user, branch=order.branch).first()
         # Override cloth_status display if payment not completed
-        if order.payment_status != 'Completed':
-            order.display_status = 'Payment Incomplete'
-        else:
-            order.display_status = order.cloth_status
+        for order in shop_orders_all:
+            if order.payment_status != "Completed":
+                order.display_status = "Payment Incomplete"
+            else:
+                order.display_status = order.cloth_status
+
 
     return render(request, 'orders.html', {'orders': user_orders})
 
@@ -1668,58 +1670,79 @@ def is_staff_user(user):
 @user_passes_test(is_staff_user, login_url='login')
 def admin_dashboard(request):
     """Admin dashboard with statistics and management tools."""
-    
-    # Statistics
-    total_orders = Order.objects.count()
-    pending_orders = Order.objects.filter(cloth_status="Pending").count()
-    completed_orders = Order.objects.filter(cloth_status="Completed").count()
-    washing_orders = Order.objects.filter(cloth_status="Washing").count()
-    ready_orders = Order.objects.filter(cloth_status="Ready").count()
-    
-    # Revenue
-    total_revenue = Order.objects.filter(payment_status="Completed").aggregate(
+
+    today = timezone.now().date()
+    now = timezone.now()
+
+    # 🔒 BASE QUERY → ONLY PAID ORDERS
+    paid_orders = Order.objects.filter(payment_status="Completed")
+
+    # =====================
+    # 📊 STATISTICS
+    # =====================
+    total_orders = paid_orders.count()
+
+    pending_orders = paid_orders.filter(cloth_status="Pending").count()
+    washing_orders = paid_orders.filter(cloth_status="Washing").count()
+    ready_orders = paid_orders.filter(cloth_status="Ready").count()
+    completed_orders = paid_orders.filter(cloth_status="Completed").count()
+
+    # =====================
+    # 💰 REVENUE
+    # =====================
+    total_revenue = paid_orders.aggregate(
         total=Sum('amount')
     )['total'] or 0
 
-    today_revenue = Order.objects.filter(
-        payment_status="Completed",
-        created_at__date=datetime.now().date()
+    today_revenue = paid_orders.filter(
+        created_at__date=today
     ).aggregate(total=Sum('amount'))['total'] or 0
 
-    # Users
+    # =====================
+    # 👤 USERS
+    # =====================
     total_users = User.objects.count()
     new_users_today = User.objects.filter(
-        date_joined__date=datetime.now().date()
+        date_joined__date=today
     ).count()
-    
-    # Shops
+
+    # =====================
+    # 🏪 SHOPS
+    # =====================
     total_shops = LaundryShop.objects.count()
     open_shops = LaundryShop.objects.filter(is_open=True).count()
     pending_approvals = LaundryShop.objects.filter(is_approved=False).count()
-    
-    # Recent orders (last 10)
-    recent_orders = (
-        Order.objects
-        .filter(payment_status="Completed")
-        .order_by('-created_at')[:10]
+
+    # =====================
+    # 📦 RECENT PAID ORDERS
+    # =====================
+    recent_orders = paid_orders.order_by('-created_at')[:10]
+
+    # =====================
+    # 📊 ORDERS BY STATUS (PAID ONLY)
+    # =====================
+    orders_by_status = (
+        paid_orders
+        .values('cloth_status')
+        .annotate(count=Count('id'))
+        .order_by('cloth_status')
     )
 
-    
-    # Orders by status
-    orders_by_status = Order.objects.values('cloth_status').annotate(count=Count('id')).order_by('cloth_status')
-    
-    # Recent users (last 5)
+    # =====================
+    # 🧑‍🤝‍🧑 RECENT USERS
+    # =====================
     recent_users = User.objects.order_by('-date_joined')[:5]
 
-    # Branches
+    # =====================
+    # 🏢 BRANCHES
+    # =====================
     total_branches = Branch.objects.count()
     recent_branches = Branch.objects.select_related('shop').order_by('-created_at')[:10]
 
-    # Shops with their branches
-    shops_with_branches = LaundryShop.objects.prefetch_related('branches').all()
-    now = timezone.now()
-
-    delayed_orders = Order.objects.select_related(
+    # =====================
+    # 🕒 DELAYED ORDERS (PAID ONLY)
+    # =====================
+    delayed_orders = paid_orders.select_related(
         'user', 'shop'
     ).filter(
         delivery_date__isnull=False,
@@ -1727,20 +1750,27 @@ def admin_dashboard(request):
         cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
     ).order_by('delivery_date')
 
+    # =====================
+    # 🧠 CONTEXT
+    # =====================
     context = {
-        # Statistics
+        # Stats
         'total_orders': total_orders,
         'pending_orders': pending_orders,
-        'completed_orders': completed_orders,
         'washing_orders': washing_orders,
         'ready_orders': ready_orders,
+        'completed_orders': completed_orders,
+
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
+
         'total_users': total_users,
         'new_users_today': new_users_today,
+
         'total_shops': total_shops,
         'open_shops': open_shops,
         'pending_approvals': pending_approvals,
+
         'total_branches': total_branches,
 
         # Data
@@ -1749,13 +1779,13 @@ def admin_dashboard(request):
         'recent_users': recent_users,
         'recent_branches': recent_branches,
         'all_shops': LaundryShop.objects.all(),
-        'shops_with_branches': shops_with_branches,
+        'shops_with_branches': LaundryShop.objects.prefetch_related('branches').all(),
+
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
     }
-    
-    return render(request, 'admin_dashboard.html', context)
 
+    return render(request, 'admin_dashboard.html', context)
 
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
@@ -2443,58 +2473,92 @@ def shop_dashboard(request):
     shop_id = request.session.get('shop_id')
     shop = get_object_or_404(LaundryShop, id=shop_id)
 
-    # Get all branches for this shop
     branches = Branch.objects.filter(shop=shop).prefetch_related('services')
 
-    # Get overall shop statistics
-    shop_orders = Order.objects.filter(shop=shop)
-    total_orders = shop_orders.count()
-    pending_orders = shop_orders.filter(cloth_status="Pending").count()
-    completed_orders = shop_orders.filter(cloth_status="Completed").count()
-    total_revenue = shop_orders.aggregate(total=Sum('amount'))['total'] or 0
+    # 🔒 PAID & UNPAID ORDERS (SEPARATED)
+    paid_orders = Order.objects.filter(shop=shop, payment_status="Completed")
+    unpaid_orders = Order.objects.filter(shop=shop, payment_status="Pending")
 
-    # Today's revenue
-    today_revenue = shop_orders.filter(
-        created_at__date=datetime.now().date()
+    # =====================
+    # 📊 SHOP STATISTICS (PAID ONLY)
+    # =====================
+    total_orders = paid_orders.count()
+    pending_orders = paid_orders.filter(cloth_status="Pending").count()
+    completed_orders = paid_orders.filter(cloth_status="Completed").count()
+
+    total_revenue = paid_orders.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    today_revenue = paid_orders.filter(
+        created_at__date=timezone.now().date()
     ).aggregate(total=Sum('amount'))['total'] or 0
 
-    # Recent orders across all branches
-    recent_orders = Order.objects.filter(shop=shop).select_related('user', 'branch').order_by('-created_at')[:10]
+    # =====================
+    # 🧾 INCOMPLETE PAYMENTS
+    # =====================
+    incomplete_payment_orders = unpaid_orders.select_related(
+        'user', 'branch'
+    ).order_by('-created_at')
 
-    # Branch statistics
+    # =====================
+    # 📦 RECENT ORDERS (MIXED VIEW)
+    # =====================
+    recent_orders = Order.objects.filter(
+        shop=shop,
+        payment_status="Completed"
+    ).select_related('user', 'branch').order_by('-created_at')[:10]
+
+    # =====================
+    # 🏢 BRANCH STATISTICS (PAID ONLY)
+    # =====================
     branch_stats = []
     for branch in branches:
-        branch_orders = Order.objects.filter(branch=branch)
+        branch_paid_orders = paid_orders.filter(branch=branch)
         branch_ratings = BranchRating.objects.filter(branch=branch)
-        branch_average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+
+        branch_average_rating = branch_ratings.aggregate(
+            avg=Avg('rating')
+        )['avg'] or 0
+
         branch_stats.append({
             'branch': branch,
-            'total_orders': branch_orders.count(),
-            'pending_orders': branch_orders.filter(cloth_status="Pending").count(),
-            'completed_orders': branch_orders.filter(cloth_status="Completed").count(),
-            'revenue': branch_orders.aggregate(total=Sum('amount'))['total'] or 0,
+            'total_orders': branch_paid_orders.count(),
+            'pending_orders': branch_paid_orders.filter(cloth_status="Pending").count(),
+            'completed_orders': branch_paid_orders.filter(cloth_status="Completed").count(),
+            'revenue': branch_paid_orders.aggregate(total=Sum('amount'))['total'] or 0,
             'average_rating': branch_average_rating,
             'total_ratings': branch_ratings.count(),
         })
 
-    # Generate shop notifications
+    # =====================
+    # 🔔 SHOP NOTIFICATIONS
+    # =====================
     shop_notifications = []
-
-    # Recent orders notifications
-    recent_orders_for_notifications = Order.objects.filter(shop=shop).order_by('-created_at')[:10]
     now = timezone.now()
 
-    delayed_orders = Order.objects.select_related(
+    recent_orders_for_notifications = Order.objects.filter(
+        shop=shop
+    ).order_by('-created_at')[:10]
+
+    delayed_orders = paid_orders.select_related(
         'user', 'branch'
     ).filter(
-        shop=shop,
         delivery_date__isnull=False,
         delivery_date__lt=now,
         cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
     ).order_by('delivery_date')
 
     for order in recent_orders_for_notifications:
-        if order.cloth_status == 'Pending':
+        if order.payment_status != "Completed":
+            shop_notifications.append({
+                'title': f'Payment Pending - Order #{order.id}',
+                'message': f'Customer {order.user.username} has not completed payment',
+                'time': order.created_at,
+                'icon': 'fas fa-exclamation-circle',
+                'color': '#e74c3c'
+            })
+        elif order.cloth_status == 'Pending':
             shop_notifications.append({
                 'title': f'New Order #{order.id}',
                 'message': f'Order from {order.user.username} - ₹{order.amount}',
@@ -2502,16 +2566,7 @@ def shop_dashboard(request):
                 'icon': 'fas fa-shopping-cart',
                 'color': '#28a745'
             })
-        elif order.cloth_status == 'Ready':
-            shop_notifications.append({
-                'title': f'Order #{order.id} Ready',
-                'message': f'Order from {order.user.username} is ready for pickup',
-                'time': order.created_at,
-                'icon': 'fas fa-box-open',
-                'color': '#f39c12'
-            })
 
-    # Add some general notifications if no recent activity
     if not shop_notifications:
         shop_notifications = [
             {
@@ -2520,42 +2575,52 @@ def shop_dashboard(request):
                 'time': timezone.now(),
                 'icon': 'fas fa-store',
                 'color': '#3498db'
-            },
-            {
-                'title': 'Add Services',
-                'message': 'Expand your offerings by adding more laundry services',
-                'time': timezone.now(),
-                'icon': 'fas fa-concierge-bell',
-                'color': '#9b59b6'
             }
         ]
 
-    # Sort notifications by time (most recent first)
     shop_notifications.sort(key=lambda x: x['time'], reverse=True)
 
-    # Get shop ratings
+    # =====================
+    # ⭐ SHOP RATINGS
+    # =====================
     shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
+    # =====================
+    # 🎯 CONTEXT
+    # =====================
     context = {
         'shop': shop,
         'branches': branches,
+
+        # Stats
         'total_orders': total_orders,
         'pending_orders': pending_orders,
         'completed_orders': completed_orders,
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
+
+        # Orders
         'recent_orders': recent_orders,
+        'incomplete_payment_orders': incomplete_payment_orders,
+        'incomplete_payment_count': incomplete_payment_orders.count(),
+
+        # Branch
         'branch_stats': branch_stats,
-        'shop_notifications': shop_notifications[:5],  # Show up to 5 notifications
+
+        # Notifications
+        'shop_notifications': shop_notifications[:5],
+
+        # Ratings
         'shop_ratings': shop_ratings,
         'average_rating': average_rating,
+
+        # Delayed
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
     }
 
     return render(request, 'shop_dashboard.html', context)
-
 
 @shop_login_required
 def select_branch(request):
@@ -2652,33 +2717,59 @@ def branch_orders(request, branch_id):
 @shop_login_required
 def shop_update_order_status(request, order_id):
     """Update order status for shop (AJAX endpoint)."""
-    if request.method == 'POST':
-        shop_id = request.session.get('shop_id')
-        shop = get_object_or_404(LaundryShop, id=shop_id)
-        order = get_object_or_404(Order, id=order_id)
 
-        # Verify that the order belongs to this shop
-        if order.shop != shop:
-            return JsonResponse({'success': False, 'message': 'You do not have permission to update this order'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse(
+            {'success': False, 'message': 'Invalid request'},
+            status=400
+        )
 
-        new_status = request.POST.get('status')
+    shop_id = request.session.get('shop_id')
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+    order = get_object_or_404(Order, id=order_id)
 
-        if new_status in dict(Order.STATUS_CHOICES):
-            old_status = order.cloth_status
-            order.cloth_status = new_status
-            order.save()
+    # 🔒 Verify that the order belongs to this shop
+    if order.shop != shop:
+        return JsonResponse(
+            {'success': False, 'message': 'You do not have permission to update this order'},
+            status=403
+        )
 
-            # Create notification for user
-            create_status_update_notification(order, new_status)
+    # 🔴 BLOCK STATUS UPDATE IF PAYMENT IS NOT COMPLETED
+    if order.payment_status != "Completed":
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Payment is incomplete. Cloth status cannot be updated.'
+            },
+            status=403
+        )
 
-            # Send status update notification emails
-            try:
-                # Email to Customer
-                customer_subject = f"Order Status Updated - Order #{order.id}"
-                customer_message = f"""
+    new_status = request.POST.get('status')
+
+    if new_status not in dict(Order.STATUS_CHOICES):
+        return JsonResponse(
+            {'success': False, 'message': 'Invalid status'},
+            status=400
+        )
+
+    old_status = order.cloth_status
+
+    # ✅ Update status
+    order.cloth_status = new_status
+    order.save()
+
+    # 🔔 Create notification for user
+    create_status_update_notification(order, new_status)
+
+    # 📧 Send notification emails
+    try:
+        # Email to Customer
+        customer_subject = f"Order Status Updated - Order #{order.id}"
+        customer_message = f"""
 Hi {order.user.get_full_name() or order.user.username},
 
-Your order status has been updated by {order.shop.name}!
+Your order status has been updated by {order.shop.name}.
 
 Order Details:
 - Order ID: #{order.id}
@@ -2688,13 +2779,8 @@ Order Details:
 - New Status: {new_status}
 - Amount: ₹{order.amount}
 
-Delivery Information:
-- Name: {order.delivery_name or 'Not provided'}
-- Address: {order.delivery_address or 'Not provided'}
-- Phone: {order.delivery_phone or 'Not provided'}
-
 {'Your laundry is ready for pickup!' if new_status == 'Ready' else ''}
-{'Your order has been completed and delivered. Thank you for choosing us!' if new_status == 'Completed' else ''}
+{'Your order has been completed. Thank you for choosing us!' if new_status == 'Completed' else ''}
 
 You can track your order status in your dashboard.
 
@@ -2703,57 +2789,51 @@ Best regards,
 🧺✨
 """
 
-                # Email to Admin (when shop updates status)
-                admin_user = User.objects.filter(is_superuser=True).first() or User.objects.filter(is_staff=True).first()
-                if admin_user:
-                    admin_subject = f"Order Status Updated by Shop - Order #{order.id}"
-                    admin_message = f"""
+        send_mail(
+            subject=customer_subject,
+            message=customer_message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[order.user.email],
+            fail_silently=True,
+        )
+
+        # Email to Admin
+        admin_user = (
+            User.objects.filter(is_superuser=True).first()
+            or User.objects.filter(is_staff=True).first()
+        )
+
+        if admin_user and admin_user.email:
+            admin_subject = f"Order Status Updated by Shop - Order #{order.id}"
+            admin_message = f"""
 Dear Admin,
 
 Order #{order.id} status has been updated by {order.shop.name}.
 
-Order Details:
-- Order ID: #{order.id}
-- Customer: {order.user.username} ({order.user.email})
-- Shop: {order.shop.name}
-- Branch: {order.branch.name if order.branch else 'Main Branch'}
-- Previous Status: {old_status}
-- New Status: {new_status}
-- Amount: ₹{order.amount}
+Previous Status: {old_status}
+New Status: {new_status}
+Amount: ₹{order.amount}
 
-The shop has updated the order status. Please review if necessary.
+Please review if necessary.
 
 Best regards,
 Shine & Bright System
-🧺✨
 """
 
-                    send_mail(
-                        subject=admin_subject,
-                        message=admin_message,
-                        from_email=settings.EMAIL_HOST_USER,
-                        recipient_list=[admin_user.email],
-                        fail_silently=True,
-                    )
+            send_mail(
+                subject=admin_subject,
+                message=admin_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[admin_user.email],
+                fail_silently=True,
+            )
 
-                # Send email to customer
-                send_mail(
-                    subject=customer_subject,
-                    message=customer_message,
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[order.user.email],
-                    fail_silently=True,
-                )
+    except Exception as e:
+        print(f"Failed to send status update emails: {e}")
 
-            except Exception as e:
-                print(f"Failed to send status update emails: {e}")
-
-            return JsonResponse({'success': True, 'message': 'Order status updated successfully'})
-        else:
-            return JsonResponse({'success': False, 'message': 'Invalid status'}, status=400)
-
-    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
-
+    return JsonResponse(
+        {'success': True, 'message': 'Order status updated successfully'}
+    )
 
 
 # ---------- Branch Views ----------

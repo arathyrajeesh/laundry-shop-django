@@ -526,7 +526,7 @@
         <!-- Main Card -->
         <div class="main-card">
             <div class="header">
-                <a href="{% url 'dashboard' %}" class="back-btn">
+                <a href="{% url 'dashboard' %}" class="back-btn" id="back-link">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back</span>
                 </a>
@@ -908,8 +908,36 @@
                 modal.style.display = 'none';
             }
         }
+        
     </script>
     {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backLink = document.getElementById('back-link');
+            
+            // 1. Handle the UI "Back" button click
+            if (backLink) {
+                backLink.addEventListener('click', function(e) {
+                    const confirmationMessage = "Are you sure you want to leave? Your delivery details and progress will not be saved.";
+                    if (!confirm(confirmationMessage)) {
+                        e.preventDefault(); // Stop the navigation if user clicks 'Cancel'
+                    }
+                });
+            }
 
+            // 2. Handle Browser Back/Close/Refresh (Optional but recommended)
+            // This triggers the browser's native "Leave site?" dialog
+            window.addEventListener('beforeunload', function (e) {
+                // Only show if the user has started filling the form 
+                // and hasn't submitted it yet.
+                const formHasData = document.querySelector('input[name="delivery_name"]').value !== "";
+                
+                if (formHasData) {
+                    e.preventDefault();
+                    e.returnValue = ''; // Required by Chrome
+                }
+            });
+        });
+    </script>
 </body>
 </html>
