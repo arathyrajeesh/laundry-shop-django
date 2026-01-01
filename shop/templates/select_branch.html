@@ -4,247 +4,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Branch - {{ shop.name }}</title>
+    <title>Branch Selection | {{ shop.name }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --brand-primary: #0f172a; /* Slate 900 */
+            --brand-accent: #4f46e5;  /* Indigo 600 */
+            --bg-muted: #f8fafc;     /* Slate 50 */
+            --border: #e2e8f0;       /* Slate 200 */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
         * {
             margin: 0;
             padding: 0;
-            font-family: "Poppins", sans-serif;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: #f5f7fa;
+            background-color: var(--bg-muted);
+            color: var(--text-main);
             min-height: 100vh;
         }
 
-        .header {
+        /* --- NAVIGATION --- */
+        .top-nav {
             background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
-        .header h1 {
-            color: #0f334bff;
-            font-size: 28px;
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
+        /* --- PAGE HEADER --- */
+        .page-header {
+            max-width: 1200px;
+            margin: 3rem auto 2rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
+        .header-content h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--brand-primary);
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
+        .header-content p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
         }
 
+        /* --- BRANCH GRID --- */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .page-title {
-            text-align: center;
-            margin-bottom: 40px;
-            color: #0f334bff;
-        }
-
-        .page-title h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .page-title p {
-            color: #666;
-            font-size: 16px;
+            padding: 0 1.5rem 4rem 1.5rem;
         }
 
         .branches-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
         }
 
         .branch-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .branch-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: var(--brand-accent);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
 
-        .branch-header {
-            background: linear-gradient(135deg, #0f334bff 0%, #1a4d6e 100%);
-            color: white;
-            padding: 25px;
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
         }
 
-        .branch-header h3 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .branch-header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-        .branch-body {
-            padding: 25px;
-        }
-
-        .branch-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .stat-value {
-            font-size: 24px;
+        .branch-badge {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
             font-weight: 700;
-            color: #0f334bff;
-            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 1rem;
         }
 
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
+        .branch-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            margin-bottom: 0.5rem;
         }
 
-        .branch-actions {
-            text-align: center;
+        .branch-location {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            min-height: 3rem;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .stat-pill {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-pill .val {
+            font-weight: 700;
+            color: var(--brand-primary);
+            font-size: 1rem;
+        }
+
+        .stat-pill .lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .card-footer {
+            padding: 1.25rem 1.5rem;
+            background-color: #fcfcfd;
+            border-top: 1px solid var(--border);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
         }
 
         .btn-primary {
-            background: #0f334bff;
+            background-color: var(--brand-accent);
             color: white;
-            padding: 12px 30px;
-            font-size: 16px;
+            width: 100%;
         }
 
         .btn-primary:hover {
-            background: #0a2538;
+            background-color: #4338ca;
         }
 
+        .btn-outline {
+            background-color: white;
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: #f9fafb;
+        }
+
+        /* --- EMPTY STATE --- */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
+            padding: 5rem 2rem;
+            background: white;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            max-width: 600px;
+            margin: 2rem auto;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-
-            .branches-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                padding: 15px 20px;
+            .page-header {
                 flex-direction: column;
-                gap: 15px;
+                align-items: flex-start;
+                gap: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
-        <div>
-            <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <i class="fas fa-layer-group" style="color: var(--brand-accent);"></i>
+            {{ shop.name }} 
         </div>
-    </div>
+        <a href="{% url 'shop_dashboard' %}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+    </nav>
+
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Select Branch</h1>
+            <p>Access operational data and manage orders for specific locations.</p>
+        </div>
+        {% if branches %}
+        <a href="{% url 'add_branch' %}" class="btn btn-outline">
+            <i class="fas fa-plus"></i> New Branch
+        </a>
+        {% endif %}
+    </header>
 
     <div class="container">
-        <div class="page-title">
-            <h1><i class="fas fa-map-marker-alt"></i> Select Branch</h1>
-            <p>Choose a branch to view and manage its orders</p>
-        </div>
-
         {% if branches %}
         <div class="branches-grid">
             {% for branch in branches %}
-            <div class="branch-card">
-                <div class="branch-header">
-                    <h3>{{ branch.name }}</h3>
-                    <p><i class="fas fa-location-dot"></i> {{ branch.address }}</p>
-                </div>
-                <div class="branch-body">
-                    <div class="branch-stats">
-                        <div class="stat-item">
-                            <span class="stat-value">{{ branch.services.count }}</span>
-                            <span class="stat-label">Services</span>
+            <article class="branch-card">
+                <div class="card-body">
+                    <span class="branch-badge">Active Unit</span>
+                    <h3 class="branch-name">{{ branch.name }}</h3>
+                    <div class="branch-location">
+                        <i class="fas fa-location-dot" style="margin-top: 3px; color: var(--brand-accent);"></i>
+                        <span>{{ branch.address }}</span>
+                    </div>
+
+                    <div class="card-stats">
+                        <div class="stat-pill">
+                            <span class="val">{{ branch.services.count }}</span>
+                            <span class="lbl">Services</span>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-value">{{ branch.orders.count }}</span>
-                            <span class="stat-label">Orders</span>
+                        <div class="stat-pill">
+                            <span class="val">{{ branch.orders.count }}</span>
+                            <span class="lbl">Orders</span>
                         </div>
                     </div>
-                    <div class="branch-actions">
-                        <a href="{% url 'branch_orders' branch.id %}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> View Orders
-                        </a>
-                    </div>
                 </div>
-            </div>
+                <div class="card-footer">
+                    <a href="{% url 'branch_orders' branch.id %}" class="btn btn-primary">
+                        Enter Branch Console <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                </div>
+            </article>
             {% endfor %}
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="fas fa-store-alt"></i>
-            <p>No branches found for this shop.</p>
-            <a href="{% url 'add_branch' %}" class="btn btn-primary" style="margin-top: 20px;">
-                <i class="fas fa-plus"></i> Add Branch
+            <i class="fas fa-store-slash" style="font-size: 3rem; color: var(--border); margin-bottom: 1.5rem; display: block;"></i>
+            <h2 style="margin-bottom: 0.5rem;">No branches registered</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">You haven't added any branch locations to your shop yet.</p>
+            <a href="{% url 'add_branch' %}" class="btn btn-primary" style="width: auto;">
+                <i class="fas fa-plus"></i> Register First Branch
             </a>
         </div>
         {% endif %}
     </div>
+
 </body>
 </html>
