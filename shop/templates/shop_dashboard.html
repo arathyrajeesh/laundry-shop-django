@@ -1000,49 +1000,63 @@
             {% endif %}
         </div>
         {% if incomplete_payment_count > 0 %}
-        <div class="dashboard-section" style="border-left: 6px solid #e74c3c;">
-            <div class="section-header">
+        
+        <div class="dashboard-section"
+            style="border-left: 6px solid #e74c3c;">
+
+            <!-- 🔽 MAIN DROPDOWN HEADER -->
+            <div class="section-header"
+                style="cursor:pointer;"
+                onclick="toggleIncompletePayments()">
                 <h2 style="color:#e74c3c;">
                     <i class="fas fa-exclamation-circle"></i>
                     Incomplete Payments ({{ incomplete_payment_count }})
                 </h2>
+                <i class="fas fa-chevron-down"
+                id="incomplete-chevron"
+                style="color:#e74c3c; transition: transform 0.3s;"></i>
             </div>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Branch</th>
-                        <th>Amount</th>
-                        <th>Payment Status</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in incomplete_payment_orders %}
-                    <tr>
-                        <td>#{{ order.id }}</td>
-                        <td>
-                            {{ order.user.username }}<br>
-                            <small style="color:#777;">{{ order.user.email }}</small>
-                        </td>
-                        <td>{{ order.branch.name }}</td>
-                        <td>₹{{ order.amount|floatformat:2 }}</td>
-                        <td>
-                            <span class="status-badge status-pending">
-                                Payment Incomplete
-                            </span>
-                        </td>
-                        <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <!-- 🔒 DROPDOWN CONTENT -->
+            <div id="incomplete-payments-body" style="display:none;">
 
-            <p style="margin-top:15px; color:#777; font-size:13px;">
-                ⚠ These orders cannot be processed until payment is completed.
-            </p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Branch</th>
+                            <th>Amount</th>
+                            <th>Payment Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in incomplete_payment_orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>
+                                {{ order.user.username }}<br>
+                                <small style="color:#777;">{{ order.user.email }}</small>
+                            </td>
+                            <td>{{ order.branch.name }}</td>
+                            <td>₹{{ order.amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="status-badge status-pending">
+                                    Payment Incomplete
+                                </span>
+                            </td>
+                            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <p style="margin-top:15px; color:#777; font-size:13px;">
+                    ⚠ These orders cannot be processed until payment is completed.
+                </p>
+
+            </div>
         </div>
         {% endif %}
 
@@ -1275,8 +1289,18 @@
             const item = document.getElementById(`order-${orderId}`).parentElement;
             item.classList.toggle("open");
         }
+        function toggleIncompletePayments() {
+            const body = document.getElementById("incomplete-payments-body");
+            const chevron = document.getElementById("incomplete-chevron");
 
-
+            if (body.style.display === "none") {
+                body.style.display = "block";
+                chevron.style.transform = "rotate(180deg)";
+            } else {
+                body.style.display = "none";
+                chevron.style.transform = "rotate(0deg)";
+            }
+        }
     </script>
 </body>
 </html>
