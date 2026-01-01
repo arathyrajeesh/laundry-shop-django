@@ -9,171 +9,116 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
+        :root {
+            --primary: #0c0f2d;
+            --indigo: #6366f1;
+            --accent: #7b61ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --bg-soft: #f8fafc;
+            --error: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body {
-            background: #fff;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
 
-        .page-wrapper {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-        }
+        body { background: var(--bg-soft); color: var(--text-main); height: 100vh; overflow: hidden; }
 
-        /* LEFT PANEL IMAGE */
+        .page-wrapper { display: flex; height: 100vh; width: 100%; }
+
+        /* --- LEFT PANEL: BRANDING --- */
         .left-panel {
             width: 50%;
-            background: #000;
             position: relative;
-            overflow: hidden; 
-            
-        }
-        .left-panel img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
-
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(68, 69, 73, 0.3), rgba(33, 25, 78, 0.3));
-            z-index: 1;
-        }
-
-        /* RIGHT PANEL FORM */
-        .right-panel {
-            width: 75%;
-            padding: 40px 10%;
+            background: var(--primary);
             display: flex;
             flex-direction: column;
             justify-content: center;
+            padding: 60px;
+            color: white;
         }
 
-        .brand {
-            font-family: cursive;
-            font-size: 24px;
-            margin-bottom: 40px;
-            color: #111;
+        .left-panel img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0.5; mix-blend-mode: overlay;
         }
 
-        .signup-box {
-            max-width: 400px;
+        .brand-content { position: relative; z-index: 2; }
+        .brand-content h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
+        .brand-content p { font-size: 18px; opacity: 0.9; max-width: 400px; }
+
+        /* --- RIGHT PANEL: FORM --- */
+        .right-panel {
+            width: 50%;
+            background: var(--white);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
         }
 
-        h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #111;
+        .signup-box { width: 100%; max-width: 420px; padding: 20px 0; }
+
+        .logo-box {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: #f1f5f9; padding: 8px; margin-bottom: 24px;
         }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        h2 { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+
+        /* --- FORM STYLING --- */
+        .form-grid { display: grid; gap: 16px; width: 100%; }
+        
+        label { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; display: block; }
 
         input {
-            width: 100%;
-            padding: 14px 15px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-size: 14px;
+            width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0;
+            border-radius: 10px; font-size: 14px; transition: var(--transition); outline: none;
         }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(123, 97, 255, 0.1); }
 
-        .password-container {
-            position: relative;
-        }
-
+        .password-container { position: relative; }
         .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            background: none;
-            border: none;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
+            position: absolute; right: 14px; top: 12px; background: none; border: none;
+            cursor: pointer; color: var(--text-muted);
         }
 
         button[type="submit"] {
-            width: 100%;
-            background: #0c0f2d;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 30px;
-            font-size: 15px;
-            font-weight: 600;
-            margin-top: 10px;
-            cursor: pointer;
+            width: 100%; background: var(--primary); color: white; padding: 14px;
+            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: var(--transition); margin-top: 10px;
         }
+        button[type="submit"]:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(123, 97, 255, 0.3); }
 
-        .footer-small, .signup-text {
-            font-size: 12px;
-            color: #777;
-            margin-top: 10px;
-        }
+        .signup-text { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
+        .signup-text a { color: var(--accent); font-weight: 700; text-decoration: none; }
 
-        .signup-text a {
-            color: #7b61ff;
-            font-weight: 600;
-            text-decoration: none;
-        }
+        /* --- ALERT MESSAGES --- */
+        .alert { padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; font-weight: 500; }
+        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        .logo-box {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 20px;
-            border-radius: 50%;
-            background: #e8ddff;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .form-container{
-            display:flex;
-            justify-content:center;
-        }
-        .logo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .left-panel {
-                display: none;
-            }
-            .right-panel {
-                width: 100%;
-                padding: 30px;
-            }
+        @media (max-width: 900px) {
+            .left-panel { display: none; }
+            .right-panel { width: 100%; }
         }
     </style>
 </head>
 <body>
 
 <div class="page-wrapper">
-
-    <!-- LEFT PANEL IMAGE -->
     <div class="left-panel">
         <img src="{% static 'images/login.webp' %}" alt="Background image">
+        <div class="brand-content">
+            <h1>Join Shine & Bright.</h1>
+            <p>Experience the future of laundry with smart location tracking and professional care.</p>
+        </div>
     </div>
 
-
-    <!-- RIGHT PANEL FORM -->
     <div class="right-panel">
         <div class="signup-box">
             <div class="logo-box">
@@ -181,57 +126,62 @@
             </div>
 
             <h2>Create Account</h2>
+            <p class="subtitle">Join our community for fresh clothes delivered fast.</p>
 
             {% if messages %}
                 {% for message in messages %}
-                    <div style="
-                        background: {% if message.tags == 'error' %}#ffdddd{% else %}#ddffdd{% endif %};
-                        padding: 12px;
-                        border-left: 5px solid {% if message.tags == 'error' %}#e63946{% else %}#2d6a4f{% endif %};
-                        margin-bottom: 15px;
-                        border-radius: 5px;
-                        color: #333;
-                    ">
-                        {{ message }}
-                    </div>
+                    <div class="alert alert-error">{{ message }}</div>
                 {% endfor %}
             {% endif %}
 
-            <div class="form-container">
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="text" name="username" placeholder="Enter Username" required>
-                    <input type="email" name="email" placeholder="Enter Email" required>
-                    
-                    <div class="password-container">
-                        <input type="password" id="password1" name="password" placeholder="Enter Password" required>
-                        <button type="button" class="toggle-password" onclick="togglePassword('password1')">
-                            <i class="fas fa-eye"></i>
-                        </button>
+            <form method="POST" class="form-grid" id="signupForm">
+                {% csrf_token %}
+                
+                <div>
+                    <label>Username <span style="color: var(--error);">*</span></label>
+                    <input type="text" name="username" placeholder="johndoe123" required>
+                </div>
+
+                <div>
+                    <label>Email Address <span style="color: var(--error);">*</span></label>
+                    <input type="email" name="email" placeholder="john@example.com" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label>Password <span style="color: var(--error);">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="password1" name="password" placeholder="••••••••" required minlength="8">
+                            <button type="button" class="toggle-password" onclick="togglePassword('password1')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
-
-                    <div class="password-container">
-                        <input type="password" id="password2" name="password_confirm" placeholder="Confirm Password" required>
-                        <button type="button" class="toggle-password" onclick="togglePassword('password2')">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                    <div>
+                        <label>Confirm <span style="color: var(--error);">*</span></label>
+                        <div class="password-container">
+                            <input type="password" id="password2" name="password_confirm" placeholder="••••••••" required minlength="8">
+                        </div>
                     </div>
+                </div>
 
-                    <input type="text" name="manual_location" id="manual_location" placeholder="Enter your city or location (optional)">
-                    <input type="hidden" name="latitude" id="latitude">
-                    <input type="hidden" name="longitude" id="longitude">
-                    <input type="hidden" name="city" id="city">
-                    <p id="location-status" style="font-size: 12px; color: #888; margin-top: 5px;"></p>
+                <div>
+                    <label>Location (City/Town) <span style="color: var(--error);">*</span></label>
+                    <input type="text" name="manual_location" id="manual_location" placeholder="e.g. Kozhikode" required>
+                    <p id="location-status" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></p>
+                </div>
 
-                    <button type="submit">Signup</button>
-                </form>
-            </div>
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+                <input type="hidden" name="city" id="city" required>
+
+                <button type="submit" id="submitBtn">Create Account</button>
+            </form>
             <p class="signup-text">
                 Already have an account? <a href="{% url 'login' %}">Login here</a>
             </p>
         </div>
     </div>
-
 </div>
 
 <script>
@@ -250,7 +200,7 @@
             icon.classList.add('fa-eye');
         }
     }
-
+    
     const locationStatus = document.getElementById("location-status");
     const manualLocationInput = document.getElementById("manual_location");
 
