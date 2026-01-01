@@ -780,22 +780,31 @@ def help_view(request):
 @login_required
 def my_orders(request):
     """Renders the My Orders page."""
-    # Show all orders, but modify status display for unpaid ones
-    user_orders = Order.objects.filter(user=request.user).select_related('shop', 'branch').order_by('-created_at')
 
-    # Add branch rating data and modify status for unpaid orders
+    user_orders = (
+        Order.objects
+        .filter(user=request.user)
+        .select_related('shop', 'branch')
+        .order_by('-created_at')
+    )
+
     for order in user_orders:
+        # Attach branch rating (if exists)
         if order.branch:
-            order.branch_rating = BranchRating.objects.filter(user=request.user, branch=order.branch).first()
-        # Override cloth_status display if payment not completed
-        for order in shop_orders_all:
-            if order.payment_status != "Completed":
-                order.display_status = "Payment Incomplete"
-            else:
-                order.display_status = order.cloth_status
+            order.branch_rating = BranchRating.objects.filter(
+                user=request.user,
+                branch=order.branch
+            ).first()
 
+        # ✅ Display logic for payment
+        if order.payment_status != "Completed":
+            order.display_status = "Payment Incomplete"
+        else:
+            order.display_status = order.cloth_status
 
-    return render(request, 'orders.html', {'orders': user_orders})
+    return render(request, 'orders.html', {
+        'orders': user_orders
+    })
 
 
 @login_required
