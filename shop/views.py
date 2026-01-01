@@ -44,6 +44,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from .models import Order, Profile
 from django.db.models import Count
+from datetime import timedelta
 
 def splash(request):
     return render(request, 'splash.html')
@@ -2486,9 +2487,14 @@ def shop_dashboard(request):
 
     # 🔒 PAID & UNPAID ORDERS (SEPARATED)
     paid_orders = Order.objects.filter(shop=shop, payment_status="Completed")
-    unpaid_orders = Order.objects.filter(shop=shop, payment_status="Pending")
+    one_week_ago = timezone.now() - timedelta(days=7)
 
-    # =====================
+    unpaid_orders = Order.objects.filter(
+        shop=shop,
+        payment_status="Pending",
+        created_at__gte=one_week_ago   # ✅ ONLY LAST 7 DAYS
+    )
+        # =====================
     # 📊 SHOP STATISTICS (PAID ONLY)
     # =====================
     total_orders = paid_orders.count()
