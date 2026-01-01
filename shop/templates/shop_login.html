@@ -6,138 +6,139 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management Console | Shine & Bright</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-deep: #020617;
-            --card-glass: rgba(15, 23, 42, 0.8);
-            --neon-blue: #38bdf8;
-            --neon-glow: rgba(56, 189, 248, 0.3);
-            --text-silver: #94a3b8;
-            --white: #ffffff;
+            --brand-primary: #3b82f6; /* Professional Blue */
+            --brand-hover: #2563eb;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body { 
-            background: radial-gradient(circle at top right, #1e293b, #020617);
+            background: radial-gradient(at 0% 0%, #1e293b 0, transparent 50%), 
+                        radial-gradient(at 50% 0%, #0f172a 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, #1e293b 0, transparent 50%),
+                        #020617;
             display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; color: var(--white);
-            overflow: hidden;
-        }
-
-        /* Animated Background Elements */
-        .bg-glow {
-            position: absolute; width: 300px; height: 300px;
-            background: var(--neon-glow); filter: blur(100px);
-            border-radius: 50%; z-index: -1;
+            min-height: 100vh; color: var(--text-main);
         }
 
         /* --- THE LOGON CARD --- */
         .admin-card {
-            background: var(--card-glass);
-            width: 100%; max-width: 420px;
-            padding: 50px 40px;
-            border-radius: 24px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            background: var(--card-bg);
+            width: 100%; max-width: 440px;
+            padding: 48px;
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .logo-area {
-            width: 70px; height: 70px; background: rgba(56, 189, 248, 0.1);
-            border-radius: 20px; display: flex; align-items: center;
+        .header { text-align: center; margin-bottom: 32px; }
+
+        .logo-wrapper {
+            width: 56px; height: 56px; 
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.2));
+            border-radius: 12px; display: flex; align-items: center;
             justify-content: center; margin: 0 auto 20px;
-            border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-glow);
+            border: 1.5px solid rgba(59, 130, 246, 0.3);
         }
 
-        .logo-area i { font-size: 28px; color: var(--neon-blue); }
+        .logo-wrapper i { font-size: 24px; color: var(--brand-primary); }
 
-        h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
-        .tagline { font-size: 14px; color: var(--text-silver); margin-bottom: 40px; }
+        h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .tagline { font-size: 14px; color: var(--text-muted); }
 
         /* --- FORM ELEMENTS --- */
-        .field { margin-bottom: 20px; text-align: left; }
+        .field { margin-bottom: 24px; position: relative; }
         
         label { 
-            display: block; font-size: 11px; font-weight: 700; 
-            color: var(--neon-blue); text-transform: uppercase; 
-            margin-bottom: 8px; letter-spacing: 1px;
+            display: block; font-size: 13px; font-weight: 500; 
+            color: var(--text-main); margin-bottom: 8px;
         }
 
         .input-group { position: relative; }
         
-        .input-group i { 
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            color: var(--text-silver); font-size: 14px; 
+        .input-group i.prefix { 
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 15px; pointer-events: none;
         }
 
         input {
-            width: 100%; padding: 14px 16px 14px 46px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px; color: var(--white); border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; padding: 12px 14px 12px 42px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            font-size: 15px; color: var(--text-main); border-radius: 10px;
+            transition: all 0.2s ease;
         }
 
         input:focus {
-            outline: none; background: rgba(255, 255, 255, 0.07);
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+            outline: none; 
+            border-color: var(--brand-primary);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
         .btn-submit {
             width: 100%; 
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-            color: white; padding: 16px; border: none; 
-            font-size: 15px; font-weight: 700; border-radius: 12px;
-            cursor: pointer; transition: all 0.3s;
-            margin-top: 10px; box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.4);
+            background: var(--brand-primary);
+            color: white; padding: 14px; border: none; 
+            font-size: 15px; font-weight: 600; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s;
+            margin-top: 8px;
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(56, 189, 248, 0.5);
-            filter: brightness(1.1);
+            background: var(--brand-hover);
+            transform: translateY(-1px);
         }
+
+        .btn-submit:active { transform: translateY(0); }
 
         /* --- TOGGLE BUTTON --- */
         .toggle-btn {
-            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; cursor: pointer; color: var(--text-silver);
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: var(--text-muted);
+            padding: 4px; transition: color 0.2s;
         }
+        
+        .toggle-btn:hover { color: var(--text-main); }
 
         .footer-nav {
-            margin-top: 35px; display: flex; justify-content: space-between;
-            font-size: 13px; color: var(--text-silver);
+            margin-top: 32px; display: flex; justify-content: center; gap: 24px;
+            font-size: 13px; border-top: 1px solid var(--border-color);
+            padding-top: 24px;
         }
 
-        .footer-nav a { color: var(--white); text-decoration: none; font-weight: 600; transition: 0.3s; }
-        .footer-nav a:hover { color: var(--neon-blue); }
+        .footer-nav a { color: var(--text-muted); text-decoration: none; transition: 0.2s; }
+        .footer-nav a:hover { color: var(--brand-primary); }
 
         /* --- ERRORS --- */
         .error-box {
-            background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444;
-            color: #fca5a5; padding: 12px; border-radius: 10px;
-            font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171; padding: 12px 16px; border-radius: 8px;
+            font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow" style="top: 10%; right: 10%;"></div>
-    <div class="bg-glow" style="bottom: 10%; left: 10%;"></div>
-
     <div class="admin-card">
-        <div class="logo-area">
-            <i class="fas fa-shield-halved"></i>
+        <div class="header">
+            <div class="logo-wrapper">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1>Merchant Portal</h1>
+            <p class="tagline">Enter your credentials to manage your store</p>
         </div>
-        
-        <h1>Shop Console</h1>
-        <p class="tagline">Secure Management Environment</p>
 
         {% if messages %}
             {% for message in messages %}
@@ -147,34 +148,34 @@
             {% endfor %}
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" id="loginForm">
             {% csrf_token %}
             
             <div class="field">
-                <label>Merchant ID</label>
+                <label for="shop_name">Merchant ID</label>
                 <div class="input-group">
-                    <i class="fas fa-fingerprint"></i>
-                    <input type="text" name="shop_name" placeholder="SHOP_REF_001" required autofocus>
+                    <i class="fas fa-hashtag prefix"></i>
+                    <input type="text" id="shop_name" name="shop_name" placeholder="e.g. SHOP_4402" required autofocus>
                 </div>
             </div>
 
             <div class="field">
-                <label>Security Key</label>
+                <label for="password">Security Key</label>
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="password" name="password" placeholder="••••••••" required>
-                    <button type="button" class="toggle-btn" id="toggleBtn">
+                    <i class="fas fa-key prefix"></i>
+                    <input type="password" id="password" name="password" placeholder="Enter key" required>
+                    <button type="button" class="toggle-btn" id="toggleBtn" tabindex="-1">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">Enter Dashboard</button>
+            <button type="submit" class="btn-submit" id="submitBtn">Sign In to Dashboard</button>
         </form>
 
         <div class="footer-nav">
-            <a href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Home</a>
-            <a href="#">Security Help</a>
+            <a href="{% url 'home' %}">Return Home</a>
+            <a href="#">Support Console</a>
         </div>
     </div>
 
@@ -182,11 +183,21 @@
         const passInput = document.getElementById('password');
         const toggleBtn = document.getElementById('toggleBtn');
         const icon = toggleBtn.querySelector('i');
+        const form = document.getElementById('loginForm');
+        const btn = document.getElementById('submitBtn');
 
+        // Toggle Password Visibility
         toggleBtn.addEventListener('click', () => {
             const isSecret = passInput.type === 'password';
             passInput.type = isSecret ? 'text' : 'password';
             icon.className = isSecret ? 'fas fa-eye-slash' : 'fas fa-eye';
+        });
+
+        // Loading State Simulation
+        form.addEventListener('submit', () => {
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
+            btn.style.opacity = '0.8';
+            btn.style.pointerEvents = 'none';
         });
     </script>
 </body>

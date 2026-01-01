@@ -18,20 +18,33 @@
         }
 
         body {
-            background: #f5f7fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
         }
 
         :root {
-            --primary-color: #0f334bff;
+            --primary-color: #0f334b;
+            --primary-dark: #0a2538;
             --accent-color: #2ecc71;
+            --accent-dark: #27ae60;
             --warning-color: #f39c12;
+            --danger-color: #e74c3c;
             --info-color: #3498db;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .shop-header {
-            background: white;
+            background: var(--white);
             padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
