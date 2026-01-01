@@ -25,7 +25,6 @@ urlpatterns = [
         path("shop/<int:shop_id>/branch/<int:branch_id>/select-services/", views.select_services, name="select_services_branch"),
         path("shop/<int:shop_id>/create-order/", views.create_order, name="create_order"),
         path("user-details/", views.user_details, name="user_details"),
-        # path("payment/", views.payment, name="payment"),
         path("payment/success/", views.payment_success, name="payment_success"),
         path("payment/failed/", views.payment_failed, name="payment_failed"),
         path("branch/<int:branch_id>/", views.branch_detail, name="branch_detail"),

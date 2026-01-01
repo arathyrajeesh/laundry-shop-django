@@ -558,7 +558,13 @@
 
                     <div class="info-item">
                         <span class="info-label">Status</span>
-                        <span class="info-value">{{ order.get_cloth_status_display }}</span>
+                        <span class="info-value">
+                            {% if order.payment_status == "Completed" %}
+                                Paid
+                            {% else %}
+                                Payment Pending
+                            {% endif %}
+                        </span>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; padding:8px 0;">
@@ -599,11 +605,24 @@
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }}">
-                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                                <i class="fas fa-
+                                    {% if 'success' in message.tags %}
+                                        check-circle
+                                    {% elif 'error' in message.tags %}
+                                        exclamation-circle
+                                    {% elif 'warning' in message.tags %}
+                                        exclamation-triangle
+                                    {% else %}
+                                        info-circle
+                                    {% endif %}
+                                "></i>
                                 {{ message }}
+                                <span onclick="this.parentElement.style.display='none'"
+                                    style="margin-left:auto; cursor:pointer; font-weight:bold;">&times;</span>
                             </div>
                         {% endfor %}
                     {% endif %}
+
 
                     <h3><i class="fas fa-clipboard-list"></i> Delivery Details</h3>
 
@@ -752,12 +771,14 @@
                         </div>
 
                         <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2ecc71;">
-                            <strong style="color: #2ecc71;"><i class="fas fa-store"></i> Shop:</strong> 
-                            <span style="color: #333;">{{ shop.name }}</span><br>
-                            <small style="color: #666; margin-top: 5px; display: block;">
-                                <i class="fas fa-info-circle"></i> Payment will be processed for this shop
+                            <strong style="color: #2ecc71;">
+                                <i class="fas fa-shield-alt"></i> Payment Platform
+                            </strong><br>
+                            <small style="color: #333;">
+                                Payment is securely processed by <b>Shine &amp; Bright Platform</b>
                             </small>
                         </div>
+
 
                         <div class="payment-buttons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                             <button class="pay-btn" onclick="startPayment('card')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
@@ -792,153 +813,228 @@
     {% if show_payment and razorpay_order_id %}
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+
     <script>
-        // Scroll to payment section function
-        function scrollToPayment() {
-            const paymentSection = document.getElementById('payment-section');
-            if (paymentSection) {
-                paymentSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-                // Hide scroll indicator after scrolling
-                setTimeout(() => {
-                    const indicator = document.getElementById('scroll-indicator');
-                    if (indicator) {
-                        indicator.style.opacity = '0';
-                        indicator.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => {
-                            indicator.style.display = 'none';
-                        }, 500);
-                    }
-                }, 1000);
-            }
-        }
+    /* =========================================================
+    PAYMENT PAGE SCRIPT (MERGED & CLEAN)
+    ========================================================= */
 
-        // Auto-scroll to payment if delivery details are just saved
-        {% if show_payment and razorpay_order_id %}
-        window.addEventListener('load', function() {
-            // Check if we just saved delivery details (show_payment is true)
-            const indicator = document.getElementById('scroll-indicator');
-            if (indicator) {
-                // Show indicator with animation
-                indicator.style.opacity = '0';
-                indicator.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => {
-                    indicator.style.opacity = '1';
-                }, 300);
-                
-                // Auto-scroll after a short delay to show the indicator first
-                setTimeout(() => {
-                    scrollToPayment();
-                }, 1500);
-            }
-        });
-        {% endif %}
-        function startPayment(method, upiApp = null) {
-            const options = {
-                key: '{{ razorpay_key_id }}',
-                amount: {{ order.amount|floatformat:0 }} * 100,                
-                currency: 'INR',
-                name: 'Shine & Bright',
-                description: 'Laundry Service Order #{{ order.id }}',
-                order_id: '{{ razorpay_order_id }}',
-                method: method,
-                handler: function (response) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{% url "payment_success" %}';
+    /* -----------------------------
+    GLOBAL FLAG
+    ------------------------------ */
+    let allowLeavePayment = false;
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = 'csrfmiddlewaretoken';
-                    csrfToken.value = '{{ csrf_token }}';
-                    form.appendChild(csrfToken);
+    /* -----------------------------
+    SCROLL TO PAYMENT SECTION
+    ------------------------------ */
+    function scrollToPayment() {
+        const paymentSection = document.getElementById('payment-section');
+        if (paymentSection) {
+            paymentSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
 
-                    const paymentId = document.createElement('input');
-                    paymentId.type = 'hidden';
-                    paymentId.name = 'razorpay_payment_id';
-                    paymentId.value = response.razorpay_payment_id;
-                    form.appendChild(paymentId);
-
-                    const orderId = document.createElement('input');
-                    orderId.type = 'hidden';
-                    orderId.name = 'razorpay_order_id';
-                    orderId.value = response.razorpay_order_id;
-                    form.appendChild(orderId);
-
-                    const signature = document.createElement('input');
-                    signature.type = 'hidden';
-                    signature.name = 'razorpay_signature';
-                    signature.value = response.razorpay_signature;
-                    form.appendChild(signature);
-
-                    document.body.appendChild(form);
-                    form.submit();
-                },
-                prefill: {
-                    name: '{{ request.user.get_full_name|default:request.user.username }}',
-                    email: '{{ request.user.email }}',
-                },
-                theme: {
-                    color: '#667eea'
-                },
-                modal: {
-                    ondismiss: function() {
-                        window.location.href = '{% url "payment_failed" %}';
-                    }
+            setTimeout(() => {
+                const indicator = document.getElementById('scroll-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '0';
+                    indicator.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => indicator.style.display = 'none', 500);
                 }
-            };
+            }, 1000);
+        }
+    }
 
-            if (method === 'upi' && upiApp) {
-                options.upi_app = upiApp;
+    /* Auto scroll after delivery save */
+    window.addEventListener('load', function () {
+        const indicator = document.getElementById('scroll-indicator');
+        if (indicator) {
+            indicator.style.opacity = '0';
+            indicator.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => indicator.style.opacity = '1', 300);
+            setTimeout(scrollToPayment, 1500);
+        }
+    });
+
+    /* -----------------------------
+    RAZORPAY PAYMENT
+    ------------------------------ */
+    function startPayment(method, upiApp = null) {
+        const options = {
+            key: '{{ razorpay_key_id }}',
+            amount: {{ order.amount|floatformat:0 }} * 100,
+            currency: 'INR',
+            name: 'Shine & Bright',
+            description: 'Laundry Service Order #{{ order.id }}',
+            order_id: '{{ razorpay_order_id }}',
+            method: method,
+
+            handler: function (response) {
+                allowLeavePayment = true; // allow navigation after success
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{% url "payment_success" %}';
+
+                form.innerHTML = `
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <input type="hidden" name="razorpay_payment_id" value="${response.razorpay_payment_id}">
+                    <input type="hidden" name="razorpay_order_id" value="${response.razorpay_order_id}">
+                    <input type="hidden" name="razorpay_signature" value="${response.razorpay_signature}">
+                `;
+
+                document.body.appendChild(form);
+                form.submit();
+            },
+
+            prefill: {
+                name: '{{ request.user.get_full_name|default:request.user.username }}',
+                email: '{{ request.user.email }}'
+            },
+
+            theme: { color: '#667eea' },
+
+            modal: {
+                ondismiss: function () {
+                    // Do nothing here – user may try another method
+                }
             }
 
-            const rzp = new Razorpay(options);
-            rzp.open();
+        };
+
+        if (method === 'upi' && upiApp) {
+            options.upi_app = upiApp;
         }
 
+        const rzp = new Razorpay(options);
+        rzp.open();
+    }
 
-        function closeUPIQR() {
-            document.getElementById('upi-qr-modal').style.display = 'none';
-        }
+    /* -----------------------------
+    UPI QR MODAL
+    ------------------------------ */
+    function closeUPIQR() {
+        document.getElementById('upi-qr-modal').style.display = 'none';
+    }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('upi-qr-modal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('upi-qr-modal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
         }
-        
+    });
+
+
+    /* -----------------------------
+    LEAVE PAYMENT WARNING MODAL
+    ------------------------------ */
+    function showLeaveWarningModal() {
+        const modal = document.getElementById("leaveWarningModal");
+        if (modal) modal.style.display = "flex";
+    }
+
+    function stayOnPaymentPage() {
+        allowLeavePayment = false;
+        document.getElementById("leaveWarningModal").style.display = "none";
+        history.pushState(null, "", location.href);
+    }
+
+    function leavePaymentPage() {
+        allowLeavePayment = true;
+        window.location.href = "{% url 'dashboard' %}";
+    }
+
+    /* -----------------------------
+    TRAP BACK / REFRESH
+    ------------------------------ */
+    history.pushState({ page: "payment" }, "", location.href);
+    window.addEventListener("popstate", function () {
+        if (!allowLeavePayment) {
+            showLeaveWarningModal();
+            history.pushState({ page: "payment" }, "", location.href);
+        }
+    });
+
+    window.addEventListener("beforeunload", function (e) {
+        if (!allowLeavePayment) {
+            e.preventDefault();
+            e.returnValue = "";
+        }
+    });
+
+    /* -----------------------------
+    UI BACK BUTTON
+    ------------------------------ */
+    document.addEventListener("DOMContentLoaded", function () {
+        const backLink = document.getElementById("back-link");
+        if (backLink) {
+            backLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                showLeaveWarningModal();
+            });
+        }
+    });
     </script>
     {% endif %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const backLink = document.getElementById('back-link');
-            
-            // 1. Handle the UI "Back" button click
-            if (backLink) {
-                backLink.addEventListener('click', function(e) {
-                    const confirmationMessage = "Are you sure you want to leave? Your delivery details and progress will not be saved.";
-                    if (!confirm(confirmationMessage)) {
-                        e.preventDefault(); // Stop the navigation if user clicks 'Cancel'
-                    }
-                });
-            }
 
-            // 2. Handle Browser Back/Close/Refresh (Optional but recommended)
-            // This triggers the browser's native "Leave site?" dialog
-            window.addEventListener('beforeunload', function (e) {
-                // Only show if the user has started filling the form 
-                // and hasn't submitted it yet.
-                const formHasData = document.querySelector('input[name="delivery_name"]').value !== "";
-                
-                if (formHasData) {
-                    e.preventDefault();
-                    e.returnValue = ''; // Required by Chrome
-                }
-            });
-        });
-    </script>
+    <!-- Leave Payment Warning Modal -->
+    <div id="leaveWarningModal" style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.6);
+        z-index:20000;
+        align-items:center;
+        justify-content:center;
+    ">
+        <div style="
+            background:#fff;
+            padding:30px;
+            border-radius:16px;
+            width:90%;
+            max-width:420px;
+            text-align:center;
+            box-shadow:0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease-out;
+        ">
+            <h3 style="color:#e74c3c; margin-bottom:10px;">
+                ⚠ Payment is Ongoing
+            </h3>
+
+            <p style="color:#555; margin-bottom:25px;">
+                Your payment is currently in progress.<br>
+                If you go back now, the payment will be cancelled and your order will remain unpaid.
+            </p>
+
+
+            <div style="display:flex; gap:12px; justify-content:center;">
+                <button onclick="stayOnPaymentPage()" style="
+                    background:#2ecc71;
+                    color:#fff;
+                    border:none;
+                    padding:12px 20px;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                ">
+                    Stay & Complete Payment
+                </button>
+
+                <button onclick="leavePaymentPage()" style="
+                    background:#e74c3c;
+                    color:#fff;
+                    border:none;
+                    padding:12px 20px;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                ">
+                    Leave Page
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
