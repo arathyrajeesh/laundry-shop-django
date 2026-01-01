@@ -4,592 +4,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ branch.name }} Orders - {{ shop.name }}</title>
+    <title>{{ branch.name }} Console | {{ shop.name }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            font-family: "Poppins", sans-serif;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #f5f7fa;
-        }
-
         :root {
-            --primary-color: #0f334bff;
-            --accent-color: #2ecc71;
-            --warning-color: #f39c12;
-            --info-color: #3498db;
+            --brand-primary: #0f172a;
+            --brand-accent: #2563eb;
+            --bg-page: #f8fafc;
+            --card-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
         }
 
-        .header {
-            background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-page); color: var(--text-main); line-height: 1.5; }
+
+        /* --- PROFESSIONAL TOP HEADER --- */
+        .top-navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
         }
 
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 28px;
-        }
+        .brand-area h1 { font-size: 1.1rem; font-weight: 800; color: var(--brand-primary); }
+        .breadcrumb { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .breadcrumb a { color: var(--brand-accent); text-decoration: none; font-weight: 600; }
 
-        .header .breadcrumb {
-            color: #666;
-            font-size: 14px;
-        }
+        /* --- CONTAINER --- */
+        .content-wrap { max-width: 1300px; margin: 32px auto; padding: 0 24px; }
 
-        .header .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
+        /* --- BRANCH OVERVIEW CARD --- */
+        .branch-hero {
+            background: white; border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px;
         }
+        .hero-title h2 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .hero-meta { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
 
-        .header .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
+        /* --- ACTION BUTTONS --- */
         .btn {
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
+            padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: 0.2s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
         }
+        .btn-primary { background: var(--brand-accent); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--card-border); color: var(--text-main); }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 40px;
-        }
-
-        .branch-info {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .branch-details h2 {
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        .branch-details p {
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
+        /* --- STATS GRID --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
         .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);
         }
+        .stat-card-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-card-val { font-size: 1.5rem; font-weight: 800; color: var(--brand-primary); margin-top: 4px; }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        /* --- SECTION BOXES --- */
+        .dashboard-card { background: white; border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 32px; overflow: hidden; }
+        .card-header { padding: 20px 24px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 1rem; font-weight: 700; }
+
+        /* --- SERVICE LIST --- */
+        .service-group { padding: 24px; border-bottom: 1px solid var(--bg-page); }
+        .service-title { font-weight: 700; color: var(--brand-accent); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .cloth-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        .price-tag {
+            background: var(--bg-page); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid transparent; transition: 0.2s;
         }
+        .price-tag:hover { border-color: var(--brand-accent); background: white; }
+        .price-tag .name { font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px; }
+        .price-tag .price { font-size: 1rem; font-weight: 800; color: var(--success); }
 
-        .stat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+        /* --- DATA TABLE --- */
+        .table-wrap { width: 100%; overflow-x: auto; }
+        .pro-table { width: 100%; border-collapse: collapse; }
+        .pro-table th { background: #fcfdfe; padding: 12px 24px; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
+        .pro-table td { padding: 16px 24px; border-bottom: 1px solid var(--bg-page); font-size: 0.85rem; vertical-align: middle; }
 
-        .stat-card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
+        .status-pill { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-washing { background: #e0f2fe; color: #075985; }
 
-        .icon-blue { background: var(--info-color); }
-        .icon-green { background: var(--accent-color); }
-        .icon-orange { background: var(--warning-color); }
-        .icon-purple { background: #9b59b6; }
-
-        .stat-card-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .stat-card-label {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .dashboard-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .section-header h2 {
-            color: var(--primary-color);
-            font-size: 24px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table thead {
-            background: #f8f9fa;
-        }
-
-        .data-table th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .data-table td {
-            padding: 15px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .data-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-washing { background: #d1ecf1; color: #0c5460; }
-        .status-drying { background: #d4edda; color: #155724; }
-        .status-ironing { background: #e2e3e5; color: #383d41; }
-        .status-ready { background: #cce5ff; color: #004085; }
-        .status-completed { background: #d4edda; color: #155724; }
-
-        .update-btn {
-            padding: 5px 15px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
-        .update-btn:hover {
-            background: #27ae60;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .data-table {
-                font-size: 14px;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 10px 5px;
-            }
-
-            .data-table th:nth-child(4),
-            .data-table td:nth-child(4) {
-                display: none; /* Hide cloth details column on mobile */
-            }
-
-            .header {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-
-            .branch-info {
-                flex-direction: column;
-                text-align: center;
-                gap: 20px;
-            }
-        }
-
-        /* Cloth pricing details styling */
-        .cloth-pricing-item {
-            margin-bottom: 8px;
-            padding: 6px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            border-left: 3px solid var(--primary-color);
-            font-size: 13px;
-        }
-
-        .cloth-pricing-item strong {
-            color: var(--primary-color);
-        }
-
-        .cloth-pricing-item small {
-            color: #666;
-            display: block;
-            margin-top: 2px;
-        }
+        .status-select { padding: 8px; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.8rem; outline: none; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div>
-            <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
-            <div class="breadcrumb">
-                <a href="{% url 'shop_dashboard' %}">Dashboard</a> >
-                <a href="{% url 'select_branch' %}">Select Branch</a> >
-                {{ branch.name }}
-            </div>
-        </div>
-        <div>
-            <a href="{% url 'select_branch' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Branches
-            </a>
-        </div>
-    </div>
 
-    <div class="container">
-        <!-- Branch Info -->
-        <div class="branch-info">
-            <div class="branch-details">
-                <h2><i class="fas fa-map-marker-alt"></i> {{ branch.name }}</h2>
-                <p><strong>Address:</strong> {{ branch.address }}</p>
-                {% if branch.phone %}
-                <p><strong>Phone:</strong> {{ branch.phone }}</p>
-                {% endif %}
-            </div>
-            <div>
-                <a href="{% url 'edit_branch' branch.id %}" class="btn btn-secondary">
-                    <i class="fas fa-edit"></i> Edit Branch
-                </a>
+    <header class="top-navbar">
+        <div class="brand-area">
+            <h1><i class="fas fa-layer-group"></i> {{ shop.name }} Console</h1>
+            <div class="breadcrumb">
+                <a href="{% url 'shop_dashboard' %}">System</a> / 
+                <a href="{% url 'select_branch' %}">Branches</a> / 
+                <span>{{ branch.name }}</span>
             </div>
         </div>
+        <div class="nav-actions">
+            <a href="{% url 'select_branch' %}" class="btn btn-outline"><i class="fas fa-chevron-left"></i> Change Branch</a>
+        </div>
+    </header>
+
+    <div class="content-wrap">
+        
+        <section class="branch-hero">
+            <div class="hero-title">
+                <h2><i class="fas fa-map-marker-alt" style="color: var(--brand-accent);"></i> {{ branch.name }}</h2>
+                <p class="hero-meta">{{ branch.address }} • {% if average_rating %}{{ average_rating|floatformat:1 }} Rating{% else %}New Branch{% endif %}</p>
+            </div>
+            <div class="hero-btns">
+                <a href="{% url 'edit_branch' branch.id %}" class="btn btn-outline"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+        </section>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">{{ total_orders }}</div>
-                        <div class="stat-card-label">Total Orders</div>
-                    </div>
-                    <div class="stat-card-icon icon-blue">
-                        <i class="fas fa-shopping-bag"></i>
-                    </div>
-                </div>
+                <div class="stat-card-label">Volume</div>
+                <div class="stat-card-val">{{ total_orders }}</div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">{{ pending_orders }}</div>
-                        <div class="stat-card-label">Pending Orders</div>
-                    </div>
-                    <div class="stat-card-icon icon-orange">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                </div>
+                <div class="stat-card-label">In Progress</div>
+                <div class="stat-card-val" style="color: var(--warning);">{{ pending_orders }}</div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">{{ completed_orders }}</div>
-                        <div class="stat-card-label">Completed Orders</div>
-                    </div>
-                    <div class="stat-card-icon icon-green">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                </div>
+                <div class="stat-card-label">Completed</div>
+                <div class="stat-card-val" style="color: var(--success);">{{ completed_orders }}</div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">₹{{ total_revenue|floatformat:2 }}</div>
-                        <div class="stat-card-label">Total Revenue</div>
-                    </div>
-                    <div class="stat-card-icon icon-green">
-                        <i class="fas fa-rupee-sign"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-card-header">
-                    <div>
-                        <div class="stat-card-value">₹{{ today_revenue|floatformat:2 }}</div>
-                        <div class="stat-card-label">Today's Revenue</div>
-                    </div>
-                    <div class="stat-card-icon icon-purple">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                </div>
+                <div class="stat-card-label">Rev (MTD)</div>
+                <div class="stat-card-val">₹{{ total_revenue|floatformat:0 }}</div>
             </div>
         </div>
 
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2><i class="fas fa-star"></i> Branch Ratings</h2>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3><i class="fas fa-tags"></i> Service Catalog</h3>
+                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Service</a>
             </div>
-            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-                <div style="font-size: 24px; font-weight: 600; color: var(--primary-color);">
-                    {% if average_rating %}
-                        {{ average_rating|floatformat:1 }} <i class="fas fa-star" style="color: #ffd700;"></i>
-                    {% else %}
-                        No ratings yet
-                    {% endif %}
+            
+            {% for service in branch.services.all %}
+            <div class="service-group">
+                <div class="service-title">
+                    <i class="fas fa-check-circle"></i> {{ service.name }}
+                    <a href="{% url 'edit_service' service.id %}" style="font-size: 0.7rem; color: var(--text-muted);">[Edit Rates]</a>
                 </div>
-                <div>
-                    <div style="font-size: 18px; font-weight: 600; color: #333;">{{ branch_ratings|length }} Customer Review{{ branch_ratings|length|pluralize }}</div>
-                    <div style="color: #666; margin-top: 5px;">Average rating from all customers</div>
+                <div class="cloth-grid">
+                    {% for cloth in service.cloths.all %}
+                    <div class="price-tag">
+                        <span class="name">{{ cloth.name }}</span>
+                        <span class="price">₹{{ cloth.price|floatformat:0 }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
+            {% endfor %}
+        </div>
 
-            {% if branch_ratings %}
-                <div style="max-height: 400px; overflow-y: auto;">
-                    {% for rating in branch_ratings %}
-                        <div style="border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                                    <strong style="color: var(--primary-color);">{{ rating.user.username }}</strong>
-                                    <div>
-                                        {% for i in "12345"|make_list %}
-                                            <i class="fas fa-star" style="color: {% if forloop.counter <= rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3><i class="fas fa-list-ul"></i> Active Order Pipeline</h3>
+            </div>
+            
+            <div class="table-wrap">
+                <table class="pro-table">
+                    <thead>
+                        <tr>
+                            <th>Ref</th>
+                            <th>Customer</th>
+                            <th>Items & Pricing</th>
+                            <th>Timeline</th>
+                            <th>Status Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td style="font-weight: 700; color: var(--brand-accent);">#{{ order.id }}</td>
+                            <td>
+                                <div style="font-weight: 700;">{{ order.delivery_name|default:order.user.username }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ order.delivery_phone }}</div>
+                            </td>
+                            <td>
+                                <div style="max-width: 250px;">
+                                    {% for detail in order.cloth_pricing_details %}
+                                        <div style="font-size: 0.75rem; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px;">
+                                            {{ detail.quantity }}x {{ detail.cloth_name }}
+                                        </div>
+                                    {% endfor %}
+                                    <div style="margin-top: 4px; font-weight: 700; color: var(--success);">₹{{ order.amount|floatformat:2 }}</div>
+                                </div>
+                            </td>
+                            <td style="line-height: 1.4;">
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">PICKUP: {{ order.pickup_date|date:"d M" }}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">DELIVERY: {{ order.delivery_date|date:"d M" }}</div>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <select class="status-select" id="status-{{ order.id }}">
+                                        {% for val, label in order.STATUS_CHOICES %}
+                                            <option value="{{ val }}" {% if order.cloth_status == val %}selected{% endif %}>{{ label }}</option>
                                         {% endfor %}
-                                    </div>
-                                    <span style="color: #999; font-size: 12px;">{{ rating.created_at|date:"M d, Y" }}</span>
+                                    </select>
+                                    <button class="btn btn-primary" style="padding: 8px 12px;" onclick="updateOrderStatus({{ order.id }})">Update</button>
                                 </div>
-                                {% if rating.comment %}
-                                    <p style="color: #555; margin: 0; line-height: 1.4;">{{ rating.comment }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-star-half-alt"></i>
-                    <p>No customer ratings yet for this branch. Encourage customers to leave reviews!</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2><i class="fas fa-tags"></i> Cloth Rates for {{ branch.name }}</h2>
-                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add Service
-                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
-            {% if branch.services.all %}
-                {% for service in branch.services.all %}
-                <div style="margin-bottom: 30px; padding: 20px; border: 1px solid #eee; border-radius: 10px; background: #f8f9fa;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h4 style="color: var(--primary-color); margin: 0;">{{ service.name }}</h4>
-                        <div>
-                            <a href="{% url 'edit_service' service.id %}" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">
-                                <i class="fas fa-edit"></i> Edit Rates
-                            </a>
-                            <form method="post" action="{% url 'delete_service' service.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this service?')">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px; background: #dc3545;">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    {% if service.cloths.all %}
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            {% for cloth in service.cloths.all %}
-                                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 8px;">{{ cloth.name }}</div>
-                                    <div style="font-size: 18px; font-weight: 700; color: var(--accent-color);">
-                                        {% if cloth.price %}
-                                            ₹{{ cloth.price|floatformat:2 }}
-                                        {% else %}
-                                            <span style="color: #999; font-size: 14px;">Not set</span>
-                                        {% endif %}
-                                    </div>
-                                    <div style="font-size: 12px; color: #666; margin-top: 5px;">per cloth</div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div style="text-align: center; padding: 20px; color: #666;">
-                            <i class="fas fa-tshirt" style="font-size: 24px; margin-bottom: 10px;"></i>
-                            <p>No cloth types configured for this service.</p>
-                            <a href="{% url 'edit_service' service.id %}" class="btn btn-primary" style="margin-top: 10px;">
-                                <i class="fas fa-plus"></i> Configure Cloth Rates
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-concierge-bell"></i>
-                <p>No services added for this branch yet.</p>
-                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary" style="margin-top: 15px;">
-                    <i class="fas fa-plus"></i> Add First Service
-                </a>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2><i class="fas fa-receipt"></i> Orders for {{ branch.name }}</h2>
-            </div>
-            {% if recent_orders %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Customer Details</th>
-                        <th>Cloth Details & Pricing</th>
-                        <th>Pickup Date</th>
-                        <th>Delivery Date</th>
-                        <th>Status</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in recent_orders %}
-                    <tr>
-                        <td>#{{ order.id }}</td>
-                        <td>{{ order.user.username }}</td>
-                        <td>
-                            <strong>Name:</strong> {{ order.delivery_name|default:"Not provided" }}<br>
-                            <strong>Phone:</strong> {{ order.delivery_phone|default:"Not provided" }}<br>
-                            <strong>Email:</strong> {{ order.user.email }}<br>
-                            <strong>Address:</strong> {{ order.delivery_address|default:"Not provided"|truncatechars:30 }}<br>
-                            <strong>City:</strong> {{ order.user.profile.city|default:"Not provided" }}
-                        </td>
-                        <td>
-                            {% for detail in order.cloth_pricing_details %}
-                                <div style="margin-bottom: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px; border-left: 3px solid var(--primary-color);">
-                                    <strong>{{ detail.service_name }}</strong> - {{ detail.cloth_name }}<br>
-                                    <small style="color: #666;">
-                                        {{ detail.quantity }} × ₹{{ detail.unit_price|floatformat:2 }} = ₹{{ detail.total_price|floatformat:2 }}
-                                    </small>
-                                </div>
-                            {% empty %}
-                                <span style="color: #999;">No cloth details available</span>
-                            {% endfor %}
-                        </td>
-                        <td>{{ order.pickup_date|date:"M d, Y H:i" }}</td>
-                        <td>{{ order.delivery_date|date:"M d, Y H:i" }}</td>
-                        <td>
-                            <span class="status-badge status-{{ order.cloth_status|lower }}">{{ order.cloth_status }}</span>
-                        </td>
-                        <td>₹{{ order.amount|floatformat:2 }}</td>
-                        <td>{{ order.created_at|date:"M d, Y" }}</td>
-                        <td>
-                            <select class="status-select" id="status-{{ order.id }}">
-                                <option value="Pending" {% if order.cloth_status == "Pending" %}selected{% endif %}>Pending</option>
-                                <option value="Washing" {% if order.cloth_status == "Washing" %}selected{% endif %}>Washing</option>
-                                <option value="Drying" {% if order.cloth_status == "Drying" %}selected{% endif %}>Drying</option>
-                                <option value="Ironing" {% if order.cloth_status == "Ironing" %}selected{% endif %}>Ironing</option>
-                                <option value="Ready" {% if order.cloth_status == "Ready" %}selected{% endif %}>Ready for Pickup</option>
-                                <option value="Completed" {% if order.cloth_status == "Completed" %}selected{% endif %}>Completed</option>
-                            </select>
-                            <button class="update-btn" onclick="updateOrderStatus({{ order.id }})">
-                                Update
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <p>No orders found for this branch</p>
-            </div>
-            {% endif %}
         </div>
     </div>
 
