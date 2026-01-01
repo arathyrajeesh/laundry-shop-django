@@ -7,269 +7,134 @@
     <title>Login - Shine & Bright Laundry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
+<style>
+    :root {
+        --primary: #0f334b;
+        --indigo: #6366f1;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --bg-soft: #f8fafc;
+        --white: #ffffff;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        body {
-            background: #fff;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
 
-        .page-wrapper {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-        }
+    body { background: var(--bg-soft); color: var(--text-main); }
 
-        /* LEFT SIDE */
-        .left-panel {
-            width: 75%;
-            padding: 40px 10%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    .page-wrapper { display: flex; height: 100vh; width: 100%; overflow: hidden; }
 
-        .brand {
-            font-family: cursive;
-            font-size: 24px;
-            margin-bottom: 60px;
-            color: #111;
-        }
+    /* --- LEFT PANEL: THE FORM --- */
+    .left-panel {
+        width: 45%;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: var(--white);
+    }
 
-        .login-box {
-            max-width: 400px;
-        }
+    .login-box { width: 100%; max-width: 400px; animation: fadeIn 0.8s ease; }
 
-        h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #111;
-        }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* GOOGLE BUTTON */
-        .google-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 18px;
-            border: 1px solid #ccc;
-            border-radius: 30px;
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
-            margin-bottom: 20px;
-            background: #fff;
-        }
+    .logo-box {
+        width: 50px; height: 50px; border-radius: 12px;
+        background: var(--primary); padding: 8px; margin-bottom: 32px;
+        box-shadow: 0 10px 15px -3px rgba(15, 51, 75, 0.2);
+    }
+    .logo-box img { width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1); }
 
-        .google-btn img {
-            width: 20px;
-            height: 20px;
-        }
+    h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px; color: var(--primary); }
+    .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 32px; }
 
-        .or {
-            text-align: center;
-            margin: 15px 0;
-            color: #aaa;
-            font-size: 14px;
-        }
+    /* --- FORM ELEMENTS --- */
+    .google-btn {
+        display: flex; align-items: center; justify-content: center; gap: 12px;
+        width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px;
+        background: var(--white); color: var(--text-main); font-weight: 600;
+        text-decoration: none; transition: var(--transition); font-size: 14px;
+    }
+    .google-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .google-btn img { width: 20px; }
 
-        /* INPUTS */
-        input {
-            width: 100%;
-            padding: 14px 15px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
+    .or { display: flex; align-items: center; margin: 24px 0; color: #cbd5e1; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .or::before, .or::after { content: ""; flex: 1; height: 1px; background: #e2e8f0; }
+    .or::before { margin-right: 16px; }
+    .or::after { margin-left: 16px; }
 
-        .password-container {
-            position: relative;
-        }
+    input {
+        width: 100%; padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px;
+        font-size: 14px; margin-bottom: 16px; transition: var(--transition); outline: none;
+    }
+    input:focus { border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
 
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            background: none;
-            border: none;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-        }
+    .password-container { position: relative; }
+    .toggle-password {
+        position: absolute; right: 16px; top: 14px; background: none; border: none;
+        cursor: pointer; color: var(--text-muted); transition: var(--transition);
+    }
+    .toggle-password:hover { color: var(--indigo); }
 
-        /* BUTTON */
-        .login-btn {
-            width: 100%;
-            background: #0c0f2d;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 30px;
-            font-size: 15px;
-            font-weight: 600;
-            margin-top: 10px;
-            cursor: pointer;
-        }
+    .forgot-password { text-align: right; margin: -8px 0 24px; }
+    .forgot-password a { font-size: 13px; color: var(--indigo); text-decoration: none; font-weight: 600; }
 
-        .footer-small {
-            font-size: 12px;
-            color: #777;
-            margin-top: 20px;
-        }
+    .login-btn {
+        width: 100%; background: var(--primary); color: white; padding: 14px;
+        border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+        cursor: pointer; transition: var(--transition);
+    }
+    .login-btn:hover { background: #1a4a6b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15, 51, 75, 0.2); }
 
-        .footer-small a {
-            color: #7b61ff;
-            text-decoration: none;
-        }
-        .combined-links {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-top: 18px;
-            font-size: 13px;
-            color: #444;
-        }
+    /* --- FOOTER LINKS --- */
+    .combined-links { margin-top: 32px; padding-top: 24px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 14px; }
+    .combined-links a { color: var(--indigo); font-weight: 700; text-decoration: none; }
+    .divider { color: #e2e8f0; margin: 0 8px; }
 
-        .combined-links .divider {
-            width: 1px;
-            height: 14px;
-            background: #ccc;
-        }
+    /* --- RIGHT PANEL: BRANDING --- */
+    .right-panel {
+        width: 55%; position: relative;
+        background: linear-gradient(135deg, rgba(15, 51, 75, 0.9), rgba(99, 102, 241, 0.4));
+    }
+    .right-panel img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: overlay; opacity: 0.8; }
+    
+    .overlay-text {
+        position: absolute; bottom: 80px; left: 60px; color: white; max-width: 450px;
+    }
+    .overlay-text h1 { font-size: 42px; line-height: 1.2; margin-bottom: 16px; font-weight: 800; }
 
-        .combined-links a {
-            color: #7b61ff;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.2s ease;
-        }
-
-        .combined-links a:hover {
-            text-decoration: underline;
-        }
-
-
-        /* RIGHT SIDE IMAGE */
-        .right-panel {
-            width: 50%;
-            background: #000;
-        }
-
-        .right-panel img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ✅ FIXED LOGO CIRCLE */
-        .logo-box {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 20px;
-            border-radius: 50%;
-            background: #e8ddff;
-            overflow: hidden;         /* IMPORTANT: clip image inside circle */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;        /* IMPORTANT: cover full circle */
-        }
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* space items */
-            gap: 10px;
-            padding: 12px 18px;
-            border: 1px solid #ccc;
-            border-radius: 30px;
-            background: #fff;
-            width: 100%;
-            font-size: 14px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .google-btn .arrow-icon {
-            margin-left: auto;
-            font-size: 14px;
-            color: #666;
-            transition: 0.2s;
-        }
-
-        .google-btn:hover .arrow-icon {
-            transform: translateX(3px); /* small animation */
-        }
-        .forgot-password {
-            text-align: right;
-            margin-top: -10px;
-            margin-bottom: 10px;
-        }
-
-        .forgot-password a {
-            font-size: 13px;
-            color: #7b61ff;
-            text-decoration: none;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .right-panel {
-                display: none;
-            }
-            .left-panel {
-                width: 100%;
-                padding: 30px;
-            }
-        }
-    </style>
+    @media (max-width: 1024px) { .right-panel { display: none; } .left-panel { width: 100%; } }
+</style>
 </head>
 
 <body>
 
 <div class="page-wrapper">
-
-    <!-- LEFT PANEL -->
     <div class="left-panel">
-
         <div class="login-box">
-
             <div class="logo-box">
                 <img src="{% static 'images/Shine.png' %}" alt="Logo">
             </div>
 
             <h2>Welcome back</h2>
+            <p class="subtitle">Please enter your details to access your laundry dashboard.</p>
 
-            <!-- Google Login -->
             <a href="{% provider_login_url 'google' process='login' %}" class="google-btn">
-                <img src="https://developers.google.com/identity/images/g-logo.png">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="G">
                 Continue with Google
-                <i class="fas fa-arrow-right arrow-icon"></i>
             </a>
 
-
-            <div class="or">or</div>
+            <div class="or">Or use email</div>
 
             <form method="POST">
                 {% csrf_token %}
-                <input type="text" name="username" placeholder="Enter email or username" required>
+                <label style="font-size: 12px; font-weight: 600; margin-bottom: 6px; display: block;">Email Address</label>
+                <input type="text" name="username" placeholder="name@company.com" required>
 
+                <label style="font-size: 12px; font-weight: 600; margin-bottom: 6px; display: block;">Password</label>
                 <div class="password-container">
-                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
                     <button type="button" class="toggle-password" id="togglePassword">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -279,28 +144,24 @@
                     <a href="{% url 'password_reset' %}">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="login-btn">Continue</button>
+                <button type="submit" class="login-btn">Sign in to Account</button>
             </form>
 
-            <p class="footer-small">
-                By continuing, you agree to our
-                <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
-            </p>
-
             <div class="combined-links">
-            <span>Don’t have an account? <a href="{% url 'signup' %}">Sign up</a></span>
-            <span class="divider"></span>
-            <span>Are you a shop owner? <a href="{% url 'shop_login' %}">Login here</a></span>
-        </div>
-
+                Don’t have an account? <a href="{% url 'signup' %}">Sign up</a>
+                <span class="divider">|</span>
+                Shop Owner? <a href="{% url 'shop_login' %}">Login here</a>
+            </div>
         </div>
     </div>
 
-    <!-- RIGHT PANEL -->
     <div class="right-panel">
-        <img src="{% static 'images/login.webp' %}" alt="Background image">
+        <img src="{% static 'images/login.webp' %}" alt="Background">
+        <div class="overlay-text">
+            <h1>Fresh clothes, <br>delivered to your door.</h1>
+            <p style="opacity: 0.8; font-size: 18px;">Join thousands of users who trust Shine & Bright for their premium laundry needs.</p>
+        </div>
     </div>
-
 </div>
 
 <!-- PASSWORD TOGGLE SCRIPT -->
