@@ -904,31 +904,7 @@
 
         </div>
     </section>
-    
-    <section class="branches-section" id="branches">
-        <div class="container">
-            <h2 class="section-title">Our Shops</h2>
-            <div class="branches-grid">
-                {% for shop in shops %}
-                <div class="branch-card">
-                    <div class="branch-info">
-                        <i class="fas fa-map-marker-alt branch-icon"></i>
-                        <h3>{{ shop.name }}</h3>
-                        <p>{{ shop.address|default:"Address not available" }}</p>
-                        <p class="branch-timing"><i class="far fa-clock"></i> {% if shop.is_open %}Open{% else %}Closed{% endif %}</p>
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'shop_detail' shop.id %}" class="branch-link">View Details</a>
-                        {% else %}
-                            <a href="{% url 'login' %}?next={% url 'shop_detail' shop.id %}" class="branch-link">View Details</a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <p>No shops available at the moment.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
+
     <section class="services-section" id="services">
         <h2 class="section-title">Dry Cleaning & Laundry,<br> Free Delivery</h2>
 
