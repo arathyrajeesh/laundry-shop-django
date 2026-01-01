@@ -561,14 +561,36 @@
                         <span class="info-value">{{ order.get_cloth_status_display }}</span>
                     </div>
 
-                    <div class="info-item" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #dee2e6;">
-                        <span class="info-label">Total Amount</span>
-                        <span class="info-value amount">₹{{ order.amount }}</span>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span>Subtotal</span>
+                        <span>₹{{ order.base_amount }}</span>
                     </div>
+
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span>Platform Fee</span>
+                        <span>₹{{ order.platform_fee }}</span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span>Delivery Fee</span>
+                        <span>₹{{ order.delivery_fee }}</span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                        <span>GST</span>
+                        <span>₹{{ order.gst_amount }}</span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; padding:12px 0; margin-top:10px; border-top:2px solid #dee2e6; font-size:18px; font-weight:700;">
+                        <span>Total Payable</span>
+                        <span style="color:#667eea;">₹{{ order.amount }}</span>
+                    </div>
+
+
 
                     <div class="shop-badge">
                         <i class="fas fa-store"></i>
-                        <span>Payment will be processed for {{ order.shop.name }}</span>
+                            <span>Payment will be processed by Shine &amp; Bright Platform</span>
                     </div>
                 </div>
 
@@ -724,8 +746,8 @@
                             </div>
                             {% endfor %}
                             <div style="display: flex; justify-content: space-between; padding: 12px 0; margin-top: 10px; border-top: 2px solid #dee2e6; font-size: 18px; font-weight: 700;">
-                                <span>Total Amount</span>
-                                <span style="color: #667eea;">₹{{ total_amount }}</span>
+                                <span>Total Payable</span>
+                                <span style="color: #667eea;">₹{{ order.amount }}</span>
                             </div>
                         </div>
 
@@ -747,9 +769,6 @@
                             <button class="pay-btn" onclick="startPayment('upi', 'paytm')" style="background: #00baf2; color: white; padding: 15px 20px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
                                 <i class="fas fa-mobile-alt"></i> Paytm
                             </button>
-                            <button class="pay-btn" onclick="showUPIQR()" style="background: #6c757d; color: white; padding: 15px 20px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                <i class="fas fa-qrcode"></i> UPI QR Code
-                            </button>
                         </div>
 
                         <!-- UPI QR Modal -->
@@ -758,7 +777,7 @@
                                 <span onclick="closeUPIQR()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;">&times;</span>
                                 <h3 style="margin-bottom: 20px; color: #333;">Scan QR Code to Pay</h3>
                                 <div id="qrcode" style="margin: 20px auto; background: white; padding: 20px; border-radius: 10px;"></div>
-                                <p style="margin-top: 20px; color: #666; font-weight: 600;">Amount: ₹{{ total_amount }}</p>
+                                <p style="margin-top: 20px; color: #666; font-weight: 600;">Amount: ₹{{ order.amount }}</p>
                                 <p style="font-size: 12px; color: #999; margin-top: 10px;">Use any UPI app to scan and pay</p>
                             </div>
                         </div>
@@ -819,9 +838,9 @@
         function startPayment(method, upiApp = null) {
             const options = {
                 key: '{{ razorpay_key_id }}',
-                amount: {{ total_amount|floatformat:0 }} * 100,
+                amount: {{ order.amount|floatformat:0 }} * 100,                
                 currency: 'INR',
-                name: '{{ shop.name }}',
+                name: 'Shine & Bright',
                 description: 'Laundry Service Order #{{ order.id }}',
                 order_id: '{{ razorpay_order_id }}',
                 method: method,
@@ -879,24 +898,6 @@
             rzp.open();
         }
 
-        function showUPIQR() {
-            const upiString = `upi://pay?pa=arathyrajeesh050@okaxis&pn={{ shop.name }}&am={{ total_amount }}&cu=INR&tn=Laundry Order #{{ order.id }}`;
-
-            document.getElementById('qrcode').innerHTML = '';
-
-            QRCode.toCanvas(document.getElementById('qrcode'), upiString, {
-                width: 200,
-                height: 200,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            }, function (error) {
-                if (error) console.error(error);
-            });
-
-            document.getElementById('upi-qr-modal').style.display = 'block';
-        }
 
         function closeUPIQR() {
             document.getElementById('upi-qr-modal').style.display = 'none';

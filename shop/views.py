@@ -49,7 +49,7 @@ from datetime import timedelta
 def splash(request):
     return render(request, 'splash.html')
 def generate_payment_receipt_pdf(order, order_items):
-    """Generate a PDF payment receipt for the order."""
+    """Generate a PDF payment receipt for the order (with fees & GST)."""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     styles = getSampleStyleSheet()
@@ -60,7 +60,7 @@ def generate_payment_receipt_pdf(order, order_items):
         parent=styles['Heading1'],
         fontSize=20,
         spaceAfter=30,
-        alignment=1,  # Center alignment
+        alignment=1,
     )
 
     heading_style = ParagraphStyle(
@@ -74,23 +74,30 @@ def generate_payment_receipt_pdf(order, order_items):
 
     story = []
 
-    # Title
+    # ---------- TITLE ----------
     story.append(Paragraph("Shine & Bright Laundry Services", title_style))
     story.append(Paragraph("Payment Receipt", heading_style))
     story.append(Spacer(1, 12))
 
-    # Order details
+    # ---------- ORDER DETAILS ----------
     story.append(Paragraph(f"<b>Order ID:</b> #{order.id}", normal_style))
-    story.append(Paragraph(f"<b>Customer:</b> {order.user.get_full_name() or order.user.username}", normal_style))
+    story.append(Paragraph(
+        f"<b>Customer:</b> {order.user.get_full_name() or order.user.username}",
+        normal_style
+    ))
     story.append(Paragraph(f"<b>Email:</b> {order.user.email}", normal_style))
-    story.append(Paragraph(f"<b>Shop:</b> {order.shop.name}", normal_style))
-    if order.branch:
-        story.append(Paragraph(f"<b>Branch:</b> {order.branch.name}", normal_style))
-    story.append(Paragraph(f"<b>Order Date:</b> {order.created_at.strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
-    story.append(Paragraph(f"<b>Payment Date:</b> {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+    story.append(Paragraph(f"<b>Platform:</b> Shine & Bright", normal_style))
+    story.append(Paragraph(
+        f"<b>Order Date:</b> {order.created_at.strftime('%Y-%m-%d %H:%M:%S')}",
+        normal_style
+    ))
+    story.append(Paragraph(
+        f"<b>Payment Date:</b> {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        normal_style
+    ))
     story.append(Spacer(1, 12))
 
-    # Delivery details
+    # ---------- DELIVERY DETAILS ----------
     if order.delivery_name or order.delivery_address or order.delivery_phone:
         story.append(Paragraph("<b>Delivery Details:</b>", heading_style))
         if order.delivery_name:
@@ -100,72 +107,98 @@ def generate_payment_receipt_pdf(order, order_items):
         if order.delivery_phone:
             story.append(Paragraph(f"Phone: {order.delivery_phone}", normal_style))
         if order.special_instructions:
-            story.append(Paragraph(f"Instructions: {order.special_instructions}", normal_style))
+            story.append(Paragraph(
+                f"Instructions: {order.special_instructions}",
+                normal_style
+            ))
         story.append(Spacer(1, 12))
 
-    # Order items table
+    # ---------- ORDER ITEMS ----------
     story.append(Paragraph("<b>Order Items:</b>", heading_style))
 
-    # Table data
     table_data = [['Service', 'Cloth', 'Quantity', 'Price', 'Total']]
+
     for item in order_items:
-        service_name = item.get('service_name', 'Service')
-        cloth_name = item.get('cloth_name', '')
-        quantity = item.get('quantity', 1)
-        price = item.get('price', 0)
-        total = item.get('total', 0)
         table_data.append([
-            service_name,
-            cloth_name,
-            str(quantity),
-            f"₹{price:.2f}",
-            f"₹{total:.2f}"
+            item.get('service_name', ''),
+            item.get('cloth_name', ''),
+            str(item.get('quantity', 1)),
+            f"₹{item.get('price', 0):.2f}",
+            f"₹{item.get('total', 0):.2f}",
         ])
 
-    # Add total row
-    table_data.append(['', '', '<b>Total</b>', f"<b>₹{order.amount:.2f}</b>"])
+    items_table = Table(
+        table_data,
+        colWidths=[2*inch, 1.5*inch, 1*inch, 1*inch, 1*inch]
+    )
 
-    # Create table
-    table = Table(table_data, colWidths=[2*inch, 1.5*inch, 1*inch, 1*inch, 1*inch])
-    table.setStyle(TableStyle([
+    items_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 12),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('ALIGN', (2, 1), (-1, -1), 'CENTER'),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
     ]))
 
-    story.append(table)
+    story.append(items_table)
     story.append(Spacer(1, 20))
 
-    # Payment status
-    story.append(Paragraph("<b>Payment Status: Completed</b>", ParagraphStyle(
-        'PaymentStatus',
-        parent=styles['Normal'],
-        fontSize=12,
-        textColor=colors.green,
-        alignment=1,
-    )))
+    # ---------- PAYMENT SUMMARY ----------
+    story.append(Paragraph("<b>Payment Summary:</b>", heading_style))
+
+    summary_data = [
+        ['Subtotal', f"₹{order.base_amount:.2f}"],
+        ['Platform Fee', f"₹{order.platform_fee:.2f}"],
+        ['Delivery Fee', f"₹{order.delivery_fee:.2f}"],
+        ['GST', f"₹{order.gst_amount:.2f}"],
+        ['Total Paid', f"₹{order.amount:.2f}"],
+    ]
+
+    summary_table = Table(summary_data, colWidths=[4*inch, 2*inch])
+    summary_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+    ]))
+
+    story.append(summary_table)
     story.append(Spacer(1, 20))
 
-    # Footer
-    story.append(Paragraph("Thank you for choosing Shine & Bright Laundry Services!", ParagraphStyle(
-        'Footer',
-        parent=styles['Normal'],
-        fontSize=10,
-        alignment=1,
-        spaceBefore=20,
-    )))
-    story.append(Paragraph("🧺✨", ParagraphStyle(
-        'Emoji',
-        parent=styles['Normal'],
-        fontSize=14,
-        alignment=1,
-    )))
+    # ---------- PAYMENT STATUS ----------
+    story.append(Paragraph(
+        "<b>Payment Status: Completed</b>",
+        ParagraphStyle(
+            'PaymentStatus',
+            parent=styles['Normal'],
+            fontSize=12,
+            textColor=colors.green,
+            alignment=1,
+        )
+    ))
+    story.append(Spacer(1, 20))
+
+    # ---------- FOOTER ----------
+    story.append(Paragraph(
+        "Thank you for choosing Shine & Bright Laundry Services!",
+        ParagraphStyle(
+            'Footer',
+            parent=styles['Normal'],
+            fontSize=10,
+            alignment=1,
+            spaceBefore=20,
+        )
+    ))
+    story.append(Paragraph(
+        "🧺✨",
+        ParagraphStyle(
+            'Emoji',
+            parent=styles['Normal'],
+            fontSize=14,
+            alignment=1,
+        )
+    ))
 
     doc.build(story)
     buffer.seek(0)
@@ -949,204 +982,8 @@ def select_services(request, shop_id, branch_id=None):
 
     return render(request, 'select_services.html', context)
 
-
-# @login_required
-# def create_order(request, shop_id):
-#     """Create order and initiate Razorpay payment."""
-#     if request.method != 'POST':
-#         return redirect('select_services', shop_id=shop_id)
-
-#     shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
-#     selected_services = request.POST.getlist('selected_services')
-    
-#     if not selected_services:
-#         messages.error(request, 'Please select at least one service.')
-#         return redirect('select_services', shop_id=shop_id)
-
-#     # Calculate total amount and process clothes
-#     total_amount = 0
-#     order_items_data = []
-#     branch = None
-
-#     for service_id in selected_services:
-#         try:
-#             service = Service.objects.get(id=service_id, branch__shop=shop)
-#             quantity = int(request.POST.get(f'quantity_{service_id}', 1))
-#             if quantity < 1:
-#                 quantity = 1
-
-#             # Ensure all services are from the same branch
-#             if branch is None:
-#                 branch = service.branch
-#             elif branch != service.branch:
-#                 messages.error(request, 'All selected services must be from the same branch.')
-#                 return redirect('select_services', shop_id=shop_id)
-
-#             # Get selected clothes for this service
-#             clothes_list = request.POST.getlist(f'clothes_{service_id}')
-#             if not clothes_list:
-#                 messages.error(request, f'Please select at least one type of cloth for {service.name}.')
-#                 return redirect('select_services', shop_id=shop_id)
-
-#             # Process each cloth for this service
-#             service_total = 0
-#             for cloth_name in clothes_list:
-#                 cloth_quantity = int(request.POST.get(f'quantity_{service_id}_{cloth_name}', 1))
-#                 if cloth_quantity < 1:
-#                     cloth_quantity = 1
-
-#                 try:
-#                     cloth = Cloth.objects.get(name=cloth_name)
-#                     order_items_data.append({
-#                         'service': service,
-#                         'cloth': cloth,
-#                         'quantity': cloth_quantity
-#                     })
-
-#                     # Get cloth-specific price
-#                     cloth_price_obj = ServiceClothPrice.objects.filter(service=service, cloth=cloth).first()
-#                     cloth_price = cloth_price_obj.price if cloth_price_obj else 0
-
-#                     service_total += cloth_price * cloth_quantity
-#                 except Cloth.DoesNotExist:
-#                     continue
-
-#             # Add service total to overall total
-#             total_amount += service_total
-
-#         except (Service.DoesNotExist, ValueError):
-#             continue
-
-#     if total_amount == 0:
-#         messages.error(request, 'Unable to calculate order total. Please try again.')
-#         return redirect('select_services', shop_id=shop_id)
-
-#     if branch is None:
-#         messages.error(request, 'Unable to determine branch for order. Please try again.')
-#         return redirect('select_services', shop_id=shop_id)
-
-#     # Create order in database - linked to selected shop
-#     order = Order.objects.create(
-#         user=request.user,
-#         shop=shop,  # Order is linked to the selected shop
-#         branch=branch,
-#         amount=total_amount,
-#         cloth_status='Pending'
-#     )
-
-#     # Create OrderItem instances
-#     for item_data in order_items_data:
-#         OrderItem.objects.create(
-#             order=order,
-#             service=item_data['service'],
-#             cloth=item_data['cloth'],
-#             quantity=item_data['quantity']
-#         )
-
-#     # Log shop information for payment tracking
-#     print(f"Order #{order.id} created for shop: {shop.name} (ID: {shop.id})")
-
-#     # Store order items in session for later use (for PDF generation)
-#     request.session['order_items'] = []
-#     for item_data in order_items_data:
-#         # Get cloth-specific price
-#         cloth_price_obj = ServiceClothPrice.objects.filter(service=item_data['service'], cloth=item_data['cloth']).first()
-#         cloth_price = cloth_price_obj.price if cloth_price_obj else (item_data['service'].price if item_data['service'].price else 0)
-#         total = cloth_price * item_data['quantity']
-
-#         request.session['order_items'].append({
-#             'service_name': item_data['service'].name,
-#             'cloth_name': item_data['cloth'].name,
-#             'quantity': item_data['quantity'],
-#             'price': float(cloth_price),
-#             'total': float(total)
-#         })
-#     request.session['order_id'] = order.id
-#     request.session['shop_id'] = shop.id
-
-#     # TEMPORARILY SKIP RAZORPAY - Store order details in session for later
-#     request.session['total_amount'] = float(total_amount)
-#     # We'll create Razorpay order later in the payment view
-
-#     # Note: Admin and shop email notifications removed as per requirements
-#     # Only the user receives the bill email after order creation
-
-#     # Send order confirmation bill to user
-#     try:
-#         # Generate PDF bill
-#         order_items = request.session.get('order_items', [])
-
-#         pdf_buffer = generate_payment_receipt_pdf(order, order_items)
-
-#         # Send bill email
-#         bill_message = f"""
-# Hi {order.user.get_full_name() or order.user.username},
-
-# Thank you for placing your order with Shine & Bright Laundry Services! 🧺✨
-
-# Your order has been successfully created and is now being processed.
-
-# Order Details:
-# - Order ID: #{order.id}
-# - Shop: {order.shop.name}
-# - Branch: {order.branch.name if order.branch else 'Main Branch'}
-# - Total Amount: ₹{order.amount}
-# - Status: {order.get_cloth_status_display()}
-
-# Delivery Information:
-# - Name: {order.delivery_name or 'To be provided'}
-# - Address: {order.delivery_address or 'To be provided'}
-# - Phone: {order.delivery_phone or 'To be provided'}
-
-# Please complete the payment to proceed with your order processing. You can make the payment using the secure payment gateway.
-
-# Please find your order bill attached as a PDF.
-
-# If you have any questions, feel free to contact us.
-
-# Thank you for choosing Shine & Bright!
-
-# Best regards,
-# Shine & Bright Team
-# 🧺✨
-# """
-
-#         # Create email with PDF attachment
-#         email = EmailMessage(
-#             subject=f"Order Bill - Order #{order.id}",
-#             body=bill_message,
-#             from_email=settings.EMAIL_HOST_USER,
-#             to=[order.user.email],
-#         )
-
-#         # Attach PDF
-#         email.attach(f'order_bill_{order.id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
-
-#         email.send(fail_silently=True)
-
-#     except Exception as e:
-#         # Log the error but don't fail the order process
-#         print(f"Failed to send order bill email: {e}")
-
-#     # Create Razorpay order for payment using main Razorpay credentials
-#     try:
-#         razorpay_order = create_razorpay_order(total_amount, None, settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
-#         razorpay_order_id = razorpay_order['id']
-#         request.session['razorpay_order_id'] = razorpay_order_id
-
-#         # Store order ID in database for tracking
-#         order.razorpay_order_id = razorpay_order_id
-#         order.save()
-#     except Exception as e:
-#         messages.error(request, f'Unable to process payment at this time: {str(e)}')
-#         return redirect('select_services', shop_id=shop.id)
-
-#     # Redirect to payment page
-#     return redirect('user_details')
-
 @login_required
 def create_order(request, shop_id):
-    print("🔥 create_order called")
     if request.method != 'POST':
         return redirect('select_services', shop_id=shop_id)
 
@@ -1161,7 +998,7 @@ def create_order(request, shop_id):
     order_items_data = []
     branch = None
 
-    # ---------- CALCULATE ORDER ----------
+    # ---------- CALCULATE BASE ORDER ----------
     for service_id in selected_services:
         service = get_object_or_404(Service, id=service_id, branch__shop=shop)
 
@@ -1181,9 +1018,11 @@ def create_order(request, shop_id):
             quantity = int(request.POST.get(f'quantity_{service_id}_{cloth_name}', 1))
             quantity = max(quantity, 1)
 
-            price_obj = ServiceClothPrice.objects.filter(service=service, cloth=cloth).first()
-            price = price_obj.price if price_obj else service.price or 0
+            price_obj = ServiceClothPrice.objects.filter(
+                service=service, cloth=cloth
+            ).first()
 
+            price = price_obj.price if price_obj else service.price or 0
             line_total = price * quantity
             total_amount += line_total
 
@@ -1199,12 +1038,28 @@ def create_order(request, shop_id):
         messages.error(request, 'Unable to create order. Please try again.')
         return redirect('select_services', shop_id=shop_id)
 
+    # ---------- FEES & TAX CALCULATION ----------
+    base_amount = total_amount
+    platform_fee = settings.PLATFORM_FEE
+    delivery_fee = settings.DELIVERY_FEE
+
+    gst_taxable_amount = base_amount + platform_fee
+    gst_amount = round((gst_taxable_amount * settings.GST_PERCENTAGE) / 100, 2)
+
+    final_amount = base_amount + platform_fee + delivery_fee + gst_amount
+
     # ---------- CREATE ORDER ----------
     order = Order.objects.create(
         user=request.user,
         shop=shop,
         branch=branch,
-        amount=total_amount,
+
+        base_amount=base_amount,
+        platform_fee=platform_fee,
+        delivery_fee=delivery_fee,
+        gst_amount=gst_amount,
+        amount=final_amount,
+
         cloth_status='Pending',
         payment_status='Pending'
     )
@@ -1230,120 +1085,13 @@ def create_order(request, shop_id):
     # ---------- STORE SESSION ----------
     request.session['order_id'] = order.id
     request.session['order_items'] = session_items
-    request.session['total_amount'] = float(total_amount)
+    request.session['total_amount'] = float(final_amount)
     request.session['shop_id'] = shop.id
 
-    # ---------- SEND EMAIL WITH PDF ----------
-    try:
-        pdf_buffer = generate_payment_receipt_pdf(order, session_items)
-
-        email_body = f"""
-Hi {request.user.get_full_name() or request.user.username},
-
-Thank you for placing your order with Shine & Bright Laundry Services 🧺✨
-
-Order Details:
-• Order ID: #{order.id}
-• Shop: {shop.name}
-• Branch: {branch.name}
-• Total Amount: ₹{order.amount}
-
-Please complete the payment to start processing your order.
-
-Your bill is attached as a PDF.
-
-Thank you,
-Shine & Bright Team
-"""
-
-        email = EmailMessage(
-            subject=f"Order Bill - Order #{order.id}",
-            body=email_body,
-            from_email=settings.EMAIL_HOST_USER,
-            to=[request.user.email],
-        )
-
-        email.attach(
-            f'order_bill_{order.id}.pdf',
-            pdf_buffer.getvalue(),
-            'application/pdf'
-        )
-
-        email.send(fail_silently=True)
-
-    except Exception as e:
-        # Email failure should NOT block order
-        print(f"Order email failed: {e}")
+    # ❌ NO EMAIL HERE (payment not completed yet)
 
     # ---------- REDIRECT TO PAYMENT ----------
     return redirect('user_details')
-
-# @login_required
-# def payment(request):
-#     """Render payment page for the order."""
-#     order_id = request.session.get('order_id')
-#     if not order_id:
-#         messages.error(request, 'No order found. Please start over.')
-#         return redirect('dashboard')
-
-#     order = get_object_or_404(Order, id=order_id, user=request.user)
-
-#     # Get order items from session
-#     order_items = request.session.get('order_items', [])
-#     total_amount = request.session.get('total_amount', order.amount)
-
-#     # If no order_items in session (for existing orders), create a dummy item
-#     if not order_items:
-#         order_items = [{
-#             'service': {'name': 'Laundry Service'},
-#             'quantity': 1,
-#             'total': total_amount
-#         }]
-
-#     # Create Razorpay order here instead of in create_order
-#     total_amount = request.session.get('total_amount', 0)
-    
-#     # Get shop's Razorpay account ID (if linked) - Payment will go to this shop
-#     shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
-    
-#     # Log payment routing information
-#     print(f"Payment for Order #{order.id} - Shop: {order.shop.name} (ID: {order.shop.id})")
-#     if shop_account_id:
-#         print(f"Shop has Razorpay account linked: {shop_account_id} - Payment will be transferred automatically")
-#     else:
-#         print(f"Shop Razorpay account not linked - Payment will stay with platform")
-
-#     # Get shop's Razorpay credentials if available
-#     shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
-#     shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
-
-#     try:
-#         # Create Razorpay order using utility function
-#         razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
-#         razorpay_order_id = razorpay_order['id']
-#         request.session['razorpay_order_id'] = razorpay_order_id
-
-#         # Store order ID in database for tracking
-#         order.razorpay_order_id = razorpay_order_id
-#         order.save()
-#     except Exception as e:
-#         messages.error(request, f'Unable to process payment at this time: {str(e)}')
-#         return redirect('dashboard')
-
-#     # Use shop's Razorpay key if available, otherwise use global key
-#     razorpay_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else settings.RAZORPAY_KEY_ID
-
-#     context = {
-#         'order': order,
-#         'order_items': order_items,
-#         'total_amount': total_amount,
-#         'razorpay_order_id': razorpay_order_id,
-#         'razorpay_key_id': razorpay_key_id,
-#         'shop': order.shop,
-#     }
-
-#     return render(request, 'payment.html', context)
-
 
 @login_required
 def user_details(request):
@@ -1450,104 +1198,75 @@ def create_status_update_notification(user, title, message, notification_type="p
     )
 @login_required
 def payment_success(request):
-    """Handle successful payment."""
+    """Handle successful payment (MAIN ACCOUNT ONLY)."""
+
     razorpay_payment_id = request.POST.get('razorpay_payment_id')
     razorpay_order_id = request.POST.get('razorpay_order_id')
     razorpay_signature = request.POST.get('razorpay_signature')
 
-    # Check if main Razorpay keys are configured
+    # 🔒 Check Razorpay configuration
     if not settings.RAZORPAY_KEY_ID or settings.RAZORPAY_KEY_ID == 'your-razorpay-key-id':
         messages.error(request, 'Payment service is not configured. Please contact support.')
         return redirect('dashboard')
 
-    # Verify payment signature using main keys
-    if not verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature, settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET):
+    # 🔒 Verify payment signature (MAIN ACCOUNT)
+    if not verify_payment_signature(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        settings.RAZORPAY_KEY_ID,
+        settings.RAZORPAY_KEY_SECRET
+    ):
         messages.error(request, 'Payment verification failed. Please contact support.')
         return redirect('dashboard')
 
-    # Payment verified, update order status and transfer funds
+    # 🔁 Fetch order
     order_id = request.session.get('order_id')
-    if order_id:
-        order = get_object_or_404(Order, id=order_id, user=request.user)
-        
-        # Store payment details
-        order.razorpay_payment_id = razorpay_payment_id
-        order.razorpay_order_id = razorpay_order_id
-        
-        # Calculate commission and shop amount
-        commission, shop_amount = calculate_commission(order.amount)
-        order.platform_commission = commission
-        order.shop_amount = shop_amount
-        
-        # Transfer payment to shop account (if shop has Razorpay account linked)
-        # Payment goes to the shop that was selected when order was created
-        shop_account_id = order.shop.razorpay_account_id if order.shop.razorpay_account_id else None
-        
-        # Log which shop is receiving the payment
-        print(f"Processing payment transfer for Order #{order.id}")
-        print(f"Shop: {order.shop.name} (ID: {order.shop.id})")
-        print(f"Order Amount: ₹{order.amount}")
-        print(f"Platform Commission: ₹{commission}")
-        print(f"Shop Amount: ₹{shop_amount}")
-        
-        if shop_account_id:
-            try:
-                print(f"Transferring ₹{shop_amount} to shop account: {shop_account_id}")
-                transfer_result = capture_payment_and_transfer(
-                    razorpay_payment_id,
-                    order.amount,
-                    shop_account_id,
-                    commission_percentage=5,
-                    shop_key_id=order.shop.razorpay_key_id if order.shop.razorpay_key_id else settings.RAZORPAY_KEY_ID,
-                    shop_key_secret=order.shop.razorpay_key_secret if order.shop.razorpay_key_secret else settings.RAZORPAY_KEY_SECRET,
-                )
+    if not order_id:
+        messages.error(request, 'No order found. Please start over.')
+        return redirect('dashboard')
 
-                
-                if transfer_result['success']:
-                    order.transfer_id = transfer_result.get('transfer_id')
-                    order.transfer_status = transfer_result.get('transfer_status', 'completed')
-                    print(f"✅ Payment successfully transferred to shop: {order.shop.name}")
-                else:
-                    order.transfer_status = transfer_result.get('transfer_status', 'failed')
-                    # Log error but don't fail the order
-                    print(f"❌ Transfer failed for order {order.id} to shop {order.shop.name}: {transfer_result.get('error')}")
-            except Exception as e:
-                # Log error but continue with order processing
-                order.transfer_status = 'failed'
-                print(f"❌ Error transferring payment for order {order.id} to shop {order.shop.name}: {str(e)}")
-        else:
-            # Shop doesn't have Razorpay account linked
-            order.transfer_status = 'shop_account_not_linked'
-            print(f"⚠️ Shop {order.shop.name} doesn't have Razorpay account linked. Payment held by platform.")
-        
-        order.cloth_status = 'Washing'  # Move to next status
-        order.payment_status = 'Completed'  # Mark payment as completed
-        order.save()
+    order = get_object_or_404(Order, id=order_id, user=request.user)
 
-        # Create notification for user
-        create_status_update_notification(
-            user=order.user,
-            title="Payment Successful",
-            message=f"Your payment for Order #{order.id} was successful. Laundry is now in Washing stage."
-        )
+    # ✅ Store payment details
+    order.razorpay_payment_id = razorpay_payment_id
+    order.razorpay_order_id = razorpay_order_id
 
-        # Generate PDF receipt
-        order_items = request.session.get('order_items', [])
-        if not order_items:
-            # Fallback: get from OrderItem model
-            order_items = []
-            for item in order.order_items.all():
-                order_items.append({
-                    'service_name': item.service.name,
-                    'cloth_name': item.cloth.name,
-                    'quantity': item.quantity,
-                    'price': float(item.service.price) if item.service.price else 0,
-                    'total': float(item.service.price * item.quantity) if item.service.price else 0
-                })
+    # ✅ MAIN ACCOUNT ONLY (NO TRANSFER)
+    order.platform_commission = 0
+    order.shop_amount = 0
+    order.transfer_status = 'not_applicable'
 
-        pdf_buffer = generate_payment_receipt_pdf(order, order_items)
+    # ✅ Update order status
+    order.payment_status = 'Completed'
+    order.cloth_status = 'Washing'
+    order.save()
 
-        # Send payment success email with PDF attachment
+    # 🔔 User notification
+    create_status_update_notification(
+        user=order.user,
+        title="Payment Successful",
+        message=f"Your payment for Order #{order.id} was successful. Laundry is now in Washing stage."
+    )
+
+    # 📄 Prepare order items for PDF
+    order_items = request.session.get('order_items', [])
+    if not order_items:
+        order_items = []
+        for item in order.order_items.all():
+            order_items.append({
+                'service_name': item.service.name,
+                'cloth_name': item.cloth.name,
+                'quantity': item.quantity,
+                'price': float(item.service.price) if item.service.price else 0,
+                'total': float(item.service.price * item.quantity) if item.service.price else 0
+            })
+
+    # 📄 Generate receipt PDF
+    pdf_buffer = generate_payment_receipt_pdf(order, order_items)
+
+    # 📧 Send payment success email
+    try:
         payment_success_message = f"""
 Hi {order.user.get_full_name() or order.user.username},
 
@@ -1559,14 +1278,8 @@ Order Details:
 - Shop: {order.shop.name}
 - Status: {order.get_cloth_status_display()}
 
-Delivery Information:
-- Name: {order.delivery_name or 'Not provided'}
-- Address: {order.delivery_address or 'Not provided'}
-- Phone: {order.delivery_phone or 'Not provided'}
-
-Your laundry will be processed shortly. You can track your order status in your dashboard.
-
-Please find your payment receipt attached as a PDF.
+Your laundry will be processed shortly.
+Please find your payment receipt attached.
 
 Thank you for choosing Shine & Bright!
 
@@ -1575,34 +1288,32 @@ Shine & Bright Team
 🧺✨
 """
 
-        try:
-            # Create email with PDF attachment
-            email = EmailMessage(
-                subject=f"Payment Successful - Order #{order.id}",
-                body=payment_success_message,
-                from_email=settings.EMAIL_HOST_USER,
-                to=[order.user.email],
-            )
+        email = EmailMessage(
+            subject=f"Payment Successful - Order #{order.id}",
+            body=payment_success_message,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[order.user.email],
+        )
 
-            # Attach PDF
-            email.attach(f'payment_receipt_order_{order.id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
+        email.attach(
+            f'payment_receipt_order_{order.id}.pdf',
+            pdf_buffer.getvalue(),
+            'application/pdf'
+        )
 
-            email.send(fail_silently=True)
-        except Exception as e:
-            # Log the error but don't fail the payment
-            print(f"Failed to send payment success email: {e}")
+        email.send(fail_silently=True)
 
-        # Clear session
-        request.session.pop('order_items', None)
-        request.session.pop('order_id', None)
-        request.session.pop('shop_id', None)
-        request.session.pop('razorpay_order_id', None)
+    except Exception as e:
+        print(f"Failed to send payment success email: {e}")
 
-        messages.success(request, f'Payment successful! Your order #{order.id} has been placed.')
-        return redirect('orders')
-    else:
-        messages.error(request, 'No order found. Please start over.')
-        return redirect('dashboard')
+    # 🧹 Clear session
+    request.session.pop('order_items', None)
+    request.session.pop('order_id', None)
+    request.session.pop('shop_id', None)
+    request.session.pop('razorpay_order_id', None)
+
+    messages.success(request, f'Payment successful! Your order #{order.id} has been placed.')
+    return redirect('orders')
 
 
 @login_required

@@ -168,6 +168,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+PLATFORM_FEE = 20        # ₹20 flat
+DELIVERY_FEE = 30        # ₹30 flat
+GST_PERCENTAGE = 18      # 18% GST
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
