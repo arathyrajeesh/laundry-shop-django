@@ -4,249 +4,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>My Orders - Shine & Bright</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        body { background: #f7f7f7; font-family: "Poppins", sans-serif; }
+        :root {
+            --primary-color: #0f334b;
+            --accent-color: #667eea;
+            --success: #28a745;
+            --warning: #f39c12;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --bg-body: #f8fafc;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body { 
+            background: var(--bg-body); 
+            font-family: "Inter", sans-serif; 
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
         .page-container { 
-            max-width: 1000px; 
-            margin: 40px auto; 
-            padding: 20px; 
-            background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-            position: relative; 
+            max-width: 900px; 
+            margin: 50px auto; 
+            padding: 0 20px;
         }
-        .page-header { font-size: 30px; font-weight: 600; color: #0f334bff; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+        /* --- Header Section --- */
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header { 
+            font-size: 28px; 
+            font-weight: 700; 
+            color: var(--primary-color);
+            margin: 0;
+        }
+
         .back-btn {
-            position: absolute;
-            top: 15px;
-            right: 10px;
-            color: #0f334bff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
             text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 50px;
-            background: rgba(15, 51, 75, 0.1);
-            transition: all 0.3s ease;
             font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
         }
-        .back-btn:hover {
-            background: rgba(15, 51, 75, 0.2);
-            transform: translateX(-3px);
-        }
+        .back-btn:hover { color: var(--primary-color); }
+
+        /* --- Order Card --- */
         .order-card {
-            background: #fff; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            margin-bottom: 15px; 
-            padding: 15px; 
+            background: white; 
+            border-radius: 16px; 
+            margin-bottom: 25px; 
+            padding: 24px; 
+            box-shadow: var(--card-shadow);
+            border: 1px solid #edf2f7;
+            transition: transform 0.2s ease;
         }
+
         .order-header { 
             display: flex; 
             justify-content: space-between; 
-            font-weight: 600; 
-            margin-bottom: 10px; 
+            align-items: flex-start;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 15px;
         }
-        .order-status { 
-            font-size: 14px; 
-            padding: 5px 10px; 
-            border-radius: 5px; 
+
+        .order-id {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
         }
-        .status-processing { 
-            background: #ffc107; 
-            color: #333; 
+
+        /* --- Status Badges --- */
+        .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 14px;
+            border-radius: 50px;
         }
-        .status-delivered {
-            background: #28a745;
-            color: white;
+        .status-pending { background: #fffaf0; color: #975a16; border: 1px solid #fbd38d; }
+        .status-completed { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+        .status-processing { background: #ebf8ff; color: #2c5282; border: 1px solid #90cdf4; }
+
+        /* --- Order Content --- */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        .status-completed {
-            background: #28a745;
-            color: white;
-            font-weight: bold;
+
+        .detail-item label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
-        .status-pending {
-            background: #ffc107;
-            color: #333;
-        }
-        .order-details p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        .order-actions {
-            margin-top: 15px;
-            text-align: right;
-        }
-        .btn-payment {
-            background: #007bff;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
+
+        .detail-item span {
             font-weight: 500;
-            transition: background 0.3s ease;
+            color: var(--text-main);
         }
-        .btn-payment:hover {
-            background: #0056b3;
-            color: white;
-            text-decoration: none;
-        }
-        .completed-highlight {
-            border-left: 4px solid #28a745;
-            background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
-        }
-        .rating-section {
+
+        /* --- Delivery Box --- */
+        .delivery-info-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px;
             margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
         }
-        .rating-form {
+        .delivery-info-box h5 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 8px;
         }
+
+        /* --- Rating Section --- */
+        .rating-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #cbd5e0;
+        }
+
         .star-rating {
             display: flex;
+            flex-direction: row-reverse; /* For CSS hover logic */
+            justify-content: flex-end;
             gap: 5px;
         }
-        .star-rating input[type="radio"] {
-            display: none;
-        }
+
+        .star-rating input { display: none; }
         .star-rating label {
-            color: #ddd;
-            font-size: 20px;
+            font-size: 22px;
+            color: #cbd5e0;
             cursor: pointer;
             transition: color 0.2s;
         }
-        .star-rating input[type="radio"]:checked ~ label,
+
+        .star-rating input:checked ~ label,
         .star-rating label:hover,
         .star-rating label:hover ~ label {
-            color: #ffd700;
+            color: #ecc94b;
         }
-        .rating-comment {
-            flex: 1;
-            min-width: 200px;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .btn-rate {
-            background: #28a745;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s;
-        }
-        .btn-rate:hover {
-            background: #218838;
-        }
-        .existing-rating {
+
+        .rating-form {
             display: flex;
+            gap: 12px;
             align-items: center;
-            gap: 10px;
-            color: #666;
+            margin-top: 10px;
         }
-        .existing-stars {
-            display: flex;
-            gap: 2px;
+
+        .rating-comment {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .btn-submit-rating {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        /* --- Empty State --- */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        @media (max-width: 600px) {
+            .rating-form { flex-direction: column; align-items: flex-start; }
+            .rating-comment { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="page-container">
-        <a href="{% url 'dashboard' %}" class="back-btn">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
-        <h1 class="page-header">My Orders 🧺</h1>
+        <div class="header-flex">
+            <h1 class="page-header">My Orders</h1>
+            <a href="{% url 'dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
 
         {% if orders %}
             {% for order in orders %}
-            <div class="order-card {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' %}completed-highlight{% endif %}">
+            <div class="order-card">
                 <div class="order-header">
-                    <span>Order #{{ order.id }}</span>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
-                        <span class="order-status
-                            {% if order.display_status == 'Payment Incomplete' %}status-pending
-                            {% elif order.cloth_status == 'Pending' %}status-pending
-                            {% elif order.cloth_status == 'Completed' %}status-completed
-                            {% else %}status-processing{% endif %}">
-                            {{ order.display_status }}
-                        </span>
+                    <div>
+                        <span class="order-id">Order #{{ order.id }}</span>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                            Placed on {{ order.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    <span class="status-badge 
+                        {% if order.display_status == 'Payment Incomplete' or order.cloth_status == 'Pending' %}status-pending
+                        {% elif order.cloth_status == 'Completed' %}status-completed
+                        {% else %}status-processing{% endif %}">
+                        {{ order.display_status }}
+                    </span>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <label>Shop</label>
+                        <span><i class="fas fa-store" style="margin-right: 5px; font-size: 12px;"></i> {{ order.shop.name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Total Amount</label>
+                        <span style="color: var(--primary-color); font-weight: 700;">₹{{ order.amount }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Laundry Status</label>
+                        <span>{{ order.get_cloth_status_display|default:order.cloth_status }}</span>
                     </div>
                 </div>
-                <div class="order-details">
-                    <p><strong>Shop:</strong> {{ order.shop.name }}</p>
-                    <p><strong>Total Amount:</strong> ₹{{ order.amount }}</p>
-                    <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
 
-                    {% if order.delivery_name %}
-                    <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
-                        <p style="margin: 0; font-weight: bold; color: #0f334bff;">Delivery Details:</p>
-                        <p style="margin: 5px 0;"><strong>Name:</strong> {{ order.delivery_name }}</p>
-                        {% if order.delivery_address %}
-                        <p style="margin: 5px 0;"><strong>Address:</strong> {{ order.delivery_address }}</p>
-                        {% endif %}
-                        {% if order.delivery_phone %}
-                        <p style="margin: 5px 0;"><strong>Phone:</strong> {{ order.delivery_phone }}</p>
-                        {% endif %}
+                {% if order.delivery_name %}
+                <div class="delivery-info-box">
+                    <h5><i class="fas fa-truck"></i> Delivery Information</h5>
+                    <div style="font-size: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div><strong>Recipient:</strong> {{ order.delivery_name }}</div>
+                        <div><strong>Phone:</strong> {{ order.delivery_phone }}</div>
+                        <div style="grid-column: span 2;"><strong>Address:</strong> {{ order.delivery_address }}</div>
                         {% if order.special_instructions %}
-                        <p style="margin: 5px 0;"><strong>Instructions:</strong> {{ order.special_instructions }}</p>
+                        <div style="grid-column: span 2; color: var(--text-muted); font-style: italic;">
+                            "{{ order.special_instructions }}"
+                        </div>
                         {% endif %}
                     </div>
-                    {% endif %}
+                </div>
+                {% endif %}
 
-                    {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' and order.branch %}
-                    <div class="rating-section">
-                        <h4 style="margin: 0 0 10px 0; color: #0f334bff; font-size: 16px;">Rate this Branch</h4>
-                        {% if order.branch_rating %}
-                        <div class="existing-rating">
-                            <span>Your rating:</span>
-                            <div class="existing-stars">
+                {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' and order.branch %}
+                <div class="rating-section">
+                    <h5 style="margin: 0 0 10px 0; font-size: 14px;">Rate your experience</h5>
+                    {% if order.branch_rating %}
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="color: #ecc94b;">
                                 {% for i in "12345"|make_list %}
-                                    <i class="fas fa-star" style="color: {% if forloop.counter <= order.branch_rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>
+                                    <i class="{% if forloop.counter <= order.branch_rating.rating %}fas{% else %}far{% endif %} fa-star"></i>
                                 {% endfor %}
                             </div>
-                            <span style="font-size: 14px;">({{ order.branch_rating.rating }}/5)</span>
-                            {% if order.branch_rating.comment %}
-                            <span style="font-size: 14px; margin-left: 10px;">"{{ order.branch_rating.comment }}"</span>
-                            {% endif %}
+                            <span style="font-size: 14px; color: var(--text-muted);">{{ order.branch_rating.comment }}</span>
                         </div>
-                        {% else %}
+                    {% else %}
                         <form class="rating-form" method="post" action="{% url 'rate_branch' order.branch.id %}">
                             {% csrf_token %}
                             <div class="star-rating">
-                                {% for i in "12345"|make_list %}
-                                <input type="radio" id="star{{ i }}_{{ order.id }}" name="rating" value="{{ i }}" required>
-                                <label for="star{{ i }}_{{ order.id }}"><i class="fas fa-star"></i></label>
-                                {% endfor %}
+                                <input type="radio" id="star5_{{ order.id }}" name="rating" value="5" required/><label for="star5_{{ order.id }}"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star4_{{ order.id }}" name="rating" value="4"/><label for="star4_{{ order.id }}"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star3_{{ order.id }}" name="rating" value="3"/><label for="star3_{{ order.id }}"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star2_{{ order.id }}" name="rating" value="2"/><label for="star2_{{ order.id }}"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="star1_{{ order.id }}" name="rating" value="1"/><label for="star1_{{ order.id }}"><i class="fas fa-star"></i></label>
                             </div>
-                            <input type="text" class="rating-comment" name="comment" placeholder="Leave a comment (optional)" maxlength="500">
-                            <button type="submit" class="btn-rate">Submit Rating</button>
+                            <input type="text" class="rating-comment" name="comment" placeholder="Any feedback?">
+                            <button type="submit" class="btn-submit-rating">Submit</button>
                         </form>
-                        {% endif %}
-                    </div>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
             {% endfor %}
         {% else %}
-            <div class="order-card">
-                <div class="order-details">
-                    <p style="text-align: center; color: #666;">No orders found. <a href="{% url 'dashboard' %}" style="color: #0f334bff;">Start shopping</a></p>
-                </div>
+            <div class="empty-state">
+                <i class="fas fa-box-open" style="font-size: 48px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                <h3 style="color: var(--primary-color);">No orders yet</h3>
+                <p style="color: var(--text-muted);">Looks like you haven't placed any laundry orders.</p>
+                <a href="{% url 'dashboard' %}" style="display: inline-block; margin-top: 15px; color: var(--accent-color); font-weight: 600; text-decoration: none;">Start Shopping →</a>
             </div>
         {% endif %}
     </div>
