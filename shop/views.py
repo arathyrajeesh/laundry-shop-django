@@ -1251,15 +1251,16 @@ def payment_success(request):
 
     # ✅ Update order status
     order.payment_status = 'Completed'
-    order.cloth_status = 'Washing'
+    order.cloth_status = 'Pickup'
     order.save()
 
     # 🔔 User notification
     create_status_update_notification(
         user=order.user,
         title="Payment Successful",
-        message=f"Your payment for Order #{order.id} was successful. Laundry is now in Washing stage."
+        message=f"Payment successful for Order #{order.id}. Please prepare your items for pickup."
     )
+
 
     # 📄 Prepare order items for PDF
     order_items = request.session.get('order_items', [])

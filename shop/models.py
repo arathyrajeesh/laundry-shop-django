@@ -160,6 +160,7 @@ class BranchCloth(models.Model):
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
+        ('Pickup', 'Pickup'),
         ('Washing', 'Washing'),
         ('Drying', 'Drying'),
         ('Ironing', 'Ironing'),
