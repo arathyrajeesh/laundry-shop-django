@@ -11,24 +11,18 @@
 
     <style>
         :root {
-            
-            --primary-orange:  #0f172a;
+            --primary-orange: #0f172a;
             --primary-orange-light: #fff5eb;
-            --text-main: #333333;
-            --text-muted: #777777;
-            --bg-body: #fdfdfd;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
             --bg-card: #ffffff;
-            --input-bg: #f5f5f5;
-            --border-radius: 12px;
+            --input-bg: #f8fafc;
+            --border: #e2e8f0;
             --shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
         body {
             background: var(--bg-body);
@@ -49,122 +43,86 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
 
         /* Sidebar Style */
         .sidebar {
             width: 280px;
             background: #fff;
-            border-right: 1px solid #f0f0f0;
+            border-right: 1px solid var(--border);
             padding: 40px 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        .avatar-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .avatar-container { text-align: center; margin-bottom: 25px; }
+        .avatar-wrapper { position: relative; display: inline-block; margin-bottom: 12px; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #f1f5f9; }
+        .avatar-btn { position: absolute; bottom: 2px; right: 2px; background: var(--primary-orange); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; font-size: 12px; }
+        
+        .user-name { font-weight: 700; font-size: 1.1rem; color: var(--primary-orange); }
+        .user-role { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
 
-        .avatar-wrapper {
-            position: relative;
-            display: inline-block;
+        .side-nav { width: 100%; margin-top: 25px; }
+        
+        /* New Dashboard Back Link in Sidebar */
+        .nav-home {
+            border-bottom: 1px solid var(--border);
             margin-bottom: 15px;
-        }
-
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #eee;
-        }
-
-        .avatar-btn {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: var(--primary-orange);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 2px solid white;
-        }
-
-        .user-name { font-weight: 700; font-size: 1.2rem; margin-top: 10px; }
-        .user-role { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
-
-        .side-nav {
-            width: 100%;
-            margin-top: 30px;
+            padding-bottom: 15px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 14px 20px;
+            padding: 12px 16px;
             text-decoration: none;
             color: var(--text-muted);
             border-radius: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             font-weight: 500;
-            transition: 0.3s;
+            font-size: 14px;
+            transition: 0.2s;
         }
 
-        .nav-item i { margin-right: 12px; width: 20px; }
-
-        .nav-item.active {
-            background: var(--primary-orange-light);
-            color: var(--primary-orange);
-        }
+        .nav-item i { margin-right: 12px; width: 20px; font-size: 16px; }
+        .nav-item:hover { background: #f1f5f9; color: var(--primary-orange); }
+        .nav-item.active { background: var(--primary-orange-light); color: var(--primary-orange); }
 
         /* Main Content Style */
-        .main-content {
-            flex: 1;
-            padding: 50px;
-        }
+        .main-content { flex: 1; padding: 50px; }
 
-        .main-content h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 30px;
-        }
-
-        /* Grid Layout for Form */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .full-width { grid-column: span 2; }
-
-        .form-section {
-            margin-bottom: 20px;
-        }
-
-        .section-label {
-            display: block;
+        /* Professional Top Back Button */
+        .btn-back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 20px;
+            transition: 0.2s;
         }
+        .btn-back-link:hover { color: var(--primary-orange); }
+        .btn-back-link i { margin-right: 8px; font-size: 10px; }
+
+        .main-content h1 { font-size: 26px; font-weight: 700; color: var(--primary-orange); margin-bottom: 30px; letter-spacing: -0.02em; }
+
+        /* Grid Layout for Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .section-label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
 
         .form-input {
             width: 100%;
             background: var(--input-bg);
-            border: 1px solid transparent;
+            border: 1px solid var(--border);
             padding: 14px 18px;
             border-radius: 10px;
             font-size: 14px;
-            transition: 0.3s;
+            transition: 0.2s;
+            color: var(--text-main);
         }
 
         .form-input:focus {
@@ -176,66 +134,39 @@
 
         /* Location Utility */
         .util-card {
-            background: #fff;
-            border: 1px solid #eee;
+            background: #f8fafc;
+            border: 1px dashed var(--border);
             border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 24px;
+            margin: 25px 0;
             grid-column: span 2;
         }
 
         .btn-detect {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        /* Bottom Buttons */
-        .footer-actions {
-            display: flex;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .discard-btn {
-            flex: 1;
-            padding: 16px;
-            background: #fff;
-            border: 2px solid var(--primary-orange);
-            color: var(--primary-orange);
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .submit-btn {
-            flex: 1;
             background: var(--primary-orange);
             color: white;
             border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 12px;
+            transition: 0.2s;
         }
+        .btn-detect:hover { background: #1e293b; }
 
-        .submit-btn:hover { background: #d97400; }
-
-        input[type="file"] { display: none; }
+        /* Bottom Buttons */
+        .footer-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .discard-btn { flex: 1; padding: 16px; background: #fff; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; font-weight: 600; text-align: center; text-decoration: none; transition: 0.2s; }
+        .discard-btn:hover { background: #f1f5f9; color: var(--primary-orange); }
+        .submit-btn { flex: 2; background: var(--primary-orange); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .submit-btn:hover { background: #260f3fff; transform: translateY(-1px); }
 
         @media (max-width: 900px) {
             .dashboard-container { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #eee; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
             .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
         }
     </style>
 </head>
@@ -251,90 +182,89 @@
                         class="profile-img" 
                         alt="User profile">
                 <label for="{{ form.profile_image.id_for_label }}" class="avatar-btn">
-                    <i class="fa-solid fa-pencil"></i>
+                    <i class="fa-solid fa-camera"></i>
                 </label>
             </div>
             <h2 class="user-name">{{ profile.full_name|default:"User Name" }}</h2>
-            <p class="user-role">Customer</p>
+            <p class="user-role">Verified Customer</p>
         </div>
 
         <nav class="side-nav">
+            <div class="nav-home">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i class="fa-solid fa-arrow-left"></i> Return to Dashboard
+                </a>
+            </div>
             <a href="{% url 'edit_profile' %}" class="nav-item active">
                 <i class="fa-solid fa-circle-user"></i> Personal Details
             </a>
             <a href="{% url 'password_change' %}" class="nav-item ">
                 <i class="fa-solid fa-shield-halved"></i> Login & Security
             </a>
-            <a href="{% url 'logout' %}" class="nav-item">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+            <a href="{% url 'logout' %}" class="nav-item" style="margin-top: 20px;">
+                <i class="fa-solid fa-power-off"></i> Sign Out
             </a>
         </nav>
     </aside>
 
     <main class="main-content">
+        <a href="{% url 'dashboard' %}" class="btn-back-link">
+            <i class="fa-solid fa-chevron-left"></i> Back to Dashboard
+        </a>
+
         <h1>Personal Information</h1>
         
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
             <div style="display:none">{{ form.profile_image }}</div>
 
             <div class="form-grid">
                 <div class="form-section">
-                    <label class="section-label">First Name</label>
-                    <input type="text" class="form-input" value="{{ profile.full_name|default:'' }}" placeholder="First Name">
+                    <label class="section-label">Full Name</label>
+                    {{ form.full_name }}
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label">Last Name</label>
-                    <input type="text" class="form-input" placeholder="Last Name">
+                    <label class="section-label">Phone Number</label>
+                    {{ form.phone }}
                 </div>
 
                 <div class="form-section full-width">
                     <label class="section-label">Email Address</label>
                     <div style="position:relative">
-                        <input type="email" class="form-input" value="{{ request.user.email }}" readonly>
-                        <span style="position:absolute; right:15px; top:12px; color:var(--success); font-size: 12px; font-weight:600">
-                             <i class="fa-solid fa-circle-check"></i> Verified
+                        <input type="email" class="form-input" value="{{ request.user.email }}" readonly style="background:#f1f5f9; color:#94a3b8;">
+                        <span style="position:absolute; right:15px; top:14px; color:#10b981; font-size: 11px; font-weight:700">
+                             <i class="fa-solid fa-circle-check"></i> VERIFIED
                         </span>
                     </div>
                 </div>
 
-                <div class="form-section full-width">
-                    <label class="section-label">Phone Number</label>
-                    <div class="input-group">
-                        {{ form.phone }}
-                    </div>
-                </div>
-
                 <div class="form-section">
-                    <label class="section-label">Location (City)</label>
-                    <div class="input-group">
-                        {{ form.city }}
-                    </div>
+                    <label class="section-label">City</label>
+                    {{ form.city }}
                 </div>
 
                 <div class="form-section">
                     <label class="section-label">Postal Code</label>
-                    <input type="text" class="form-input" placeholder="e.g. 30301">
+                    <input type="text" class="form-input" placeholder="e.g. 10001">
                 </div>
             </div>
 
-            <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default_if_none:'' }}">
-            <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default_if_none:'' }}">
-
             <div class="util-card">
-                <h3><i class="fa-solid fa-crosshairs" style="color: var(--primary-orange);"></i> Precise Logistics</h3>
-                <button type="button" id="geoBtn" class="btn-detect">
-                    Capture Coordinates
-                </button>
-                <div id="statusMsg" class="util-status">
-                    Localized data improves pickup & delivery efficiency.
-                </div>
+                <h3 style="font-size: 15px; color: var(--primary-orange);">
+                    <i class="fa-solid fa-location-dot" style="color: var(--primary-orange);"></i> Precise Logistics
+                </h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Capture your GPS coordinates to ensure faster and more accurate deliveries.</p>
+                <button type="button" id="geoBtn" class="btn-detect">Capture Location</button>
+                
+                <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
+                <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default:'' }}">
+                
+                <div id="statusMsg" style="margin-top: 10px; font-size: 12px; font-weight: 500;"></div>
             </div>
 
             <div class="footer-actions">
-                <a href="{% url 'dashboard' %}" class="discard-btn">Discard Changes</a>
+                <a href="{% url 'dashboard' %}" class="discard-btn">Discard</a>
                 <button type="submit" class="submit-btn">Save Changes</button>
             </div>
         </form>
@@ -342,47 +272,40 @@
 </div>
 
 <script>
-    // Ensure the django form inputs get the professional class
-    document.querySelectorAll('input').forEach(input => {
-        if(!input.classList.contains('form-input')) {
-            input.classList.add('form-input');
-        }
+    // Styling Django inputs
+    document.querySelectorAll('input, select').forEach(el => {
+        if(!el.classList.contains('form-input')) el.classList.add('form-input');
     });
 
-    // Image Preview
+    // Image Preview logic
     const fileInput = document.getElementById("{{ form.profile_image.id_for_label }}");
     if (fileInput) {
-        fileInput.addEventListener("change", e => {
+        fileInput.onchange = e => {
             const [file] = e.target.files;
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    document.getElementById("imgPreview").src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+            if (file) document.getElementById("imgPreview").src = URL.createObjectURL(file);
+        };
     }
 
-    // Geolocation
-    document.getElementById("geoBtn").addEventListener("click", function () {
+    // Geolocation logic
+    document.getElementById("geoBtn").onclick = function() {
         const msg = document.getElementById("statusMsg");
-        const btn = this;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Detecting...';
+        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
         
         navigator.geolocation.getCurrentPosition(
             pos => {
                 document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
                 document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
-                msg.innerHTML = '<span style="color: var(--success)">Coordinate data captured.</span>';
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Location Set';
+                msg.innerHTML = '<span style="color: #10b981"><i class="fa-solid fa-check"></i> Coordinates captured successfully.</span>';
+                this.innerHTML = 'Location Saved';
+                this.style.background = "#10b981";
             },
             () => {
-                msg.innerHTML = '<span style="color: red">Enable location permissions.</span>';
-                btn.innerText = "Failed";
-            }
+                msg.innerHTML = '<span style="color: #ef4444">Location access denied. Please enable GPS.</span>';
+                this.innerHTML = 'Retry Capture';
+            },
+            { enableHighAccuracy: true }
         );
-    });
+    };
 </script>
 
 </body>
