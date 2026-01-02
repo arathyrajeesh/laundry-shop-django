@@ -199,6 +199,12 @@
             btn.style.opacity = '0.8';
             btn.style.pointerEvents = 'none';
         });
+        setTimeout(() => {
+            const errorBox = document.querySelector('.error-box');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+        }, 5000);
     </script>
 </body>
 </html>

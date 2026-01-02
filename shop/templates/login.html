@@ -115,7 +115,11 @@
             position: absolute; bottom: 80px; left: 60px; color: white; max-width: 450px;
         }
         .overlay-text h1 { font-size: 42px; line-height: 1.2; margin-bottom: 16px; font-weight: 800; }
-
+        .error-box {
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171; padding: 12px 16px; border-radius: 8px;
+            font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+        }
         @media (max-width: 1024px) { .right-panel { display: none; } .left-panel { width: 100%; } }
     </style>
 </head>
@@ -128,7 +132,13 @@
             <div class="logo-box">
                 <img src="{% static 'images/Shine.png' %}" alt="Logo">
             </div>
-
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-box">
+                        <i class="fas fa-circle-exclamation"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <h2>Welcome back</h2>
             <p class="subtitle">Please enter your details to access your laundry dashboard.</p>
 
@@ -188,6 +198,13 @@
         icon.classList.toggle("fa-eye");
         icon.classList.toggle("fa-eye-slash");
     });
+    setTimeout(() => {
+        const errorBox = document.querySelector('.error-box');
+        if (errorBox) {
+            errorBox.style.display = 'none';
+        }
+    }, 5000); 
+
 </script>
 
 </body>
