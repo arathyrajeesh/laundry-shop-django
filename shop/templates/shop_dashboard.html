@@ -535,6 +535,72 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+        /* CENTER ALERT MODAL */
+        .center-alert-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .center-alert-box {
+            background: #fff;
+            width: 420px;
+            max-width: 90%;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            animation: scaleIn 0.25s ease;
+            text-align: center;
+        }
+
+        .center-alert-box h3 {
+            color: #0f334b;
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+
+        .center-alert-box p {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .center-alert-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover { background: #5a6268; }
+        .btn-confirm:hover { background: #c0392b; }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
 
         @media (max-width: 768px) {
             .shop-container {
@@ -563,6 +629,19 @@
     </style>
 </head>
 <body>
+    <!-- CENTER ALERT MODAL -->
+    <div id="center-alert-overlay" class="center-alert-overlay">
+        <div class="center-alert-box">
+            <h3 id="center-alert-title">Confirm Action</h3>
+            <p id="center-alert-message"></p>
+
+            <div class="center-alert-actions">
+                <button class="btn-cancel" onclick="closeCenterAlert()">Cancel</button>
+                <button class="btn-confirm" id="center-alert-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <div class="shop-header">
         <h1><i class="fas fa-store"></i> {{ shop.name }} - Dashboard</h1>
         <div class="header-actions">
@@ -976,7 +1055,7 @@
 
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <a href="{% url 'edit_branch' branch.id %}"
-                           style="background: linear-gradient(135deg, var(--primary-color), #0a2538); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; transition: all 0.3s ease;">
+                            style="background: linear-gradient(135deg, var(--primary-color), #0a2538); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; transition: all 0.3s ease;">
                             <i class="fas fa-edit" style="margin-right: 6px;"></i>
                             Edit
                         </a>
@@ -1103,65 +1182,68 @@
         const statusDot = document.querySelector('.status-dot');
         const statusText = document.querySelector('.status-indicator span');
 
-        shopStatusToggle.addEventListener('click', function() {
-            const isCurrentlyOpen = this.classList.contains('active');
+        shopStatusToggle.addEventListener("click", function () {
+            const isCurrentlyOpen = this.classList.contains("active");
             const newStatus = !isCurrentlyOpen;
 
-            // If shop is currently open and user wants to close it, show confirmation
+            // Confirmation only when closing shop
             if (isCurrentlyOpen && !newStatus) {
-                const confirmed = confirm('Are you sure you want to close the shop? This will prevent customers from placing new orders. Existing orders will still be processed.');
-                if (!confirmed) {
-                    return; // Don't proceed with closing
-                }
+                showCenterAlert(
+                    "Close Shop?",
+                    "Closing the shop will stop customers from placing new orders. Existing orders will continue to be processed.",
+                    () => toggleShopStatus(newStatus)
+                );
+                return;
             }
 
-            // Show loading state
-            this.style.pointerEvents = 'none';
-            this.style.opacity = '0.6';
+            // Opening shop → no confirmation
+            toggleShopStatus(newStatus);
+        });
+        function toggleShopStatus(newStatus) {
+            shopStatusToggle.style.pointerEvents = "none";
+            shopStatusToggle.style.opacity = "0.6";
 
             const formData = new FormData();
-            formData.append('is_open', newStatus);
-            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+            formData.append("is_open", newStatus);
+            formData.append("csrfmiddlewaretoken", getCookie("csrftoken"));
 
-            fetch('/shop/toggle-shop-status/', {
-                method: 'POST',
+            fetch("/shop/toggle-shop-status/", {
+                method: "POST",
                 body: formData,
                 headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
+                    "X-CSRFToken": getCookie("csrftoken")
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update UI
                     if (newStatus) {
-                        this.classList.add('active');
-                        statusDot.classList.remove('status-closed');
-                        statusDot.classList.add('status-open');
-                        statusText.textContent = 'Shop Open';
+                        shopStatusToggle.classList.add("active");
+                        statusDot.classList.remove("status-closed");
+                        statusDot.classList.add("status-open");
+                        statusText.textContent = "Shop Open";
                     } else {
-                        this.classList.remove('active');
-                        statusDot.classList.remove('status-open');
-                        statusDot.classList.add('status-closed');
-                        statusText.textContent = 'Shop Closed';
+                        shopStatusToggle.classList.remove("active");
+                        statusDot.classList.remove("status-open");
+                        statusDot.classList.add("status-closed");
+                        statusText.textContent = "Shop Closed";
                     }
 
-                    // Show success message
-                    showMessage(data.message, 'success');
+                    showMessage(data.message, "success");
                 } else {
-                    showMessage('Error: ' + data.message, 'error');
+                    showMessage(data.message || "Failed to update shop status.", "error");
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showMessage('An error occurred while updating shop status.', 'error');
+                console.error("Error:", error);
+                showMessage("An error occurred while updating shop status.", "error");
             })
             .finally(() => {
-                // Restore normal state
-                this.style.pointerEvents = 'auto';
-                this.style.opacity = '1';
+                shopStatusToggle.style.pointerEvents = "auto";
+                shopStatusToggle.style.opacity = "1";
             });
-        });
+        }
+
 
         function showMessage(message, type) {
             // Remove existing messages
@@ -1314,6 +1396,29 @@
                 chevron.style.transform = "rotate(0deg)";
             }
         }
+        let centerAlertConfirmCallback = null;
+
+        function showCenterAlert(title, message, onConfirm) {
+            document.getElementById("center-alert-title").innerText = title;
+            document.getElementById("center-alert-message").innerText = message;
+
+            centerAlertConfirmCallback = onConfirm;
+
+            document.getElementById("center-alert-overlay").style.display = "flex";
+        }
+
+        function closeCenterAlert() {
+            document.getElementById("center-alert-overlay").style.display = "none";
+            centerAlertConfirmCallback = null;
+        }
+
+        document.getElementById("center-alert-confirm").addEventListener("click", function () {
+            if (typeof centerAlertConfirmCallback === "function") {
+                centerAlertConfirmCallback();
+            }
+            closeCenterAlert();
+        });
+
     </script>
 </body>
 </html>
