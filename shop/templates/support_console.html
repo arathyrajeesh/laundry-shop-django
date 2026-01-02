@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Support Console | Shine & Bright</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Icons & Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-dark: #020617;
+            --card-bg: rgba(15, 23, 42, 0.75);
+            --border: rgba(255,255,255,0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 20% 0%, #1e293b 0%, transparent 45%),
+                radial-gradient(circle at 80% 0%, #0f172a 0%, transparent 40%),
+                #020617;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .support-wrapper {
+            width: 100%;
+            max-width: 960px;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header i {
+            font-size: 34px;
+            color: var(--primary);
+            margin-bottom: 14px;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+            transition: 0.25s ease;
+            backdrop-filter: blur(12px);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59,130,246,0.4);
+        }
+
+        .card i {
+            font-size: 26px;
+            color: var(--primary);
+            margin-bottom: 14px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .contact {
+            margin-top: 48px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: 22px;
+            margin-bottom: 14px;
+        }
+
+        .contact p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .contact strong {
+            color: var(--text-main);
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .support-wrapper { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="support-wrapper">
+
+    <!-- HEADER -->
+    <div class="header">
+        <i class="fas fa-headset"></i>
+        <h1>Support Console</h1>
+        <p>Assistance and guidance for merchants and partners</p>
+    </div>
+
+    <!-- SUPPORT CARDS -->
+    <div class="grid">
+
+        <div class="card">
+            <i class="fas fa-user-shield"></i>
+            <h3>Account & Login</h3>
+            <p>
+                Resolve login issues, reset passwords, recover access keys,
+                and update registered account details securely.
+            </p>
+        </div>
+
+        <div class="card">
+            <i class="fas fa-receipt"></i>
+            <h3>Orders & Payments</h3>
+            <p>
+                Get help with payment failures, settlement delays,
+                order mismatches, and invoice-related concerns.
+            </p>
+        </div>
+
+        <div class="card">
+            <i class="fas fa-store"></i>
+            <h3>Shop & Branch Management</h3>
+            <p>
+                Assistance with branch setup, service pricing,
+                shop availability, and operational configurations.
+            </p>
+        </div>
+
+        <div class="card">
+            <i class="fas fa-screwdriver-wrench"></i>
+            <h3>Technical Support</h3>
+            <p>
+                Report technical issues such as dashboard errors,
+                performance problems, or feature malfunctions.
+            </p>
+        </div>
+
+        <div class="card">
+            <i class="fas fa-file-contract"></i>
+            <h3>Policies & Guidelines</h3>
+            <p>
+                Learn about merchant policies, service standards,
+                refunds, cancellations, and platform guidelines.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- CONTACT SECTION -->
+    <div class="contact">
+        <h2>Contact Support</h2>
+        <p><strong>Support Hours:</strong> Monday – Saturday, 9:00 AM – 6:00 PM</p>
+        <p><strong>Email:</strong> support@shineandbright.com</p>
+        <p><strong>Emergency:</strong> +91-XXXXXXXXXX</p>
+        <p style="margin-top:14px; font-size:13px;">
+            For security reasons, never share your password, access keys, or OTP.
+        </p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        © Shine & Bright Laundry Services
+        <br>
+        <a href="{% url 'home' %}">Home</a> |
+        <a href="{% url 'shop_entry' %}">Dashboard</a>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -50,6 +50,12 @@ def splash(request):
     return render(request, 'splash.html')
 def shop_splash(request):
     return render(request, "shop_splash.html")
+def support_console(request):
+    return render(request, "support_console.html")
+def shop_entry(request):
+    if 'shop_id' in request.session:
+        return redirect('shop_dashboard')
+    return redirect('shop_login')
 
 def generate_payment_receipt_pdf(order, order_items):
     """Generate a PDF payment receipt for the order (with fees & GST)."""

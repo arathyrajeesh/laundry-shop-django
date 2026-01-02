@@ -9,6 +9,9 @@ urlpatterns = [
         path("signup/", views.signup, name="signup"),
         path("logout/", views.logout_user, name="logout"),
         path("shop/splash/", views.shop_splash, name="shop_splash"),
+        path("support/", views.support_console, name="support_console"),
+        path("shop/", views.shop_entry, name="shop_entry"),
+
         # PROFILE
         path("profile/", views.profile_page, name="profile"),
         path("profile/edit/", views.edit_profile, name="edit_profile"),

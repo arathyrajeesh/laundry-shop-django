@@ -152,7 +152,7 @@
             {% csrf_token %}
             
             <div class="field">
-                <label for="shop_name">Merchant ID</label>
+                <label for="shop_name">Shop Name</label>
                 <div class="input-group">
                     <i class="fas fa-hashtag prefix"></i>
                     <input type="text" id="shop_name" name="shop_name" placeholder="e.g. SHOP_4402" required autofocus>
@@ -160,7 +160,7 @@
             </div>
 
             <div class="field">
-                <label for="password">Security Key</label>
+                <label for="password">Password</label>
                 <div class="input-group">
                     <i class="fas fa-key prefix"></i>
                     <input type="password" id="password" name="password" placeholder="Enter key" required>
@@ -175,7 +175,7 @@
 
         <div class="footer-nav">
             <a href="{% url 'home' %}">Return Home</a>
-            <a href="#">Support Console</a>
+            <a href="{% url 'support_console' %}">Support Console</a>
         </div>
     </div>
 
