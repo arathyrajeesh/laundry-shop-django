@@ -31,7 +31,7 @@
         body {
             background-color: var(--bg-light);
             background-image: radial-gradient(at 0% 0%, hsla(210,100%,98%,1) 0, transparent 50%), 
-                              radial-gradient(at 50% 0%, hsla(220,100%,97%,1) 0, transparent 50%);
+                            radial-gradient(at 50% 0%, hsla(220,100%,97%,1) 0, transparent 50%);
             color: var(--text-dark);
             min-height: 100vh;
         }
@@ -300,6 +300,7 @@
                     <p style="font-size: 0.8rem; color: var(--text-muted)">{{ request.user.email }}</p>
                 </div>
                 <a href="{% url 'profile' %}" style="display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--text-dark); font-size: 0.9rem; border-radius: 8px;">Profile</a>
+                <a href="{% url 'password_change' %}" style="display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--text-dark); font-size: 0.9rem; border-radius: 8px;">Reset Password</a>
                 <a href="{% url 'orders' %}" style="display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--text-dark); font-size: 0.9rem; border-radius: 8px;">My Orders</a>
                 <a href="{% url 'logout' %}" style="display: block; padding: 0.8rem 1rem; text-decoration: none; color: #ef4444; font-size: 0.9rem; border-radius: 8px;">Sign Out</a>
             </div>

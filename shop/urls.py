@@ -34,7 +34,6 @@ urlpatterns = [
 
         # DROPDOWN PAGES
         path("settings/", views.settings_view, name="settings"),
-        path("settings/change-password/", views.change_password, name="change_password"),
         path("settings/privacy-policy/", views.privacy_policy, name="privacy_policy"),
         path("settings/delete-account/", views.delete_account, name="delete_account"),
         path("help/", views.help_view, name="help"),
@@ -86,27 +85,20 @@ urlpatterns = [
         path("shop/<int:shop_id>/rate/", views.rate_shop, name="rate_shop"),
         path("service/<int:service_id>/rate/", views.rate_service, name="rate_service"),
         path("branch/<int:branch_id>/rate/", views.rate_branch, name="rate_branch"),
-        path("password_reset/",
-                auth_views.PasswordResetView.as_view(
-                        template_name="password_reset.html",
-                        email_template_name="password_reset_email.html",
-                        subject_template_name="password_reset_subject.txt",
+        path(
+        'password-change/',
+        auth_views.PasswordChangeView.as_view(
+                template_name='auth/password_change.html'
                 ),
-                name="password_reset"
+                name='password_change'
+        ),
+        path(
+                'password-change/done/',
+                auth_views.PasswordChangeDoneView.as_view(
+                template_name='auth/password_change_done.html'
                 ),
-
-
-        path("password_reset_done/",
-                auth_views.PasswordResetDoneView.as_view(template_name="password_reset_done.html"),
-                name="password_reset_done"),
-
-        path("reset/<uidb64>/<token>/",
-                auth_views.PasswordResetConfirmView.as_view(template_name="password_reset_confirm.html"),
-                name="password_reset_confirm"),
-
-        path("reset/done/",
-                auth_views.PasswordResetCompleteView.as_view(template_name="password_reset_complete.html"),
-                name="password_reset_complete"),
+                name='password_change_done'
+        ),
         path("shop/reset/", views.shop_reset_request, name="shop_reset_request"),
         path("shop/reset/<str:token>/", views.shop_reset_confirm, name="shop_reset_confirm"),
 

@@ -500,32 +500,52 @@ def logout_user(request):
     logout(request)
     return redirect("login")
 
+
 @login_required
 def edit_profile(request):
+    # Retrieve or create the profile instance for the current user
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
+        # Initialize form with POST data and uploaded files
         form = ProfileForm(request.POST, request.FILES, instance=profile)
 
         if form.is_valid():
+            # Save the form data but don't commit to DB yet
             profile = form.save(commit=False)
 
-            profile.latitude = request.POST.get("latitude")
-            profile.longitude = request.POST.get("longitude")
-            profile.city = request.POST.get("city")
+            # Safely capture location data from hidden inputs
+            # Use .get() to prevent KeyErrors and check if values are not empty
+            lat = request.POST.get("latitude")
+            lng = request.POST.get("longitude")
+            city = request.POST.get("city")
+
+            # Only update coordinates if the user actually clicked "Capture"
+            if lat and lng:
+                try:
+                    profile.latitude = float(lat)
+                    profile.longitude = float(lng)
+                except ValueError:
+                    # Handle cases where non-numeric data might be sent
+                    pass
+            
+            if city:
+                profile.city = city
 
             profile.save()
-            messages.success(request, "Profile updated successfully!")
+            messages.success(request, "Your profile and logistics data have been updated.")
             return redirect("profile")
         else:
-            messages.error(request, "Invalid data submitted!")
+            messages.error(request, "There was an error with your submission. Please check the form.")
 
     else:
+        # Initial GET request: load form with existing data
         form = ProfileForm(instance=profile)
 
-    return render(request, "edit_profile.html", {"form": form, "profile": profile})
-
-
+    return render(request, "edit_profile.html", {
+        "form": form, 
+        "profile": profile
+    })
 @login_required
 def user_dashboard(request):
     # Statistics from your original code - Only count paid orders
