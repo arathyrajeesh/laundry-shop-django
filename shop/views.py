@@ -219,24 +219,27 @@ def generate_payment_receipt_pdf(order, order_items):
 # NOTE: The dashboard template expects a 'cloth_status' list. 
 # We'll use the user's last 5 orders as a stand-in.
 def get_cloth_status(user):
-    # Fetch actual orders and format them
-    orders = Order.objects.filter(user=user).select_related('shop').order_by('-id')[:5]
-    if orders:
-        result = []
-        for order in orders:
-            if order.payment_status != 'Completed':
-                status = 'Payment Incomplete'
-            else:
-                status = order.cloth_status
-            result.append({
-                'cloth_name': f"Order #{order.id}",
-                'status': status,
-                'delivery_date': order.created_at,
-                'shop_name': order.shop.name
-            })
-        return result
+    orders = Order.objects.filter(
+        user=user,
+        payment_status="Completed"   # filter here, not inside loop
+    ).select_related('shop').order_by('-created_at')
+
+    if not orders.exists():
+        return [{
+            'cloth_name': 'No recent orders',
+            'status': 'N/A',
+            'delivery_date': 'N/A',
+            'shop_name': 'N/A'
+        }]
+
     return [
-        {'cloth_name': 'No recent orders', 'status': 'N/A', 'delivery_date': 'N/A', 'shop_name': 'N/A'}
+        {
+            'cloth_name': f"Order #{order.id}",
+            'status': order.cloth_status,   # 🔑 single source of truth
+            'delivery_date': order.created_at,
+            'shop_name': order.shop.name
+        }
+        for order in orders
     ]
 
 # --- Notification Helper Functions ---
