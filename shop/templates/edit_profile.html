@@ -259,8 +259,14 @@
         </div>
 
         <nav class="side-nav">
-            <a href="#" class="nav-item active">
-                <i class="fa-solid fa-user"></i> Personal Information
+            <a href="{% url 'edit_profile' %}" class="nav-item active">
+                <i class="fa-solid fa-circle-user"></i> Personal Details
+            </a>
+            <a href="{% url 'password_change' %}" class="nav-item ">
+                <i class="fa-solid fa-shield-halved"></i> Login & Security
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
             </a>
         </nav>
     </aside>
@@ -289,7 +295,7 @@
                     <div style="position:relative">
                         <input type="email" class="form-input" value="{{ request.user.email }}" readonly>
                         <span style="position:absolute; right:15px; top:12px; color:var(--success); font-size: 12px; font-weight:600">
-                                <i class="fa-solid fa-circle-check"></i> Verified
+                             <i class="fa-solid fa-circle-check"></i> Verified
                         </span>
                     </div>
                 </div>
