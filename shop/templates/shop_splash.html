@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shine & Bright | Premium Laundry</title>
+    <link rel="stylesheet" href="{% static 'css/splash.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="splash-container">
+    <div class="splash-content">
+        <div class="logo-wrapper">
+            <img src="{% static 'images/logo.png' %}" alt="Shine & Bright Logo" class="splash-logo">
+        </div>
+        
+        <div class="text-reveal">
+            <h1 class="brand-name">Shine & Bright</h1>
+            <div class="divider"></div>
+            <p class="tagline">Experience Premium Laundry Care</p>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/shop_splash.js' %}"></script>
+
+</body>
+</html>
