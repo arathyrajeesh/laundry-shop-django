@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP | Shine & Bright</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Reuse styles from Page 1 */
+        :root { --primary: #0f172a; --accent: #f28100; --text-muted: #64748b; }
+        body { background: #f8fafc; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .auth-card { background: white; width: 100%; max-width: 400px; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
+        .main-icon { font-size: 40px; color: var(--accent); margin-bottom: 20px; }
+        h2 { font-size: 24px; color: var(--primary); margin-bottom: 12px; }
+        p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 30px; }
+        .auth-input { width: 100%; padding: 14px; background: #f1f5f9; border: 1px solid transparent; border-radius: 10px; font-size: 18px; text-align: center; letter-spacing: 4px; font-weight: 700; transition: 0.3s; box-sizing: border-box; }
+        .auth-input:focus { outline: none; border-color: var(--accent); background: white; }
+        .btn-auth { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <i class="fa-solid fa-shield-halved main-icon"></i>
+        <h2>Verify OTP</h2>
+        <p>Please enter the 6-digit code sent to your inbox to continue.</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="otp" class="auth-input" placeholder="000000" maxlength="6" required>
+            <button type="submit" class="btn-auth">Verify Account</button>
+        </form>
+    </div>
+</body>
+</html>

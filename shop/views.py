@@ -7,6 +7,11 @@ from .payment_utils import (
     calculate_commission,
     get_razorpay_client,
 )
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+import random
+from django.conf import settings
+from .models import PasswordResetOTP
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -3068,3 +3073,95 @@ def update_order_status(request, order_id):
         "success": True
     })
 
+
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email.")
+            return redirect("forgot_password")
+
+        otp = str(random.randint(100000, 999999))
+
+        PasswordResetOTP.objects.create(user=user, otp=otp)
+
+        send_mail(
+            subject="Password Reset OTP - Shine & Bright",
+            message=f"Your OTP is {otp}. It is valid for 5 minutes.",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[email],
+            fail_silently=True,
+        )
+
+        request.session["reset_user_id"] = user.id
+        messages.success(request, "OTP sent to your email.")
+        return redirect("verify_otp")
+
+    return render(request, "auth/forgot_password.html")
+
+def verify_otp(request):
+    if request.method == "POST":
+        otp_entered = request.POST.get("otp")
+        user_id = request.session.get("reset_user_id")
+
+        if not user_id:
+            return redirect("forgot_password")
+
+        otp_obj = PasswordResetOTP.objects.filter(
+            user_id=user_id,
+            otp=otp_entered
+        ).last()
+
+        if not otp_obj or otp_obj.is_expired():
+            messages.error(request, "Invalid or expired OTP.")
+            return redirect("verify_otp")
+
+        # ✅ IMPORTANT LINES (MISSING IN YOUR FLOW)
+        request.session["otp_verified"] = True
+
+        messages.success(request, "OTP verified.")
+        return redirect("reset_password")
+
+    return render(request, "auth/verify_otp.html")
+
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
+def reset_password(request):
+    user_id = request.session.get("reset_user_id")
+    otp_verified = request.session.get("otp_verified")
+
+    if not user_id or not otp_verified:
+        return redirect("forgot_password")
+
+    if request.method == "POST":
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+
+        if password1 != password2:
+            messages.error(request, "Passwords do not match.")
+            return redirect("reset_password")
+
+        user = User.objects.get(id=user_id)
+
+        try:
+            validate_password(password1, user)
+        except ValidationError as e:
+            for msg in e.messages:
+                messages.error(request, msg)
+            return redirect("reset_password")
+
+        user.set_password(password1)
+        user.save()
+
+        PasswordResetOTP.objects.filter(user=user).delete()
+        del request.session["reset_user_id"]
+        del request.session["otp_verified"]
+
+        messages.success(request, "Password reset successful. Please login.")
+        return redirect("login")
+
+    return render(request, "auth/reset_password.html")

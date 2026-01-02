@@ -99,6 +99,38 @@ urlpatterns = [
                 ),
                 name='password_change_done'
         ),
+        path(
+        'password-reset/',
+        auth_views.PasswordResetView.as_view(
+                template_name='auth/password_reset.html'
+                ),
+                name='password_reset'
+        ),
+        path(
+                'password-reset/done/',
+                auth_views.PasswordResetDoneView.as_view(
+                template_name='auth/password_reset_done.html'
+                ),
+                name='password_reset_done'
+        ),
+        path(
+                'reset/<uidb64>/<token>/',
+                auth_views.PasswordResetConfirmView.as_view(
+                template_name='auth/password_reset_confirm.html'
+                ),
+                name='password_reset_confirm'
+        ),
+        path(
+                'reset/done/',
+                auth_views.PasswordResetCompleteView.as_view(
+                template_name='auth/password_reset_complete.html'
+                ),
+                name='password_reset_complete'
+        ),
+        path("forgot-password/", views.forgot_password, name="forgot_password"),
+        path("verify-otp/", views.verify_otp, name="verify_otp"),
+        path("reset-password/", views.reset_password, name="reset_password"),
+
         path("shop/reset/", views.shop_reset_request, name="shop_reset_request"),
         path("shop/reset/<str:token>/", views.shop_reset_confirm, name="shop_reset_confirm"),
 

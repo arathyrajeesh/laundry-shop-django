@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from cloudinary.models import CloudinaryField
-
+from datetime import timedelta
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100, blank=True)
@@ -307,3 +307,14 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.order.id} - {self.service.name} - {self.cloth.name} x{self.quantity}"
+
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=5)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.otp}"
