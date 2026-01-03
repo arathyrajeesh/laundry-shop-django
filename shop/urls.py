@@ -55,6 +55,7 @@ urlpatterns = [
         path("admin-panel/shop/<int:shop_id>/edit/", views.admin_edit_shop, name="admin_edit_shop"),
         path("admin-panel/shop/<int:shop_id>/", views.admin_shop_detail, name="admin_shop_detail"),
         path("admin-panel/order/<int:order_id>/update-status/", views.admin_update_order_status, name="admin_update_order_status"),
+        path("save-login-location/", views.save_login_location, name="save_login_location"),
 
         # SHOP AUTHENTICATION
         path("shop/register/", views.shop_register, name="shop_register"),

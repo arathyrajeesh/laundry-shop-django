@@ -205,6 +205,49 @@
             errorBox.style.display = 'none';
         }
     }, 5000); 
+    document.addEventListener("DOMContentLoaded", () => {
+        // Only try once per login session
+        if (!navigator.geolocation) return;
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+                    { headers: { "User-Agent": "ShineAndBright/1.0" } }
+                );
+                const data = await res.json();
+
+                const city =
+                    data.address?.city ||
+                    data.address?.town ||
+                    data.address?.village ||
+                    data.address?.county ||
+                    data.address?.state;
+
+                if (!city) return;
+
+                await fetch("{% url 'save_login_location' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: new URLSearchParams({
+                        city: city,
+                        latitude: lat,
+                        longitude: lon
+                    })
+                });
+
+            } catch (e) {
+                console.log("Login location save failed");
+            }
+        });
+    });
+
 
 </script>
 

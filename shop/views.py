@@ -426,15 +426,14 @@ def signup(request):
         try:
             profile = user.profile
             if manual_location:
-                # Use manual location input
-                profile.city = manual_location
+                profile.city = manual_location.strip()
                 profile.latitude = None
                 profile.longitude = None
             else:
-                # Use geolocation data
-                profile.latitude = latitude
-                profile.longitude = longitude
-                profile.city = city
+                if city and city.strip():   # 🔑 THIS CHECK
+                    profile.city = city.strip()
+                    profile.latitude = latitude
+                    profile.longitude = longitude
             profile.email_verified = True  # Mark email as verified since no verification needed
             profile.save()
         except Exception as e:
@@ -3155,3 +3154,25 @@ def reset_password(request):
         return redirect("login")
 
     return render(request, "auth/reset_password.html")
+
+@login_required
+@require_POST
+def save_login_location(request):
+    profile = request.user.profile
+
+    # Do NOT overwrite if already set
+    if profile.city:
+        return JsonResponse({"status": "ignored"})
+
+    city = request.POST.get("city")
+    latitude = request.POST.get("latitude")
+    longitude = request.POST.get("longitude")
+
+    if city and city != "Unknown City":
+        profile.city = city
+        profile.latitude = latitude
+        profile.longitude = longitude
+        profile.save()
+        return JsonResponse({"status": "saved"})
+
+    return JsonResponse({"status": "failed"}, status=400)

@@ -268,22 +268,32 @@
 
     async function getCityFromLocation(lat, lon) {
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, {
-                headers: { 'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)' }
-            });
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                {
+                    headers: {
+                        'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)'
+                    }
+                }
+            );
+
+            if (!res.ok) return "";
+
             const data = await res.json();
+
             return (
                 data.address?.city ||
                 data.address?.town ||
                 data.address?.village ||
-                data.address?.county ||   
-                data.address?.state ||    
-                "Unknown City"
+                data.address?.county ||   // ⭐ Kozhikode comes here
+                data.address?.state ||    // fallback like Kerala
+                ""
             );
         } catch (err) {
-            return "Unknown City";
+            return "";
         }
     }
+
     setTimeout(() => {
         const errorBox = document.querySelector('.error-box');
         if (errorBox) {
