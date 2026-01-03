@@ -466,6 +466,45 @@
     </div>
 
     <script>
+        const toggle = document.getElementById('profileToggle');
+        const menu = document.getElementById('dropdownMenu');
+
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            menu.classList.remove('show');
+        });
+        
+        document.getElementById('profile-trigger').addEventListener('click', function() {
+            var dropdown = document.getElementById('profile-dropdown-menu');
+            dropdown.classList.toggle('show');
+
+            if (dropdown.classList.contains('show')) {
+                fetch('/notifications/mark-read/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Notifications marked as read');
+                        var badges = dropdown.querySelectorAll('.notification-badge');
+                        badges.forEach(function(badge) {
+                            badge.style.display = 'none';
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error marking notifications as read:', error);
+                });
+            }
+        });
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
