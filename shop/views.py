@@ -540,110 +540,163 @@ def edit_profile(request):
         "form": form, 
         "profile": profile
     })
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Q
+from django.shortcuts import render
+
 @login_required
 def user_dashboard(request):
-    # Statistics from your original code - Only count paid orders
-    pending = Order.objects.filter(user=request.user, cloth_status="Pending", payment_status="Completed").count()
-    completed = Order.objects.filter(user=request.user, cloth_status="Completed", payment_status="Completed").count()
 
-    spent = Order.objects.filter(user=request.user, payment_status="Completed").aggregate(
-        total=Sum('amount')
-    )["total"] or 0
+    # ===============================
+    # ORDER STATISTICS
+    # ===============================
+    pending = Order.objects.filter(
+        user=request.user,
+        cloth_status="Pending",
+        payment_status="Completed"
+    ).count()
 
-    # Data needed for the new dashboard template (shops and cloth status table)
+    completed = Order.objects.filter(
+        user=request.user,
+        cloth_status="Completed",
+        payment_status="Completed"
+    ).count()
+
+    spent = (
+        Order.objects
+        .filter(user=request.user, payment_status="Completed")
+        .aggregate(total=Sum("amount"))["total"]
+        or 0
+    )
+
     cloth_status = get_cloth_status(request.user)
 
-    # Handle search functionality
-    search_query = request.GET.get('search', '')
-    services_nearby = []
-    shops_nearby = []
+    # ===============================
+    # USER LOCATION
+    # ===============================
+    search_query = request.GET.get("search", "").strip()
     user_city = None
 
-    # Check if user has city data
     try:
-        user_profile = request.user.profile
-        user_city = user_profile.city if user_profile.city else None
+        user_city = request.user.profile.city.strip()
     except:
         user_city = None
 
-    if search_query:
-        # Search for services by name and get nearby branches
-        services = Service.objects.filter(
-            Q(name__icontains=search_query)
-        ).select_related('branch__shop').filter(branch__shop__is_approved=True)
+    services_nearby = []
+    shops_nearby = []
+    nearby_shop_count = 0
 
-        # If user has city, prioritize services from same city
+    # ===============================
+    # SEARCH MODE
+    # ===============================
+    if search_query:
+        services = (
+            Service.objects
+            .filter(name__icontains=search_query)
+            .select_related("branch__shop")
+            .filter(branch__shop__is_approved=True)
+        )
+
         if user_city:
-            city_services = services.filter(branch__shop__city__iexact=user_city)[:10]
-            if city_services:
-                services_nearby = city_services
-            else:
-                # If no services in user's city, show all matching services
-                services_nearby = services[:10]
+            city_services = services.filter(
+                branch__shop__city__iexact=user_city
+            )
+            services_nearby = city_services[:10] if city_services.exists() else services[:10]
         else:
-            services_nearby = services[:10]  # Limit to 10 results
+            services_nearby = services[:10]
+
+    # ===============================
+    # LOCATION-BASED MODE
+    # ===============================
     elif user_city:
-        # Show services and shops from user's city only if user has city set
+        # Services in user's city (LIMIT for display)
         services_nearby = Service.objects.filter(
             branch__shop__is_approved=True,
             branch__shop__city__iexact=user_city
         ).select_related('branch__shop')[:10]
 
-        # Also get shops in user's city
-        shops_nearby = LaundryShop.objects.filter(
-            is_approved=True,
-            city__iexact=user_city
-        )[:10]
-    # If no search query and no city, services_nearby and shops_nearby remain empty
+        # 🔑 ALL nearby shops (NO LIMIT, DISTINCT) — for COUNT
+        nearby_shops_qs = (
+            LaundryShop.objects
+            .filter(is_approved=True, city__iexact=user_city)
+            .order_by("id")   # 🔑 FORCE deterministic rows
+            .distinct()
+        )
 
-    # Create notifications for user's orders and welcome messages
+
+        # 🔑 LIMITED nearby shops — for DISPLAY
+        shops_nearby = nearby_shops_qs[:10]
+
+        # 🔑 ACCURATE nearby shop count
+        nearby_shop_count = nearby_shops_qs.count()
+
+    # ===============================
+    # NOTIFICATIONS
+    # ===============================
     create_order_notifications(request.user)
     create_welcome_notifications(request.user)
 
-    # Get only UNREAD notifications from database (avoid showing read notifications)
-    recent_notifications = Notification.objects.filter(
-        user=request.user,
-        is_read=False  # Only show unread notifications
-    ).order_by('-created_at')[:5]
+    recent_notifications = (
+        Notification.objects
+        .filter(user=request.user, is_read=False)
+        .order_by("-created_at")[:5]
+    )
 
-    # Format notifications for template (convert to dict format)
     recent_notifications = [
         {
-            'id': notification.id,
-            'title': notification.title,
-            'message': notification.message,
-            'time': notification.created_at,
-            'icon': notification.icon,
-            'color': notification.color,
-            'is_read': notification.is_read
+            "id": n.id,
+            "title": n.title,
+            "message": n.message,
+            "time": n.created_at,
+            "icon": n.icon,
+            "color": n.color,
+            "is_read": n.is_read,
         }
-        for notification in recent_notifications
+        for n in recent_notifications
     ]
 
-    # Count unread notifications for badge (only if notifications are enabled)
-    if hasattr(request.user, 'profile') and request.user.profile.notifications_enabled:
-        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    if hasattr(request.user, "profile") and request.user.profile.notifications_enabled:
+        unread_count = Notification.objects.filter(
+            user=request.user,
+            is_read=False
+        ).count()
     else:
         unread_count = 0
-        
+
+    # ===============================
+    # PREVIOUS SHOPS
+    # ===============================
     previous_shops = (
-    LaundryShop.objects
-    .filter(order__user=request.user, order__cloth_status='Completed', order__payment_status='Completed')
-    .distinct()
-)
-    return render(request, "user_dashboard.html", {
-        "pending_count": pending,
-        "completed_count": completed,
-        "total_spent": spent,
-        "cloth_status": cloth_status, # Added for the 'Your Cloth Status' table
-        "services_nearby": services_nearby,
-        "shops_nearby": shops_nearby,
-        "search_query": search_query,
-        "user_city": user_city,
-        "recent_notifications": recent_notifications,  # Show up to 5 notifications
-        "unread_count": unread_count,
-        "previous_shops": previous_shops,   
-    })
+        LaundryShop.objects
+        .filter(
+            order__user=request.user,
+            order__cloth_status="Completed",
+            order__payment_status="Completed",
+        )
+        .distinct()
+    )
+
+    # ===============================
+    # RENDER
+    # ===============================
+    return render(
+        request,
+        "user_dashboard.html",
+        {
+            "pending_count": pending,
+            "completed_count": completed,
+            "total_spent": spent,
+            "cloth_status": cloth_status,
+            "services_nearby": services_nearby,
+            "shops_nearby": shops_nearby,
+            "nearby_shop_count": nearby_shop_count,   # 🔑 ACCURATE COUNT
+            "search_query": search_query,
+            "user_city": user_city,
+            "recent_notifications": recent_notifications,
+            "unread_count": unread_count,
+            "previous_shops": previous_shops,
+        },
+    )
 
 # --- NEW DROPDOWN VIEWS ---
 
