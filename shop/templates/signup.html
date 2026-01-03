@@ -162,11 +162,24 @@
                         </div>
                     </div>
                     <div>
-                        <label>Confirm <span style="color: var(--error);">*</span></label>
+                        <label>Confirm Password <span style="color: var(--error);">*</span></label>
                         <div class="password-container">
-                            <input type="password" id="password2" name="password_confirm" placeholder="••••••••" required minlength="8">
+                            <input type="password"
+                                id="password2"
+                                name="password_confirm"
+                                placeholder="••••••••"
+                                required
+                                minlength="8">
+
+                            <button type="button"
+                                    class="toggle-password"
+                                    onclick="togglePassword('password2')"
+                                    aria-label="Show or hide confirm password">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
                     </div>
+
                 </div>
 
                 <div>
