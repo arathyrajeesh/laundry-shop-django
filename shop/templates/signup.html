@@ -171,9 +171,28 @@
 
                 <div>
                     <label>Location (City/Town)</label>
-                    <input type="text" name="manual_location" id="manual_location" placeholder="e.g. Kozhikode" >
-                    <p id="location-status" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></p>
+                    <input type="text" name="manual_location" id="manual_location" placeholder="e.g. Kozhikode">
+
+                    <button type="button"
+                            id="detectLocationBtn"
+                            style="
+                                margin-top:8px;
+                                width:100%;
+                                padding:10px;
+                                border-radius:10px;
+                                border:1.5px dashed #c7d2fe;
+                                background:#eef2ff;
+                                color:#4338ca;
+                                font-weight:600;
+                                cursor:pointer;">
+                        <i class="fas fa-crosshairs"></i> Detect My Location
+                    </button>
+
+                    <p id="location-status"
+                    style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+                    </p>
                 </div>
+
 
                 <input type="hidden" name="latitude" id="latitude">
                 <input type="hidden" name="longitude" id="longitude">
@@ -253,7 +272,14 @@
                 headers: { 'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)' }
             });
             const data = await res.json();
-            return data.address?.city || data.address?.town || data.address?.village || "Unknown City";
+            return (
+                data.address?.city ||
+                data.address?.town ||
+                data.address?.village ||
+                data.address?.county ||   
+                data.address?.state ||    
+                "Unknown City"
+            );
         } catch (err) {
             return "Unknown City";
         }
@@ -263,7 +289,39 @@
         if (errorBox) {
             errorBox.style.display = 'none';
         }
-    }, 5000); 
+    }, 5000);
+    const detectBtn = document.getElementById("detectLocationBtn");
+
+    detectBtn.addEventListener("click", async () => {
+        locationStatus.textContent = "Detecting location...";
+
+        if (!navigator.geolocation) {
+            locationStatus.textContent = "Geolocation not supported.";
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                document.getElementById("latitude").value = lat;
+                document.getElementById("longitude").value = lon;
+
+                const city = await getCityFromLocation(lat, lon);
+                document.getElementById("city").value = city;
+
+                manualLocationInput.value = "";
+                locationStatus.textContent = city
+                    ? `Location detected: ${city}`
+                    : "Location detected, city unavailable.";
+            },
+            () => {
+                locationStatus.textContent = "Location permission denied.";
+            }
+        );
+    });
+
 </script>
 
 </body>
