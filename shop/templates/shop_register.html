@@ -7,181 +7,187 @@
     <title>Shop Registration - Shine & Bright Laundry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        :root {
+            --brand-primary: #3b82f6;
+            --brand-hover: #2563eb;
+            --bg-dark: #020617;
+            --glass-bg: rgba(30, 41, 59, 0.75);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255,255,255,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
-            font-family: "Poppins", Arial, sans-serif;
-            background: url("{% static 'images/bg1.jpeg' %}") no-repeat center center/cover;            display: flex;
+            background:
+                radial-gradient(at 0% 0%, #1e293b 0, transparent 50%),
+                radial-gradient(at 50% 0%, #0f172a 0, transparent 50%),
+                radial-gradient(at 100% 0%, #1e293b 0, transparent 50%),
+                var(--bg-dark);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
             padding: 20px;
+            color: var(--text-main);
         }
 
         .register-container {
-            background: #ffffff;
             width: 100%;
-            max-width: 450px;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 480px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border-radius: 20px;
+            padding: 48px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.35);
         }
 
         .logo-container {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
+            width: 70px;
+            height: 70px;
             margin-bottom: 10px;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,.4));
         }
 
         h2 {
-            margin: 10px 0 5px;
-            color: #0f334bff;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-main);
         }
 
         .subtitle {
-            color: #666;
             font-size: 14px;
-            margin-bottom: 25px;
+            color: var(--text-muted);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
+            font-size: 13px;
             font-weight: 500;
-            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-main);
         }
 
         input {
             width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            outline: none;
-            font-size: 15px;
-            transition: all 0.3s;
-            box-sizing: border-box;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(15,23,42,0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 14px;
+            transition: all .2s ease;
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
         }
 
         input:focus {
-            border-color: #0f334bff;
-            box-shadow: 0 0 0 3px rgba(15, 51, 75, 0.1);
+            outline: none;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(59,130,246,.15);
+            background: rgba(15,23,42,0.85);
         }
 
-        .password-container {
-            position: relative; 
-        }
-
-        .password-container input {
-            padding-right: 40px; 
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            color: #666;
-            padding: 5px;
-            z-index: 10;
-        }
-
-        button[type="submit"] {
+        button[type="submit"],
+        #detectLocationBtn {
             width: 100%;
             padding: 14px;
-            background: #0f334bff;
+            background: var(--brand-primary);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
+            transition: all .2s ease;
         }
 
-        button[type="submit"]:hover {
-            background: #0a2538;
-        }
-        
-        #detectLocationBtn {
-            width: 100%; 
-            padding: 12px; 
-            background:  #0f334bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            margin-bottom: 10px;
-            transition: background 0.3s;
-        }
-
+        button[type="submit"]:hover,
         #detectLocationBtn:hover:not([disabled]) {
-            background:  #041e30ff;
+            background: var(--brand-hover);
+            transform: translateY(-1px);
+        }
+
+        #detectLocationBtn {
+            background: rgba(15,23,42,.8);
+            border: 1px solid var(--border-color);
         }
 
         #detectLocationBtn:disabled {
+            opacity: .6;
             cursor: not-allowed;
-            opacity: 0.7;
         }
 
+        .toggle-password {
+            color: var(--text-muted);
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        #locationStatus {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
 
         .footer-text {
-            margin-top: 20px;
+            margin-top: 24px;
             text-align: center;
-            color: #666;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--text-muted);
         }
 
-        a {
-            color: #0f334bff;
+        .footer-text a {
+            color: var(--brand-primary);
             text-decoration: none;
             font-weight: 600;
         }
 
-        a:hover {
+        .footer-text a:hover {
             text-decoration: underline;
         }
 
         .error-message {
-            background: #ffebee;
-            color: #c62828;
+            background: rgba(239,68,68,.15);
+            border: 1px solid rgba(239,68,68,.3);
+            color: #fecaca;
             padding: 12px;
             border-radius: 8px;
+            font-size: 13px;
             margin-bottom: 20px;
-            border-left: 4px solid #c62828;
-            font-size: 14px;
         }
 
         .success-message {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: rgba(16,185,129,.15);
+            border: 1px solid rgba(16,185,129,.3);
+            color: #bbf7d0;
             padding: 12px;
             border-radius: 8px;
+            font-size: 13px;
             margin-bottom: 20px;
-            border-left: 4px solid #2e7d32;
-            font-size: 14px;
         }
     </style>
+
 </head>
 <body>
 

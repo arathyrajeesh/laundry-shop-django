@@ -337,24 +337,46 @@
         <div class="section-header">
             <h2>Recommended Services</h2>
         </div>
-        
+
         {% if services_nearby %}
-        <div class="modern-grid">
-            {% for service in services_nearby %}
-            <div class="shop-card">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <h3 style="font-size: 1.1rem; color: var(--primary)">{{ service.name }}</h3>
-                        <span class="badge-price">₹{{ service.price|default:"--" }}</span>
+            <div class="modern-grid">
+                {% for service in services_nearby %}
+                    <div class="shop-card">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h3 style="font-size: 1.1rem;">{{ service.name }}</h3>
+                                <span class="badge-price">₹{{ service.price|default:"--" }}</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: #64748b;">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ service.branch.name }}
+                            </p>
+                            <a href="{% url 'select_services' service.branch.shop.id %}" class="btn-main">
+                                Book Now
+                            </a>
+                        </div>
                     </div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                        <i class="fas fa-map-marker-alt" style="margin-right: 5px"></i> {{ service.branch.name }}
-                    </p>
-                    <a href="{% url 'select_services' service.branch.shop.id %}" class="btn-main">Book Now</a>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
+        {% else %}
+            <!-- NO SERVICES MESSAGE -->
+            <div style="
+                background: #f8fafc;
+                border: 1px dashed #e2e8f0;
+                padding: 40px;
+                border-radius: 16px;
+                text-align: center;
+                margin-bottom: 3rem;
+            ">
+                <i class="fas fa-store-slash" style="font-size: 32px; color: #94a3b8;"></i>
+                <h3 style="margin-top: 10px; color: #334155;">No services available in your area</h3>
+                <p style="color: #64748b; font-size: 14px; margin-top: 5px;">
+                    We couldn’t find any laundry services in <strong>{{ user_city|default:"your location" }}</strong>.
+                </p>
+                <a href="{% url 'edit_profile' %}" class="btn-main" style="max-width: 200px; margin: 20px auto;">
+                    Change Location
+                </a>
+            </div>
         {% endif %}
 
         <div class="section-header">

@@ -55,8 +55,6 @@ def splash(request):
     return render(request, 'splash.html')
 def shop_splash(request):
     return render(request, "shop_splash.html")
-def support_console(request):
-    return render(request, "support_console.html")
 def shop_entry(request):
     if 'shop_id' in request.session:
         return redirect('shop_dashboard')
@@ -226,21 +224,13 @@ def generate_payment_receipt_pdf(order, order_items):
 def get_cloth_status(user):
     orders = Order.objects.filter(
         user=user,
-        payment_status="Completed"   # filter here, not inside loop
+        payment_status="Completed"
     ).select_related('shop').order_by('-created_at')
-
-    if not orders.exists():
-        return [{
-            'cloth_name': 'No recent orders',
-            'status': 'N/A',
-            'delivery_date': 'N/A',
-            'shop_name': 'N/A'
-        }]
 
     return [
         {
             'cloth_name': f"Order #{order.id}",
-            'status': order.cloth_status,   # 🔑 single source of truth
+            'status': order.cloth_status,
             'delivery_date': order.created_at,
             'shop_name': order.shop.name
         }
