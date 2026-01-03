@@ -243,6 +243,16 @@
             font-weight: 700;
             background: #f1f5f9;
         }
+        .avatar-fallback {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
 
         /* --- Profile Menu Refinement --- */
         .user-profile-trigger {
@@ -292,7 +302,13 @@
         
         <div class="user-profile-trigger" id="profileToggle">
             <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted)">{{ request.user.username }}</span>
-            <img src="{% if request.user.profile.profile_image %}{{ request.user.profile.profile_image.url }}{% else %}{% static 'default.png' %}{% endif %}" class="avatar">
+            {% if request.user.profile.profile_image %}
+                <img src="{{ request.user.profile.profile_image.url }}" class="avatar" alt="Profile">
+            {% else %}
+                <div class="avatar avatar-fallback">
+                    {{ request.user.username|slice:":1"|upper }}
+                </div>
+            {% endif %}
             
             <div class="dropdown-menu" id="dropdownMenu">
                 <div style="padding: 1rem; border-bottom: 1px solid #f1f5f9">
