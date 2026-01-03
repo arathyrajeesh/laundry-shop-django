@@ -120,6 +120,37 @@
             cursor: pointer;
             transition: all .2s ease;
         }
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 44px; /* space for eye icon */
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password i {
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        .toggle-password:hover i {
+            color: var(--text-main);
+        }
 
         button[type="submit"]:hover,
         #detectLocationBtn:hover:not([disabled]) {
@@ -247,7 +278,13 @@
         <div class="form-group">
             <label for="password1">Password *</label>
             <div class="password-container">
-                <input type="password" id="password1" name="password" placeholder="Enter password (min 6 characters)" required autocomplete="new-password">
+            <input type="password"
+                id="password1"
+                name="password"
+                placeholder="Enter password (min 8 characters)"
+                required
+                minlength="8"
+                autocomplete="new-password">
                 <button type="button" class="toggle-password" onclick="togglePassword('password1')" aria-label="Toggle password visibility">
                     <i class="fas fa-eye"></i>
                 </button>
@@ -257,12 +294,16 @@
         <div class="form-group">
             <label for="password2">Confirm Password *</label>
             <div class="password-container">
-                <input type="password" id="password2" name="password_confirm" placeholder="Confirm your password" required autocomplete="new-password">
-                <button type="button" class="toggle-password" onclick="togglePassword('password2')" aria-label="Toggle password visibility">
+                <input type="password" id="password2" name="password_confirm" placeholder="••••••••" required minlength="8">
+                <button type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('password2')">
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
         </div>
+
+
 
         <button type="submit">Register Shop</button>
     </form>
@@ -277,72 +318,81 @@
     const statusDiv = document.getElementById("locationStatus");
     const locationBtn = document.getElementById("detectLocationBtn");
 
-    locationBtn.addEventListener("click", function() {
+    statusDiv.setAttribute("aria-live", "polite");
+
+    locationBtn.addEventListener("click", function () {
         locationBtn.disabled = true;
-        locationBtn.innerHTML = "🔄 Detecting...";
-        statusDiv.innerHTML = "Getting your location...";
+        locationBtn.textContent = "Detecting location...";
+        statusDiv.textContent = "Please wait while we detect your location.";
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    document.getElementById("latitude").value = lat;
-                    document.getElementById("longitude").value = lon;
-
-                    statusDiv.innerHTML = "Location detected! Getting city information...";
-
-                    const city = await getCityFromLocation(lat, lon);
-                    
-                    if (city && city !== "Unknown City") {
-                        document.getElementById("city").value = city;
-                        statusDiv.innerHTML = `Location detected: **${city}**`;
-                    } else {
-                        statusDiv.innerHTML = "Location detected, but could not retrieve city. Please enter it manually.";
-                    }
-                    
-                    locationBtn.disabled = false;
-                    locationBtn.innerHTML = INITIAL_BTN_TEXT;
-                },
-                function(error) {
-                    console.error("Geolocation failed:", error.message);
-                    statusDiv.innerHTML = "Location access denied. Please enter your city manually.";
-                    locationBtn.disabled = false;
-                    locationBtn.innerHTML = INITIAL_BTN_TEXT;
-                }
-            );
-        } else {
-            statusDiv.innerHTML = "Geolocation not supported by your browser.";
-            locationBtn.disabled = false;
-            locationBtn.innerHTML = INITIAL_BTN_TEXT;
+        if (!navigator.geolocation) {
+            statusDiv.textContent =
+                "Geolocation is not supported by your browser. Please enter your city manually.";
+            resetButton();
+            return;
         }
+
+        navigator.geolocation.getCurrentPosition(
+            async function (position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                document.getElementById("latitude").value = lat;
+                document.getElementById("longitude").value = lon;
+
+                statusDiv.textContent = "Location detected. Resolving city name…";
+
+                const city = await getCityFromLocation(lat, lon);
+
+                if (city) {
+                    document.getElementById("city").value = city;
+                    statusDiv.textContent = `Location set to ${city}.`;
+                } else {
+                    statusDiv.textContent =
+                        "Location detected, but the city could not be identified. Please enter it manually.";
+                }
+
+                resetButton();
+            },
+            function () {
+                statusDiv.textContent =
+                    "Location access was denied. Please enter your city manually.";
+                resetButton();
+            }
+        );
     });
 
-    async function getCityFromLocation(lat, lon) {
-        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    function resetButton() {
+        locationBtn.disabled = false;
+        locationBtn.textContent = INITIAL_BTN_TEXT;
+    }
 
+    async function getCityFromLocation(lat, lon) {
         try {
-            const response = await fetch(url, {
-                headers: {
-                    'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)' 
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                {
+                    headers: {
+                        "User-Agent":
+                            "ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)",
+                    },
                 }
-            });
+            );
+
+            if (!response.ok) return "";
+
             const data = await response.json();
 
-            if (data.address) {
-                return data.address.city ||
-                    data.address.town ||
-                    data.address.village ||
-                    data.address.county ||
-                    data.address.state ||
-                    "Unknown City";
-            }
-            return "Unknown City";
-
-        } catch (error) {
-            console.error("Error fetching city:", error);
-            return "Unknown City";
+            return (
+                data.address?.city ||
+                data.address?.town ||
+                data.address?.village ||
+                data.address?.county ||
+                data.address?.state ||
+                ""
+            );
+        } catch {
+            return "";
         }
     }
 
@@ -355,15 +405,24 @@
             passwordInput.type = 'text';
             icon.classList.remove('fa-eye');
             icon.classList.add('fa-eye-slash');
-            toggleBtn.setAttribute('aria-label', 'Hide password');
         } else {
             passwordInput.type = 'password';
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
-            toggleBtn.setAttribute('aria-label', 'Show password');
         }
     }
+    document.querySelector("form").addEventListener("submit", function (e) {
+        const city = document.getElementById("city").value.trim();
+
+        if (!city) {
+            e.preventDefault();
+            statusDiv.textContent =
+                "Please detect your location or enter your city before registering.";
+            statusDiv.style.color = "#ef4444";
+        }
+    });
 </script>
+
 
 </body>
 </html>
