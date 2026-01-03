@@ -321,7 +321,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.address) {
-                        const location = data.address.city || data.address.town || data.address.state || data.address.country;
+                    const location =
+                        data.address.city ||
+                        data.address.town ||
+                        data.address.village ||
+                        data.address.county ||  
+                        data.address.state ||
+                        data.address.country;
                         placeElement.innerHTML = location;
                         placeElement.classList.remove('loading-shimmer');
                     }

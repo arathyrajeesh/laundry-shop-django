@@ -11,10 +11,19 @@ class CustomPasswordChangeForm(PasswordChangeForm):
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['full_name', 'phone', 'profile_image', 'city']
+        fields = ["full_name", "phone", "city", "profile_image"]
+        widgets = {
+            "city": forms.TextInput(attrs={
+                "id": "cityInput",
+                "class": "form-input"
+            }),
+            "full_name": forms.TextInput(attrs={"class": "form-input"}),
+            "phone": forms.TextInput(attrs={"class": "form-input"}),
+        }
 
 
 class ServiceForm(forms.ModelForm):

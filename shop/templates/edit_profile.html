@@ -234,7 +234,7 @@
                     <div style="position:relative">
                         <input type="email" class="form-input" value="{{ request.user.email }}" readonly style="background:#f1f5f9; color:#94a3b8;">
                         <span style="position:absolute; right:15px; top:14px; color:#10b981; font-size: 11px; font-weight:700">
-                             <i class="fa-solid fa-circle-check"></i> VERIFIED
+                                <i class="fa-solid fa-circle-check"></i> VERIFIED
                         </span>
                     </div>
                 </div>
@@ -243,7 +243,6 @@
                     <label class="section-label">City</label>
                     {{ form.city }}
                 </div>
-
                 <div class="form-section">
                     <label class="section-label">Postal Code</label>
                     <input type="text" class="form-input" placeholder="e.g. 10001">
@@ -256,7 +255,9 @@
                 </h3>
                 <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Capture your GPS coordinates to ensure faster and more accurate deliveries.</p>
                 <button type="button" id="geoBtn" class="btn-detect">Capture Location</button>
-                
+                <div id="detectedLocation"
+                    style="margin-top:10px;font-size:13px;color:#334155;font-weight:500;">
+                </div>
                 <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
                 <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default:'' }}">
                 
@@ -285,7 +286,39 @@
             if (file) document.getElementById("imgPreview").src = URL.createObjectURL(file);
         };
     }
+    document.addEventListener("DOMContentLoaded", function () {
+        const lat = document.getElementById("lat").value;
+        const lng = document.getElementById("lng").value;
+        const box = document.getElementById("detectedLocation");
 
+        if (lat && lng) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    const city =
+                        data.address.city ||
+                        data.address.town ||
+                        data.address.village ||
+                        data.address.county ||   
+                        data.address.state ||
+                        "Detected location";
+
+
+                    box.innerHTML = `
+                        <i class="fa-solid fa-location-dot" style="color:#10b981"></i>
+                        ${city}
+                    `;
+                        // OPTIONAL: auto-fill city input
+                    const cityInput = document.getElementById("cityInput");
+                    if (cityInput && !cityInput.value) {
+                        cityInput.value = city;
+                    }
+                })
+                .catch(() => {
+                    box.innerHTML = `📍 ${lat}, ${lng}`;
+                });
+        }
+    });
     // Geolocation logic
     document.getElementById("geoBtn").onclick = function() {
         const msg = document.getElementById("statusMsg");
