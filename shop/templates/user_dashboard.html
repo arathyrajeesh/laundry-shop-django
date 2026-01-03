@@ -371,31 +371,45 @@
         </div>
 
         <div class="section-header">
-            <h2>Recommended Services</h2>
+            <h2>Shops Near You</h2>
+            {% if user_city %}
+                <span style="font-size: 0.85rem; color: var(--text-muted);">
+                    {{ nearby_shop_count }} shops in {{ user_city }}
+                </span>
+            {% endif %}
         </div>
 
-        {% if services_nearby %}
+        {% if shops_nearby %}
             <div class="modern-grid">
-                {% for service in services_nearby %}
+                {% for shop in shops_nearby %}
                     <div class="shop-card">
                         <div class="card-body">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <h3 style="font-size: 1.1rem;">{{ service.name }}</h3>
-                                <span class="badge-price">₹{{ service.price|default:"--" }}</span>
-                            </div>
-                            <p style="font-size: 0.85rem; color: #64748b;">
+
+                            <h3 style="font-size: 1.1rem; font-weight: 700;">
+                                {{ shop.name }}
+                            </h3>
+
+                            <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
                                 <i class="fas fa-map-marker-alt"></i>
-                                {{ service.branch.name }}
+                                {{ shop.city }}
                             </p>
-                            <a href="{% url 'select_services' service.branch.shop.id %}" class="btn-main">
-                                Book Now
+
+                            {% if shop.address %}
+                                <p style="font-size: 0.8rem; color: #94a3b8;">
+                                    {{ shop.address|truncatechars:60 }}
+                                </p>
+                            {% endif %}
+
+                            <a href="{% url 'shop_detail' shop.id %}" class="btn-main">
+                                View Shop
                             </a>
+
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <!-- NO SERVICES MESSAGE -->
+
             <div style="
                 background: #f8fafc;
                 border: 1px dashed #e2e8f0;
@@ -405,15 +419,18 @@
                 margin-bottom: 3rem;
             ">
                 <i class="fas fa-store-slash" style="font-size: 32px; color: #94a3b8;"></i>
-                <h3 style="margin-top: 10px; color: #334155;">No services available in your area</h3>
+                <h3 style="margin-top: 10px; color: #334155;">No shops near you</h3>
                 <p style="color: #64748b; font-size: 14px; margin-top: 5px;">
-                    We couldn’t find any laundry services in <strong>{{ user_city|default:"your location" }}</strong>.
+                    We couldn’t find any laundry shops in
+                    <strong>{{ user_city|default:"your location" }}</strong>.
                 </p>
-                <a href="{% url 'edit_profile' %}" class="btn-main" style="max-width: 200px; margin: 20px auto;">
-                    Change Location
-                </a>
+
+                <button id="useLiveLocationBtn" class="btn-main" style="max-width: 220px; margin: 20px auto;">
+                    Use Current Location
+                </button>
             </div>
         {% endif %}
+
 
         <div class="section-header">
             <h2>Track Your Items</h2>
