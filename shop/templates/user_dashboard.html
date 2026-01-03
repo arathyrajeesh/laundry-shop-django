@@ -348,6 +348,26 @@
                 <input type="text" name="search" value="{{ search_query }}" placeholder="Search wash & fold, dry cleaning, premium care...">
                 <button type="submit" class="search-btn-alt">Search</button>
             </form>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px;">
+                <button id="useLiveLocationBtn"
+                        style="
+                            background: rgba(255,255,255,0.15);
+                            color: #fff;
+                            border: 1px solid rgba(255,255,255,0.3);
+                            padding: 8px 14px;
+                            border-radius: 999px;
+                            font-size: 0.85rem;
+                            cursor: pointer;
+                        ">
+                    <i class="fas fa-location-crosshairs"></i>
+                    Use Current Location
+                </button>
+
+                <span id="liveLocationStatus"
+                    style="font-size: 0.8rem; color: rgba(255,255,255,0.8);">
+                </span>
+            </div>
+
         </div>
 
         <div class="section-header">
@@ -429,53 +449,6 @@
     </div>
 
     <script>
-        const toggle = document.getElementById('profileToggle');
-        const menu = document.getElementById('dropdownMenu');
-
-        toggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menu.classList.toggle('show');
-        });
-
-        document.addEventListener('click', () => {
-            menu.classList.remove('show');
-        });
-        
-        document.getElementById('profile-trigger').addEventListener('click', function() {
-            var dropdown = document.getElementById('profile-dropdown-menu');
-            dropdown.classList.toggle('show');
-
-            if (dropdown.classList.contains('show')) {
-                fetch('/notifications/mark-read/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Notifications marked as read');
-                        var badges = dropdown.querySelectorAll('.notification-badge');
-                        badges.forEach(function(badge) {
-                            badge.style.display = 'none';
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error marking notifications as read:', error);
-                });
-            }
-        });
-
-        window.addEventListener('click', function(e) {
-            var container = document.querySelector('.profile-pic-container');
-            if (!container.contains(e.target) && document.getElementById('profile-dropdown-menu').classList.contains('show')) {
-                document.getElementById('profile-dropdown-menu').classList.remove('show');
-            }
-        });
-
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -513,8 +486,7 @@
                         
                         // Check if no notifications left
                         const notificationsSection = document.querySelector('.notifications-section');
-                        const notificationItems = notificationsSection.querySelectorAll('.notification-item');
-                        if (notificationItems.length === 0) {
+                        if (notificationsSection) {
                             // Show "No notifications" message
                             const noNotificationsHTML = `
                                 <div class="no-notifications">
@@ -579,7 +551,63 @@
                 });
             }, 5000); // Mark as read after 5 seconds of viewing
         });
-    </script>
+        document.getElementById("useLiveLocationBtn").addEventListener("click", () => {
+            const status = document.getElementById("liveLocationStatus");
+            status.textContent = "Detecting your current location…";
+
+            if (!navigator.geolocation) {
+                status.textContent = "Geolocation is not supported.";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+                        { headers: { "User-Agent": "ShineBrightApp/1.0" } }
+                    );
+
+                    const data = await res.json();
+
+                    // 🔑 REPLACE city logic HERE
+                    const city =
+                        data.address?.city ||
+                        data.address?.town ||
+                        data.address?.county ||
+                        data.address?.state_district ||
+                        data.address?.state ||
+                        "";
+
+                    if (!city) {
+                        status.textContent = "Could not detect city.";
+                        return;
+                    }
+
+                    await fetch("{% url 'update_live_location' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: new URLSearchParams({
+                            city: city,
+                            latitude: lat,
+                            longitude: lon
+                        })
+                    });
+
+                    window.location.reload();
+                },
+                () => {
+                    status.textContent = "Location permission denied.";
+                }
+            );
+        });
+        </script>
+
 
 </body>
 </html>

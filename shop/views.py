@@ -3176,3 +3176,20 @@ def save_login_location(request):
         return JsonResponse({"status": "saved"})
 
     return JsonResponse({"status": "failed"}, status=400)
+
+@login_required
+@require_POST
+def update_live_location(request):
+    profile = request.user.profile
+
+    city = request.POST.get("city", "").strip()
+    latitude = request.POST.get("latitude")
+    longitude = request.POST.get("longitude")
+
+    if city:
+        profile.city = city
+        profile.latitude = latitude
+        profile.longitude = longitude
+        profile.save()
+
+    return JsonResponse({"status": "updated"})

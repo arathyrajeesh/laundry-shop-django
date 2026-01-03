@@ -110,6 +110,16 @@
             color: var(--primary);
             margin-top: 15px;
         }
+        .avatar-fallback {
+            background: linear-gradient(135deg, var(--accent), #193a86ff);
+            color: #fff;
+            font-weight: 700;
+            font-size: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
 
         .user-badge {
             font-size: 12px;
@@ -243,8 +253,11 @@
                 {% if user.profile.profile_image %}
                     <img src="{{ user.profile.profile_image.url }}" class="profile-img" alt="User">
                 {% else %}
-                    <img src="{% static 'default.png' %}" class="profile-img" alt="Default">
+                    <div class="profile-img avatar-fallback">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
                 {% endif %}
+
                 <div class="status-indicator"></div>
             </div>
             <div class="user-title">
