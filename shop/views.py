@@ -1466,15 +1466,36 @@ def is_staff_user(user):
     """Check if user is staff or superuser."""
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
+def admin_user_search(request):
+    query = request.GET.get("q", "")
 
+    users = User.objects.filter(
+        Q(username__icontains=query) |
+        Q(email__icontains=query) |
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query)
+    )
+
+    return render(request, "admin/partials/users_table.html", {
+        "users": users
+    })
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
 def admin_dashboard(request):
     """Admin dashboard with statistics and management tools."""
+    search_query = request.GET.get('search', '')
+    users = User.objects.all().order_by('-date_joined')
 
     today = timezone.now().date()
     now = timezone.now()
-
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
     # 🔒 BASE QUERY → ONLY PAID ORDERS
     paid_orders = Order.objects.filter(payment_status="Completed")
 
@@ -1573,7 +1594,8 @@ def admin_dashboard(request):
         'pending_approvals': pending_approvals,
 
         'total_branches': total_branches,
-
+        'users': users,
+        'search_query': search_query,
         # Data
         'recent_orders': recent_orders,
         'orders_by_status': orders_by_status,
@@ -1873,28 +1895,6 @@ def admin_revenue_orders(request):
     return render(request, 'admin_orders.html', context)  # Reuse the same template
 
 
-@login_required
-@user_passes_test(is_staff_user, login_url='login')
-def admin_users(request):
-    """View all users."""
-    search_query = request.GET.get('search', '')
-    
-    users = User.objects.all().order_by('-date_joined')
-    
-    if search_query:
-        users = users.filter(
-            Q(username__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query)
-        )
-    
-    context = {
-        'users': users,
-        'search_query': search_query,
-    }
-    
-    return render(request, 'admin_users.html', context)
 
 
 @login_required
@@ -3230,19 +3230,19 @@ def save_login_location(request):
 
     return JsonResponse({"status": "failed"}, status=400)
 
+
 @login_required
-@require_POST
 def update_live_location(request):
-    profile = request.user.profile
+    if request.method == "POST":
+        profile = request.user.profile
 
-    city = request.POST.get("city", "").strip()
-    latitude = request.POST.get("latitude")
-    longitude = request.POST.get("longitude")
+        profile.city = request.POST.get("city")
+        profile.latitude = request.POST.get("latitude")
+        profile.longitude = request.POST.get("longitude")
 
-    if city:
-        profile.city = city
-        profile.latitude = latitude
-        profile.longitude = longitude
+        # ✅ UPDATE TIMESTAMP
+        profile.location_updated_at = timezone.now()
+
         profile.save()
 
-    return JsonResponse({"status": "updated"})
+        return JsonResponse({"success": True})

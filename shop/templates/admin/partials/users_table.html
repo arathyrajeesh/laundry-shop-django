@@ -1,0 +1,47 @@
+{% if users %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Full Name</th>
+            <th>Joined Date</th>
+            <th>Last Login</th>
+            <th>Status</th>
+            <th>Staff</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>#{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.get_full_name|default:"N/A" }}</td>
+            <td>{{ user.date_joined|date:"M d, Y" }}</td>
+            <td>{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</td>
+            <td>
+                {% if user.is_active %}
+                    <span class="status-badge status-completed">Active</span>
+                {% else %}
+                    <span class="status-badge status-pending">Inactive</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.is_staff %}
+                    <span class="status-badge status-completed">Yes</span>
+                {% else %}
+                    <span class="status-badge status-pending">No</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div style="text-align:center;color:#999;padding:30px">
+    <i class="fas fa-users"></i>
+    <p>No users found</p>
+</div>
+{% endif %}

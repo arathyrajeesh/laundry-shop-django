@@ -288,6 +288,17 @@
             display: none;
             padding: 0.5rem;
         }
+        .location-updated {
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.12);
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
 
         .dropdown-menu.show { display: block; animation: slideIn 0.2s ease; }
 
@@ -367,12 +378,18 @@
                     style="font-size: 0.8rem; color: rgba(255,255,255,0.8);">
                 </span>
             </div>
-
+            {% if request.user.profile.location_updated_at %}
+                <div class="location-updated">
+                    <i class="fas fa-clock"></i>
+                    Location updated at {{ request.user.profile.location_updated_at|date:"d M Y, h:i A" }}
+                </div>
+            {% endif %}
         </div>
 
         <div class="section-header">
             <h2>Recommended Services</h2>
         </div>
+
 
         {% if services_nearby %}
             <div class="modern-grid">
@@ -590,6 +607,13 @@
                 });
             }, 5000); // Mark as read after 5 seconds of viewing
         });
+        function getCSRFToken() {
+            return document.cookie
+                .split("; ")
+                .find(row => row.startsWith("csrftoken="))
+                ?.split("=")[1];
+        }
+
         document.getElementById("useLiveLocationBtn").addEventListener("click", () => {
             const status = document.getElementById("liveLocationStatus");
             status.textContent = "Detecting your current location…";
@@ -629,7 +653,7 @@
                         method: "POST",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded",
-                            "X-CSRFToken": "{{ csrf_token }}"
+                            "X-CSRFToken": getCSRFToken()
                         },
                         body: new URLSearchParams({
                             city: city,

@@ -14,7 +14,7 @@ class Profile(models.Model):
     email_verified = models.BooleanField(default=False)
     notifications_enabled = models.BooleanField(default=True)
     login_email_sent = models.BooleanField(default=False)
-
+    location_updated_at = models.DateTimeField(blank=True, null=True)
     def __str__(self):
         return f"{self.user.username}'s profile"
 
