@@ -1466,25 +1466,14 @@ def is_staff_user(user):
     """Check if user is staff or superuser."""
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
-def admin_user_search(request):
-    query = request.GET.get("q", "")
 
-    users = User.objects.filter(
-        Q(username__icontains=query) |
-        Q(email__icontains=query) |
-        Q(first_name__icontains=query) |
-        Q(last_name__icontains=query)
-    )
-
-    return render(request, "admin/partials/users_table.html", {
-        "users": users
-    })
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
 def admin_dashboard(request):
     """Admin dashboard with statistics and management tools."""
     search_query = request.GET.get('search', '')
     users = User.objects.all().order_by('-date_joined')
+    shops = LaundryShop.objects.all().order_by('name')
 
     today = timezone.now().date()
     now = timezone.now()
@@ -1603,12 +1592,26 @@ def admin_dashboard(request):
         'recent_branches': recent_branches,
         'all_shops': LaundryShop.objects.all(),
         'shops_with_branches': LaundryShop.objects.prefetch_related('branches').all(),
+        'shops': shops,
 
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
     }
 
     return render(request, 'admin_dashboard.html', context)
+def admin_user_search(request):
+    query = request.GET.get("q", "")
+
+    users = User.objects.filter(
+        Q(username__icontains=query) |
+        Q(email__icontains=query) |
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query)
+    )
+
+    return render(request, "admin/partials/users_table.html", {
+        "users": users
+    })
 
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
@@ -1895,6 +1898,28 @@ def admin_revenue_orders(request):
     return render(request, 'admin_orders.html', context)  # Reuse the same template
 
 
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_users(request):
+    """View all users."""
+    search_query = request.GET.get('search', '')
+    
+    users = User.objects.all().order_by('-date_joined')
+    
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    context = {
+        'users': users,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'admin_users.html', context)
 
 
 @login_required
