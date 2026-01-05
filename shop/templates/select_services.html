@@ -171,71 +171,71 @@
 </head>
 <body>
 
-<form id="order-form" method="post" action="{% url 'create_order' shop.id %}">
-    {% csrf_token %}
+    <form id="order-form" method="post" action="{% url 'create_order' shop.id  branch.id %}">
+        {% csrf_token %}
 
-    <div class="header">
-        <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
-        <a href="{% url 'dashboard' %}" class="back-link"><i class="fas fa-times"></i></a>
-    </div>
+        <div class="header">
+            <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
+            <a href="{% url 'dashboard' %}" class="back-link"><i class="fas fa-times"></i></a>
+        </div>
 
-    <div class="container">
-        <div class="section">
-            <h2>1. Choose Services</h2>
-            <div class="services-grid">
-                {% for service in services %}
-                <div class="service-card" onclick="toggleCard('{{ service.id }}')">
-                    <div class="card-top">
-                        <div style="display:flex; gap:10px; align-items:center">
-                            <input type="checkbox" 
-                                    id="cb-{{ service.id }}" 
-                                    class="service-checkbox" 
-                                    value="{{ service.id }}" 
-                                    data-name="{{ service.name }}"
-                                    data-price="{{ service.price }}"
-                                    onclick="event.stopPropagation(); updateSelections();">
-                            <span style="font-weight:600">{{ service.name }}</span>
+        <div class="container">
+            <div class="section">
+                <h2>1. Choose Services</h2>
+                <div class="services-grid">
+                    {% for service in services %}
+                    <div class="service-card" onclick="toggleCard('{{ service.id }}')">
+                        <div class="card-top">
+                            <div style="display:flex; gap:10px; align-items:center">
+                                <input type="checkbox" 
+                                        id="cb-{{ service.id }}" 
+                                        class="service-checkbox" 
+                                        value="{{ service.id }}" 
+                                        data-name="{{ service.name }}"
+                                        data-price="{{ service.price }}"
+                                        onclick="event.stopPropagation(); updateSelections();">
+                                <span style="font-weight:600">{{ service.name }}</span>
+                            </div>
+                            <span class="price-tag">₹{{ service.price }}</span>
                         </div>
-                        <span class="price-tag">View Prices</span>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 10px;">
+                            Count: 
+                            <input type="number" 
+                                    id="qty-{{ service.id }}" 
+                                    value="1" min="1" 
+                                    onclick="event.stopPropagation();"
+                                    oninput="updateSelections()">
+                        </div>
                     </div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 10px;">
-                        Count: 
-                        <input type="number" 
-                                id="qty-{{ service.id }}" 
-                                value="1" min="1" 
-                                onclick="event.stopPropagation();"
-                                oninput="updateSelections()">
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="section" id="cloth-section" style="display:none">
-            <h2>2. Item Breakdown</h2>
-            <div id="cloth-content"></div>
-        </div>
-
-        <div class="section" id="summary-section" style="display:none">
-            <h2>3. Billing Summary</h2>
-            <div class="summary-box">
-                <div id="summary-items"></div>
-                <div class="total-row">
-                    <span>Amount Payable</span>
-                    <span id="grand-total">₹0.00</span>
+                    {% endfor %}
                 </div>
             </div>
+
+            <div class="section" id="cloth-section" style="display:none">
+                <h2>2. Item Breakdown</h2>
+                <div id="cloth-content"></div>
+            </div>
+
+            <div class="section" id="summary-section" style="display:none">
+                <h2>3. Billing Summary</h2>
+                <div class="summary-box">
+                    <div id="summary-items"></div>
+                    <div class="total-row">
+                        <span>Amount Payable</span>
+                        <span id="grand-total">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hidden-inputs"></div>
         </div>
 
-        <div id="hidden-inputs"></div>
-    </div>
-
-    <div class="footer-action" id="footer-action" style="display:none">
-        <button type="submit" class="btn-proceed">
-            Proceed to Payment <i class="fas fa-chevron-right" style="margin-left:10px"></i>
-        </button>
-    </div>
-</form>
+        <div class="footer-action" id="footer-action" style="display:none">
+            <button type="submit" class="btn-proceed">
+                Proceed to Payment <i class="fas fa-chevron-right" style="margin-left:10px"></i>
+            </button>
+        </div>
+    </form>
 
 <script>
     function calculateBillingSummary() {
@@ -292,6 +292,7 @@
 
 
     function updateSelections() {
+        syncSelectedServices();
         const clothSection = document.getElementById("cloth-section");
         const summarySection = document.getElementById("summary-section");
         const clothContent = document.getElementById("cloth-content");
@@ -383,11 +384,20 @@
     };
 
     function toggleCard(id) {
-        const cb = document.getElementById('cb-' + id);
-        cb.checked = !cb.checked;
-        updateSelections();
-    }
+            const cb = document.getElementById('cb-' + id);
+            cb.checked = !cb.checked;
+            updateSelections();
+        }
+        function syncSelectedServices() {
+        const hidden = document.getElementById("hidden-inputs");
+        hidden.innerHTML = "";
 
+        document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
+            hidden.innerHTML += `
+                <input type="hidden" name="selected_services" value="${cb.value}">
+            `;
+        });
+    }
 </script>
 
 </body>

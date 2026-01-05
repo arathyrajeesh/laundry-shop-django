@@ -1051,115 +1051,128 @@ def select_services(request, shop_id, branch_id=None):
     return render(request, "select_services.html", context)
 
 @login_required
-def create_order(request, shop_id):
-    if request.method != 'POST':
-        return redirect('select_services', shop_id=shop_id)
+def create_order(request, shop_id, branch_id):
+    if request.method != "POST":
+        return redirect(
+            "select_services",
+            shop_id=shop_id,
+            branch_id=branch_id
+        )
 
     shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
-    selected_services = request.POST.getlist('selected_services')
+    branch = get_object_or_404(Branch, id=branch_id, shop=shop)
+
+    selected_services = request.POST.getlist("selected_services")
 
     if not selected_services:
-        messages.error(request, 'Please select at least one service.')
-        return redirect('select_services', shop_id=shop_id)
+        messages.error(request, "Please select at least one service.")
+        return redirect("select_services", shop_id=shop.id, branch_id=branch.id)
 
     total_amount = 0
     order_items_data = []
-    branch = None
 
-    # ---------- CALCULATE BASE ORDER ----------
+    # ---------- CALCULATE ORDER ----------
     for service_id in selected_services:
-        service = get_object_or_404(Service, id=service_id, branch__shop=shop)
+        service = get_object_or_404(
+            Service,
+            id=service_id,
+            branch=branch
+        )
 
-        if branch is None:
-            branch = service.branch
-        elif branch != service.branch:
-            messages.error(request, 'All services must be from the same branch.')
-            return redirect('select_services', shop_id=shop_id)
-
-        clothes_list = request.POST.getlist(f'clothes_{service_id}')
+        clothes_list = request.POST.getlist(f"clothes_{service_id}")
         if not clothes_list:
-            messages.error(request, f'Select clothes for {service.name}.')
-            return redirect('select_services', shop_id=shop_id)
+            messages.error(request, f"Select clothes for {service.name}.")
+            return redirect(
+                "select_services",
+                shop_id=shop.id,
+                branch_id=branch.id
+            )
 
-        for cloth_name in clothes_list:
-            cloth = get_object_or_404(Cloth, name=cloth_name)
-            quantity = int(request.POST.get(f'quantity_{service_id}_{cloth_name}', 1))
+        for cloth_id in clothes_list:
+            cloth = get_object_or_404(Cloth, id=cloth_id)
+
+            quantity = int(
+                request.POST.get(
+                    f"quantity_{service_id}_{cloth_id}", 1
+                )
+            )
             quantity = max(quantity, 1)
 
             price_obj = ServiceClothPrice.objects.filter(
-                service=service, cloth=cloth
+                service=service,
+                cloth=cloth
             ).first()
 
-            price = price_obj.price if price_obj else service.price or 0
-            line_total = price * quantity
+            if not price_obj:
+                messages.error(
+                    request,
+                    f"Price not set for {cloth.name} in {service.name}"
+                )
+                return redirect(
+                    "select_services",
+                    shop_id=shop.id,
+                    branch_id=branch.id
+                )
+
+            line_total = price_obj.price * quantity
             total_amount += line_total
 
             order_items_data.append({
-                'service': service,
-                'cloth': cloth,
-                'quantity': quantity,
-                'price': price,
-                'total': line_total,
+                "service": service,
+                "cloth": cloth,
+                "quantity": quantity,
+                "price": price_obj.price,
+                "total": line_total,
             })
 
-    if total_amount <= 0 or branch is None:
-        messages.error(request, 'Unable to create order. Please try again.')
-        return redirect('select_services', shop_id=shop_id)
-
-    # ---------- FEES & TAX CALCULATION ----------
-    base_amount = total_amount
-    platform_fee = settings.PLATFORM_FEE
-    delivery_fee = settings.DELIVERY_FEE
-
-    gst_taxable_amount = base_amount + platform_fee
-    gst_amount = round((gst_taxable_amount * settings.GST_PERCENTAGE) / 100, 2)
-
-    final_amount = base_amount + platform_fee + delivery_fee + gst_amount
+    if total_amount <= 0:
+        messages.error(request, "Unable to create order.")
+        return redirect(
+            "select_services",
+            shop_id=shop.id,
+            branch_id=branch.id
+        )
 
     # ---------- CREATE ORDER ----------
     order = Order.objects.create(
         user=request.user,
         shop=shop,
         branch=branch,
-
-        base_amount=base_amount,
-        platform_fee=platform_fee,
-        delivery_fee=delivery_fee,
-        gst_amount=gst_amount,
-        amount=final_amount,
-
-        cloth_status='Pending',
-        payment_status='Pending'
+        base_amount=total_amount,
+        platform_fee=settings.PLATFORM_FEE,
+        delivery_fee=settings.DELIVERY_FEE,
+        gst_amount=0,
+        amount=total_amount,
+        cloth_status="Pending",
+        payment_status="Pending",
     )
 
-    # ---------- CREATE ORDER ITEMS ----------
     session_items = []
+
     for item in order_items_data:
         OrderItem.objects.create(
             order=order,
-            service=item['service'],
-            cloth=item['cloth'],
-            quantity=item['quantity']
+            service=item["service"],
+            cloth=item["cloth"],
+            quantity=item["quantity"],
         )
 
         session_items.append({
-            'service_name': item['service'].name,
-            'cloth_name': item['cloth'].name,
-            'quantity': item['quantity'],
-            'price': float(item['price']),
-            'total': float(item['total']),
+            "service_name": item["service"].name,
+            "cloth_name": item["cloth"].name,
+            "quantity": item["quantity"],
+            "price": float(item["price"]),
+            "total": float(item["total"]),
         })
 
-    # ---------- STORE SESSION ----------
-    request.session['order_id'] = order.id
-    request.session['order_items'] = session_items
-    request.session['total_amount'] = float(final_amount)
-    request.session['shop_id'] = shop.id
+    # ---------- SESSION ----------
+    request.session["order_id"] = order.id
+    request.session["order_items"] = session_items
+    request.session["total_amount"] = float(total_amount)
+    request.session["shop_id"] = shop.id
 
-    # ❌ NO EMAIL HERE (payment not completed yet)
-
-    # ---------- REDIRECT TO PAYMENT ----------
-    return redirect('user_details')
+    # ---------- REDIRECT ----------
+    return redirect("user_details")
 
 @login_required
 def user_details(request):

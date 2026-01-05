@@ -23,9 +23,13 @@ urlpatterns = [
         # SHOPS
         path("shop/<int:shop_id>/", views.shop_detail, name="shop_detail"),
         path("shop/<int:shop_id>/select-branch/", views.select_branch_for_order, name="select_branch_for_order"),
-        path("shop/<int:shop_id>/select-services/", views.select_services, name="select_services"),
+        path(
+        "shop/<int:shop_id>/branch/<int:branch_id>/select-services/",
+        views.select_services,
+        name="select_services"
+        ),
         path("shop/<int:shop_id>/branch/<int:branch_id>/select-services/", views.select_services, name="select_services_branch"),
-        path("shop/<int:shop_id>/create-order/", views.create_order, name="create_order"),
+        path("shop/<int:shop_id>/branch/<int:branch_id>/create-order/",views.create_order,name="create_order"),
         path("user-details/", views.user_details, name="user_details"),
         path("payment/success/", views.payment_success, name="payment_success"),
         path("payment/failed/", views.payment_failed, name="payment_failed"),

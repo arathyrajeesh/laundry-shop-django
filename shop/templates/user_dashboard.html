@@ -427,9 +427,11 @@
                                 {{ service.branch.name }} · {{ service.branch.shop.city }}
                             </p>
 
-                            <a href="{% url 'select_services' service.branch.shop.id %}" class="btn-main">
+                            <a href="{% url 'select_services' service.branch.shop.id service.branch.id %}"
+                            class="btn-main">
                                 Book Now
                             </a>
+
                         </div>
                     </div>
                 {% endfor %}
