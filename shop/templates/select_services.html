@@ -351,7 +351,13 @@
         clothSection.style.display = "block";
         summarySection.style.display = "block";
 
+
         calculateBillingSummary();
+        document.getElementById('cloth-section').style.display = anySelected ? 'block' : 'none';
+        document.getElementById('summary-section').style.display = anySelected ? 'block' : 'none';
+        document.getElementById('footer-action').style.display = anySelected ? 'flex' : 'none';
+        document.getElementById('grand-total').innerText = `₹${totalAmount.toFixed(2)}`;
+        setTimeout(calculateBillingSummary, 0);
     }
 
 
