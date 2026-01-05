@@ -1,0 +1,71 @@
+<!-- ===== ORDERS HEADER + STAT ===== -->
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:20px; flex-wrap:wrap;">
+    
+    <h3 style="margin-bottom:0">
+        Orders ({{ orders.count }})
+    </h3>
+
+    <!-- Delayed Orders Card -->
+    <div class="stat-card"
+        style="min-width:220px; cursor:pointer;"
+        onclick="showDelayedOrders()">
+
+        <div class="stat-card-header"
+            style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <div class="stat-card-value"
+                    style="color:#e74c3c; font-size:22px; font-weight:700;">
+                    {{ delayed_orders_count }}
+                </div>
+                <div class="stat-card-label"
+                    style="font-size:13px; color:#777;">
+                    Delayed Orders
+                </div>
+            </div>
+            <div class="stat-card-icon icon-red">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+{% if orders %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Shop</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>Delivery Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.user.username }}</td>
+            <td>{{ order.shop.name|default:"N/A" }}</td>
+
+            <!-- ✅ STATUS -->
+            <td>
+                <span class="status-badge status-{{ order.cloth_status|lower }}">
+                    {{ order.cloth_status }}
+                </span>
+            </td>
+
+            <td>₹{{ order.amount|floatformat:2 }}</td>
+            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <p>No orders found</p>
+</div>
+{% endif %}

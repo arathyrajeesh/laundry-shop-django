@@ -291,6 +291,32 @@ body{
     color: #2d8a63;
     margin-bottom: 10px;
 }
+.filter-select {
+    padding: 10px 40px 10px 15px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+    min-width: 180px;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23777' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 12px;
+}
+
+.filter-select:hover {
+    border-color: var(--sidebar);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--sidebar);
+    box-shadow: 0 0 0 2px rgba(45, 138, 99, 0.15);
+}
 
 .shop-card p {
     font-size: 13px;
@@ -384,6 +410,36 @@ body{
     border-radius: 5px;
     font-size: 14px;
 }
+.status-washing {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-drying {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-ironing {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.status-ready {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-completed {
+    background: #e6f4ef;
+    color: #2d8a63;
+}
+
+.status-pending {
+    background: #fff4e5;
+    color: #c47a12;
+}
+
 /* ---------- TABLE ---------- */
 .table-box{
     background:#fff;
@@ -431,6 +487,20 @@ th{color:#666;font-size:13px}
             <a>
                 <i class="fas fa-store"></i>
                 <span>Manage Shops</span>
+            </a>
+        </li>
+
+        <li class="nav-item" onclick="showSection('orders', this)">
+            <a>
+                <i class="fas fa-list-alt"></i>
+                <span>Orders</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="/admin/" target="_blank">
+                <i class="fas fa-cog"></i>
+                <span>Django Admin</span>
             </a>
         </li>
 
@@ -536,6 +606,57 @@ th{color:#666;font-size:13px}
             <!-- THIS PART WILL BE UPDATED DYNAMICALLY -->
             <div id="usersTableWrapper">
                 {% include "admin/partials/users_table.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div id="orders" class="content-section">
+
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list-alt"></i> All Orders</h2>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <form id="ordersFilterForm" style="display:flex; gap:15px; flex-wrap:wrap; width:100%;">
+                    <input type="text"
+                        name="search"
+                        placeholder="Search by user, email, or order ID"
+                        value="{{ search_query }}">
+
+                        <select name="status" class="filter-select">
+                            <option value="">All Status</option>
+                            {% for code, label in status_choices %}
+                                <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+
+                    <button type="submit"
+                            class="btn"
+                            style="background:var(--sidebar); color:white;">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="resetOrdersFilter()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </form>
+            </div>
+            <button id="backToAllOrdersBtn"
+                    class="btn btn-secondary"
+                    style="display:none; margin-bottom:15px;"
+                    onclick="loadAllOrders()">
+                <i class="fas fa-arrow-left"></i> Back to All Orders
+            </button>
+
+            <!-- Orders Table -->
+            <div class="table-box">
+                <div id="ordersTableWrapper">
+                    {% include "admin/partials/orders_table.html" %}
+                </div>
             </div>
         </div>
     </div>
@@ -728,6 +849,33 @@ function showSection(id,el){
         .forEach(n=>n.classList.remove('active'));
     el.classList.add('active');
 }
+function showDelayedOrders() {
+    // Switch to Orders tab
+    showSection('orders', document.querySelector('.nav-item[onclick*="orders"]'));
+
+    fetch(`/admin-panel/orders/filter/?delayed=1`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("ordersTableWrapper").innerHTML = html;
+
+            // show back button
+            document.getElementById("backToAllOrdersBtn").style.display = "inline-block";
+        })
+        .catch(err => console.error(err));
+}
+function loadAllOrders() {
+    fetch(`/admin-panel/orders/filter/`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("ordersTableWrapper").innerHTML = html;
+
+            // hide back button
+            document.getElementById("backToAllOrdersBtn").style.display = "none";
+        })
+        .catch(err => console.error(err));
+}
+
+
 
 const form = document.getElementById("userSearchForm");
 const input = document.getElementById("userSearchInput");
@@ -776,7 +924,27 @@ function approveShop(shopId) {
         });
     }
 }
+const ordersForm = document.getElementById("ordersFilterForm");
+const ordersWrapper = document.getElementById("ordersTableWrapper");
 
+ordersForm.addEventListener("submit", function (e) {
+    e.preventDefault(); // stop full page reload
+
+    const formData = new FormData(ordersForm);
+    const query = new URLSearchParams(formData).toString();
+
+    fetch(`/admin-panel/orders/filter/?${query}`)
+        .then(response => response.text())
+        .then(html => {
+            ordersWrapper.innerHTML = html; // update orders table only
+        })
+        .catch(err => console.error("Orders filter error:", err));
+});
+
+function resetOrdersFilter() {
+    ordersForm.reset();
+    ordersForm.dispatchEvent(new Event("submit"));
+}
 function rejectShop(shopId) {
     if (confirm('Are you sure you want to reject this shop?')) {
         fetch(`/admin-panel/shop/${shopId}/reject/`, {
@@ -803,7 +971,7 @@ function rejectShop(shopId) {
 }
 </script>
 </body>
-</html>
+</html> 
 
 
 
@@ -1664,5 +1832,4 @@ function rejectShop(shopId) {
     </script>
 </body>
 </html>
-
  {% endcomment %}

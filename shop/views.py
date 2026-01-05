@@ -1466,14 +1466,51 @@ def is_staff_user(user):
     """Check if user is staff or superuser."""
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
+@login_required
+@user_passes_test(is_staff_user, login_url='login')
+def admin_orders(request):
+    """View all orders with filtering."""
+    status_filter = request.GET.get('status', '')
+    search_query = request.GET.get('search', '')
+
+    orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
+
+    if status_filter:
+        orders = orders.filter(cloth_status=status_filter)
+
+    if search_query:
+        orders = orders.filter(
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(id__icontains=search_query)
+        )
+
+    # Only show orders from approved shops that are visible in admin dashboard
+    approved_shops = LaundryShop.objects.filter(is_approved=True)
+
+    # Filter orders to only show those from approved shops
+    orders = orders.filter(shop__is_approved=True)
+
+    context = {
+        'orders': orders,
+        'status_choices': Order.STATUS_CHOICES,
+        'current_status': status_filter,
+        'search_query': search_query,
+        'all_shops': approved_shops,  # Only approved shops for reassignment
+    }
+
+    return render(request, 'admin_orders.html', context)
 
 @login_required
 @user_passes_test(is_staff_user, login_url='login')
 def admin_dashboard(request):
     """Admin dashboard with statistics and management tools."""
+    status_filter = request.GET.get('status', '')
+    search_query = request.GET.get('search', '')
     search_query = request.GET.get('search', '')
     users = User.objects.all().order_by('-date_joined')
     shops = LaundryShop.objects.all().order_by('name')
+    orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
 
     today = timezone.now().date()
     now = timezone.now()
@@ -1487,6 +1524,22 @@ def admin_dashboard(request):
     
     # 🔒 BASE QUERY → ONLY PAID ORDERS
     paid_orders = Order.objects.filter(payment_status="Completed")
+    
+    if status_filter:
+        orders = orders.filter(cloth_status=status_filter)
+
+    if search_query:
+        orders = orders.filter(
+            Q(user__username__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(id__icontains=search_query)
+        )
+
+    # Only show orders from approved shops that are visible in admin dashboard
+    approved_shops = LaundryShop.objects.filter(is_approved=True)
+
+    # Filter orders to only show those from approved shops
+    orders = orders.filter(shop__is_approved=True)
 
     # =====================
     # 📊 STATISTICS
@@ -1571,7 +1624,12 @@ def admin_dashboard(request):
         'washing_orders': washing_orders,
         'ready_orders': ready_orders,
         'completed_orders': completed_orders,
-
+        'orders': orders,
+        'status_choices': Order.STATUS_CHOICES,
+        'current_status': status_filter,
+        'search_query': search_query,
+        'all_shops': approved_shops,
+        
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
 
@@ -1790,40 +1848,6 @@ Shine & Bright System
     return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
 
-@login_required
-@user_passes_test(is_staff_user, login_url='login')
-def admin_orders(request):
-    """View all orders with filtering."""
-    status_filter = request.GET.get('status', '')
-    search_query = request.GET.get('search', '')
-
-    orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
-
-    if status_filter:
-        orders = orders.filter(cloth_status=status_filter)
-
-    if search_query:
-        orders = orders.filter(
-            Q(user__username__icontains=search_query) |
-            Q(user__email__icontains=search_query) |
-            Q(id__icontains=search_query)
-        )
-
-    # Only show orders from approved shops that are visible in admin dashboard
-    approved_shops = LaundryShop.objects.filter(is_approved=True)
-
-    # Filter orders to only show those from approved shops
-    orders = orders.filter(shop__is_approved=True)
-
-    context = {
-        'orders': orders,
-        'status_choices': Order.STATUS_CHOICES,
-        'current_status': status_filter,
-        'search_query': search_query,
-        'all_shops': approved_shops,  # Only approved shops for reassignment
-    }
-
-    return render(request, 'admin_orders.html', context)
 
 
 @login_required
@@ -3271,3 +3295,38 @@ def update_live_location(request):
         profile.save()
 
         return JsonResponse({"success": True})
+from django.utils import timezone
+from django.db.models import Q
+
+def admin_orders_filter(request):
+    orders = Order.objects.select_related("user", "shop").order_by("-created_at")
+
+    search = request.GET.get("search", "").strip()
+    cloth_status = request.GET.get("status", "").strip()
+    delayed = request.GET.get("delayed")
+
+    if search:
+        orders = orders.filter(
+            Q(user__username__icontains=search) |
+            Q(user__email__icontains=search) |
+            Q(id__icontains=search)
+        )
+
+    if cloth_status:
+        orders = orders.filter(cloth_status=cloth_status)
+
+    if delayed:
+        orders = orders.filter(
+            delivery_date__lt=timezone.now(),
+            cloth_status__in=["Pending", "Washing", "Drying", "Ironing"]
+        )
+
+    delayed_orders_count = Order.objects.filter(
+        delivery_date__lt=timezone.now(),
+        cloth_status__in=["Pending", "Washing", "Drying", "Ironing"]
+    ).count()
+
+    return render(request, "admin/partials/orders_table.html", {
+        "orders": orders,
+        "delayed_orders_count": delayed_orders_count,
+    })
