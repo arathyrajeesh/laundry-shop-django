@@ -13,7 +13,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
 
 :root{
-    --sidebar:#2d8a63;
+    --sidebar:#0f334b;
     --bg:#e9f0eb;
     --card:#fff;
     --text-muted:#7a7a7a;
@@ -288,7 +288,7 @@ body{
 .shop-card h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #2d8a63;
+    color:var(--primary-color);
     margin-bottom: 10px;
 }
 .filter-select {
@@ -666,7 +666,7 @@ th{color:#666;font-size:13px}
 
         <div class="dashboard-section">
             <div class="section-header">
-                <h2><i class="fas fa-store"></i> Shops and Branches</h2>
+                <h2 style="margin-bottom:20px;color:var(--sidebar)"><i class="fas fa-store"></i> Shops and Branches</h2>
             </div>
 
             {% if shops_with_branches %}
@@ -816,7 +816,7 @@ th{color:#666;font-size:13px}
                         {% endif %}
 
                         <a href="{% url 'admin_edit_shop' shop.id %}"
-                        class="btn btn-primary"
+                        class="btn btn-secondary"
                         style="font-size:12px">
                             <i class="fas fa-edit"></i> Edit
                         </a>

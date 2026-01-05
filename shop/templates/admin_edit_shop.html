@@ -4,208 +4,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Shop - Admin</title>
+    <title>Edit Shop | Admin Portal</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
+        :root {
+            --primary: #0f334b;
+            --primary-light: #1a4a6e;
+            --accent: #27ae60;
+            --danger: #e74c3c;
+            --bg-gray: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
         * {
             margin: 0;
             padding: 0;
-            font-family: "Poppins", sans-serif;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: #f5f7fa;
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
         }
 
-        :root {
-            --primary-color: #0f334bff;
-            --accent-color: #2ecc71;
-        }
-
+        /* Header Styling */
         .admin-header {
-            background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--white);
+            padding: 1.25rem 2.5rem;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .admin-header h1 {
-            color: var(--primary-color);
-            font-size: 28px;
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
+        /* Container & Card */
         .admin-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 30px 40px;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
         }
 
-        .dashboard-section {
-            background: white;
-            padding: 30px;
+        .dashboard-card {
+            background: var(--white);
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
+
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: #fafafa;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Professional Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .full-width { grid-column: span 2; }
 
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .form-group label {
-            display: block;
-            margin-bottom: 5px;
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #333;
+            color: var(--text-main);
         }
 
-        .form-control {
+        /* Targeting Django's auto-generated inputs */
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background-color: #fcfcfc;
         }
 
-        .form-control:focus {
+        .form-group input:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 51, 75, 0.1);
+            background-color: var(--white);
+        }
+
+        /* Toggle/Checkbox Switches */
+        .status-switches {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-radius: 8px;
         }
 
         .form-check {
             display: flex;
             align-items: center;
-            margin-top: 10px;
+            cursor: pointer;
+            gap: 8px;
         }
 
-        .form-check-input {
-            margin-right: 10px;
+        .form-check input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
 
-        .form-check-label {
-            font-weight: 500;
-        }
-
+        /* Buttons */
         .btn-group {
             display: flex;
-            gap: 10px;
-            margin-top: 30px;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
         }
 
-        @media (max-width: 768px) {
-            .admin-container {
-                padding: 20px 15px;
-            }
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
 
-            .btn-group {
-                flex-direction: column;
-            }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .btn-group { flex-direction: column-reverse; }
+            .btn { justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <div class="admin-header">
-        <h1><i class="fas fa-edit"></i> Edit Shop</h1>
-        <div>
-            <a href="{% url 'admin_shops' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Shops
+    <header class="admin-header">
+        <div class="header-title">
+            <h1><i class="fas fa-store"></i> Merchant Administration</h1>
+        </div>
+        <nav>
+            <a href="{% url 'admin_shops' %}" class="btn btn-outline">
+                <i class="fas fa-chevron-left"></i> Back to List
             </a>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2>Edit Shop Profile</h2>
+            </div>
+            
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="{{ form.name.id_for_label }}">Official Shop Name</label>
+                            {{ form.name }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}">Business Email</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.phone.id_for_label }}">Contact Number</label>
+                            {{ form.phone }}
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="{{ form.address.id_for_label }}">Physical Address</label>
+                            {{ form.address }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.city.id_for_label }}">City/Region</label>
+                            {{ form.city }}
+                        </div>
+
+                        <div class="form-group">
+                            </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.latitude.id_for_label }}">Latitude</label>
+                            {{ form.latitude }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.longitude.id_for_label }}">Longitude</label>
+                            {{ form.longitude }}
+                        </div>
+                    </div>
+
+                    <div class="status-switches">
+                        <div class="form-check">
+                            {{ form.is_approved }}
+                            <label for="{{ form.is_approved.id_for_label }}">Verified/Approved</label>
+                        </div>
+
+                        <div class="form-check">
+                            {{ form.is_open }}
+                            <label for="{{ form.is_open.id_for_label }}">Currently Open</label>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="{% url 'admin_dashboard' %}#shops"
+                        class="btn btn-outline"
+                        onclick="return confirm('Discard changes and return to Manage Shops?')">
+                            <i class="fas fa-times-circle"></i> Discard Changes
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check-circle"></i> Update Shop Details
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </main>
 
-    <div class="admin-container">
-        <div class="dashboard-section">
-            <h2 style="margin-bottom: 20px; color: var(--primary-color);">Edit Shop Details</h2>
-
-            <form method="post">
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Shop Name</label>
-                    {{ form.name }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email</label>
-                    {{ form.email }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.address.id_for_label }}">Address</label>
-                    {{ form.address }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.phone.id_for_label }}">Phone</label>
-                    {{ form.phone }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.city.id_for_label }}">City</label>
-                    {{ form.city }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.latitude.id_for_label }}">Latitude</label>
-                    {{ form.latitude }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.longitude.id_for_label }}">Longitude</label>
-                    {{ form.longitude }}
-                </div>
-
-                <div class="form-check">
-                    {{ form.is_approved }}
-                    <label class="form-check-label" for="{{ form.is_approved.id_for_label }}">
-                        Approved
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    {{ form.is_open }}
-                    <label class="form-check-label" for="{{ form.is_open.id_for_label }}">
-                        Open
-                    </label>
-                </div>
-
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                    <a href="{% url 'admin_shops' %}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
+    <script>
+        // Adding CSS classes to Django's auto-generated inputs via JS for cleanliness
+        document.querySelectorAll('input, select, textarea').forEach(element => {
+            if (element.type !== 'checkbox') {
+                element.classList.add('form-control');
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.location.hash === "#shops") {
+                const shopsNav = document.querySelector(".nav-item[onclick*='shops']");
+                if (shopsNav) {
+                    showSection('shops', shopsNav);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
