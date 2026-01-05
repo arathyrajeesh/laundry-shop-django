@@ -196,7 +196,7 @@
                                     onclick="event.stopPropagation(); updateSelections();">
                             <span style="font-weight:600">{{ service.name }}</span>
                         </div>
-                        <span class="price-tag">₹{{ service.price }}</span>
+                        <span class="price-tag">View Prices</span>
                     </div>
                     <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 10px;">
                         Count: 
@@ -239,49 +239,132 @@
 
 <script>
     function calculateBillingSummary() {
-        const summaryItems = document.getElementById('summary-items');
+        const summaryItems = document.getElementById("summary-items");
+        const totalEl = document.getElementById("grand-total");
+        const footerAction = document.getElementById("footer-action");
+
+        summaryItems.innerHTML = "";
         let totalAmount = 0;
 
-        summaryItems.innerHTML = '';
-
-        document.querySelectorAll('.service-checkbox:checked').forEach(cb => {
+        document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
             const sId = cb.value;
-            const sName = cb.getAttribute('data-name');
+            const sName = cb.getAttribute("data-name");
 
             document
                 .querySelectorAll(`input[name="clothes_${sId}"]:checked`)
                 .forEach(clothCb => {
-                    const clothName = clothCb.value;
-                    const qtyInput = document.querySelector(
-                        `input[name="quantity_${sId}_${clothName}"]`
-                    );
+                    const clothId = clothCb.value;
 
+                    const qtyInput = document.querySelector(
+                        `input[name="quantity_${sId}_${clothId}"]`
+                    );
                     const qty = parseInt(qtyInput?.value || 0);
                     if (qty <= 0) return;
 
-                    const clothId = clothes.find(c => c.name === clothName)?.id;
-                    const price = clothPrices[sId]?.[clothId] || 0;
+                    const price = clothPrices[sId]?.[clothId];
+                    if (price === undefined) return;
+
+                    const cloth = (serviceClothes[sId] || []).find(
+                        c => c.id == clothId
+                    );
+                    if (!cloth) return;
 
                     const subtotal = price * qty;
                     totalAmount += subtotal;
 
                     summaryItems.innerHTML += `
                         <div class="summary-row">
-                            <span>${sName} - ${clothName} (x${qty})</span>
+                            <span>${sName} - ${cloth.name} (x${qty})</span>
                             <span>₹${subtotal.toFixed(2)}</span>
                         </div>
                     `;
                 });
         });
 
-        document.getElementById('grand-total').innerText =
-            `₹${totalAmount.toFixed(2)}`;
+        totalEl.innerText = `₹${totalAmount.toFixed(2)}`;
+
+        // ✅ Enable Proceed button ONLY if a cloth is selected
+        const anyClothSelected =
+            document.querySelectorAll('input[name^="clothes_"]:checked').length > 0;
+
+        footerAction.style.display = anyClothSelected ? "flex" : "none";
     }
-    const clothes = [
-        {% for cloth in clothes %}
-        { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
+
+
+    function updateSelections() {
+        const clothSection = document.getElementById("cloth-section");
+        const summarySection = document.getElementById("summary-section");
+        const clothContent = document.getElementById("cloth-content");
+
+        clothContent.innerHTML = "";
+
+        document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
+            const sId = cb.value;
+            const sName = cb.getAttribute("data-name");
+
+            let clothHTML = `
+                <div class="cloth-card">
+                    <div class="service-title-bar">
+                        ${sName} - Select Items
+                    </div>
+            `;
+
+            const availableClothes = serviceClothes[sId] || [];
+
+            if (availableClothes.length === 0) {
+                clothHTML += `
+                    <div style="padding:1rem; text-align:center; color:#64748b; font-size:0.9rem">
+                        No clothes available for this service
+                    </div>
+                `;
+            } else {
+                availableClothes.forEach(c => {
+                    const price = clothPrices[sId]?.[c.id];
+                    if (price === undefined) return;
+
+                    clothHTML += `
+                        <div class="cloth-item">
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+                                <input type="checkbox"
+                                    name="clothes_${sId}"
+                                    value="${c.id}"
+                                    onchange="calculateBillingSummary()">
+                                <span style="font-weight:500">${c.name}</span>
+                            </label>
+
+                            <div class="price-quantity">
+                                <span style="color:var(--primary); font-weight:600">₹${price}</span>
+                                <input type="number"
+                                    name="quantity_${sId}_${c.id}"
+                                    value="1" min="1"
+                                    oninput="calculateBillingSummary()">
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            clothHTML += `</div>`;
+            clothContent.insertAdjacentHTML("beforeend", clothHTML);
+        });
+
+        clothSection.style.display = "block";
+        summarySection.style.display = "block";
+
+        calculateBillingSummary();
+    }
+
+
+
+        const serviceClothes = {
+        {% for service_id, cloth_list in service_clothes.items %}
+        {{ service_id }}: [
+            {% for cloth in cloth_list %}
+            { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]{% if not forloop.last %},{% endif %}
         {% endfor %}
-    ];
+    };
 
     const clothPrices = {
         {% for service_id, prices in cloth_prices.items %}
@@ -299,91 +382,6 @@
         updateSelections();
     }
 
-    function updateSelections() {
-        const checkboxes = document.querySelectorAll('.service-checkbox');
-        const hidden = document.getElementById('hidden-inputs');
-        const clothContent = document.getElementById('cloth-content');
-        const summaryItems = document.getElementById('summary-items');
-
-        let totalAmount = 0;
-        let anySelected = false;
-
-        hidden.innerHTML = '';
-        clothContent.innerHTML = '';
-        summaryItems.innerHTML = '';
-
-        checkboxes.forEach(cb => {
-            const card = cb.closest('.service-card');
-            if (cb.checked) {
-                anySelected = true;
-                card.classList.add('active');
-
-                const sId = cb.value;
-                const sName = cb.getAttribute('data-name');
-                const sPrice = parseFloat(cb.getAttribute('data-price'));
-                const sQty = parseInt(document.getElementById('qty-' + sId).value) || 1;
-
-                // POST Data
-                hidden.innerHTML += `
-                    <input type="hidden" name="selected_services" value="${sId}">
-                    <input type="hidden" name="quantity_${sId}" value="${sQty}">
-                `;
-
-                // Summary Rows - show cloth breakdown
-                    clothes.forEach(c => {
-                        const clothPrice = clothPrices[sId] && clothPrices[sId][c.id] !== undefined ? clothPrices[sId][c.id] : 0.00;
-                        const clothQty = parseInt(document.querySelector(`input[name="quantity_${sId}_${c.name}"]`)?.value) || 0;
-                        if (clothQty > 0) {
-                            const clothSubtotal = clothPrice * clothQty;
-                            totalAmount += clothSubtotal;
-                            summaryItems.innerHTML += `
-                                <div class="summary-row">
-                                    <span>${sName} - ${c.name} (x${clothQty})</span>
-                                    <span>₹${clothSubtotal.toFixed(2)}</span>
-                                </div>
-                            `;
-                        }
-                    });
-
-                // Cloth Breakdown UI
-                    let clothHTML = `<div class="cloth-card">
-                        <div class="service-title-bar">${sName} - Select Items</div>`;
-
-                    clothes.forEach(c => {
-                        const price = clothPrices[sId] && clothPrices[sId][c.id] !== undefined ? clothPrices[sId][c.id] : 0.00;
-                        clothHTML += `
-                            <div class="cloth-item">
-                                <label style="cursor:pointer; display:flex; align-items:center; gap:8px">
-                                <input type="checkbox"
-                                    name="clothes_${sId}"
-                                    value="${c.name}"
-                                    onchange="calculateBillingSummary()">
-                                    ${c.name}
-                                </label>
-                                <div class="price-quantity">
-                                    <span style="color: var(--primary); font-weight:600">₹${price}</span>
-                                    <input type="number"
-                                        name="quantity_${sId}_${c.name}"
-                                        value="1" min="1"
-                                        oninput="calculateBillingSummary()">
-                                </div>
-                            </div>`;
-                    });
-                    clothHTML += `</div>`;
-                clothContent.insertAdjacentHTML('beforeend', clothHTML);
-
-            } else {
-                card.classList.remove('active');
-            }
-        });
-
-        // Visibility Toggles
-        document.getElementById('cloth-section').style.display = anySelected ? 'block' : 'none';
-        document.getElementById('summary-section').style.display = anySelected ? 'block' : 'none';
-        document.getElementById('footer-action').style.display = anySelected ? 'flex' : 'none';
-        document.getElementById('grand-total').innerText = `₹${totalAmount.toFixed(2)}`;
-        setTimeout(calculateBillingSummary, 0);
-    }
 </script>
 
 </body>

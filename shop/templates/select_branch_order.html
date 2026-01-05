@@ -4,288 +4,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Branch - {{ shop.name }}</title>
+    <title>Select Branch | {{ shop.name }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --brand-dark: #0f172a;    /* Elegant Slate 900 */
+            --brand-primary: #2563eb; /* Royal Blue */
+            --brand-success: #10b981; /* Emerald 500 */
+            --bg-body: #f8fafc;      /* Modern light gray */
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
-            font-family: "Poppins", sans-serif;
             box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            background: #f7f7f7;
-            min-height: 100vh;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
         }
 
-        :root {
-            --primary-color: #0f334bff;
-            --accent-color: #2ecc71;
-            --secondary-color: #6c757d;
-        }
-
-        .header {
-            background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* --- NAVIGATION --- */
+        .top-nav {
+            background: #ffffff;
+            padding: 1rem 5%;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 24px;
+        .shop-identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--brand-dark);
         }
 
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
+        .shop-identity i {
+            color: var(--brand-primary);
+            background: #eff6ff;
+            padding: 8px;
+            border-radius: 10px;
         }
 
-        .btn-secondary {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
+        /* --- PAGE HEADER --- */
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 3rem 1.5rem;
         }
 
-        .page-title {
+        .page-header {
             text-align: center;
-            margin-bottom: 40px;
-            color: var(--primary-color);
+            margin-bottom: 3rem;
         }
 
-        .page-title h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
+        .page-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            letter-spacing: -0.025em;
         }
 
-        .page-title p {
-            color: #666;
-            font-size: 16px;
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
         }
 
+        /* --- GRID & CARDS --- */
         .branches-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
         }
 
         .branch-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
         }
 
         .branch-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            border-color: var(--brand-primary);
         }
 
-        .branch-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #1a4d6e 100%);
-            color: white;
-            padding: 25px;
+        .card-body {
+            padding: 1.75rem;
+            flex-grow: 1;
         }
 
-        .branch-header h3 {
-            font-size: 24px;
-            margin-bottom: 5px;
+        .status-badge {
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
         }
 
-        .branch-header p {
-            opacity: 0.9;
-            font-size: 14px;
+        .branch-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+            margin-bottom: 0.5rem;
         }
 
-        .branch-body {
-            padding: 25px;
-        }
-
-        .branch-rating {
+        .branch-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 1.25rem;
         }
 
-        .stars {
-            display: flex;
-            gap: 2px;
+        /* --- RATING --- */
+        .rating-pill {
+            display: inline-flex;
+            align-items: center;
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
         }
 
-        .star {
-            color: #ddd;
-            font-size: 16px;
+        .rating-pill i {
+            color: #f59e0b;
+            font-size: 0.85rem;
+            margin-right: 6px;
         }
 
-        .star.filled {
-            color: #ffd700;
+        .rating-score {
+            font-weight: 700;
+            color: #92400e;
+            font-size: 0.9rem;
         }
 
-        .rating-text {
-            font-size: 14px;
-            color: #666;
-            font-weight: 500;
+        /* --- SERVICES --- */
+        .services-section {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1.25rem;
         }
 
-        .branch-services {
-            margin-bottom: 20px;
-        }
-
-        .branch-services h4 {
-            color: var(--primary-color);
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 10px;
-            font-size: 16px;
+            display: block;
         }
 
-        .services-list {
+        .tag-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .service-tag {
-            background: #f8f9fa;
-            color: var(--primary-color);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+        .tag {
+            background: #f1f5f9;
+            color: var(--text-main);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
             font-weight: 500;
         }
 
-        .branch-actions {
-            text-align: center;
+        .card-footer {
+            padding: 1.25rem 1.75rem;
+            background: #fcfcfd;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 0.95rem;
         }
 
         .btn-primary {
-            background: var(--accent-color);
+            background: var(--brand-primary);
             color: white;
-            padding: 12px 30px;
-            font-size: 16px;
             width: 100%;
         }
 
         .btn-primary:hover {
-            background: #27ae60;
+            background: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: var(--text-main);
+        }
+
+        /* --- EMPTY STATE --- */
         .empty-state {
+            background: white;
+            padding: 4rem 2rem;
+            border-radius: 24px;
             text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
+            border: 2px dashed #e2e8f0;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-
-            .branches-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
-            }
+            .page-header h1 { font-size: 1.75rem; }
+            .branches-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
-        <div>
-            <a href="{% url 'shop_detail' shop.id %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Shop
-            </a>
+
+    <nav class="top-nav">
+        <div class="shop-identity">
+            <i class="fas fa-store"></i>
+            {{ shop.name }}
         </div>
-    </div>
+        <a href="{% url 'shop_detail' shop.id %}" class="btn btn-outline">
+            <i class="fas fa-chevron-left"></i> Back
+        </a>
+    </nav>
 
     <div class="container">
-        <div class="page-title">
-            <h1><i class="fas fa-map-marker-alt"></i> Select a Branch</h1>
-            <p>Choose the branch location where you'd like to place your order</p>
-        </div>
+        <header class="page-header">
+            <h1>Our Locations</h1>
+            <p>Select a branch to view availability and start your order.</p>
+        </header>
 
         {% if branches %}
         <div class="branches-grid">
             {% for branch in branches %}
-            <div class="branch-card" onclick="window.location.href='{% url 'select_services_branch' shop.id branch.id %}'">
-                <div class="branch-header">
-                    <h3>{{ branch.name }}</h3>
-                    <p><i class="fas fa-location-dot"></i> {{ branch.address }}</p>
-                </div>
-                <div class="branch-body">
+            <article class="branch-card">
+                <div class="card-body">
+                    <span class="status-badge">Open Now</span>
+                    
+                    <h2 class="branch-name">{{ branch.name }}</h2>
+                    
+                    <div class="branch-meta">
+                        <i class="fas fa-map-pin"></i>
+                        {{ branch.address }}
+                    </div>
+
                     {% if branch.average_rating %}
-                    <div class="branch-rating">
-                        <div class="stars">
-                            {% for i in "12345"|make_list %}
-                                <i class="fas fa-star star {% if forloop.counter <= branch.average_rating %}filled{% endif %}"></i>
-                            {% endfor %}
-                        </div>
-                        <span class="rating-text">{{ branch.average_rating|floatformat:1 }} ({{ branch.branch_ratings|length }} review{{ branch.branch_ratings|length|pluralize }})</span>
+                    <div class="rating-pill">
+                        <i class="fas fa-star"></i>
+                        <span class="rating-score">{{ branch.average_rating|floatformat:1 }}</span>
+                        <span style="color: #92400e; opacity: 0.6; font-size: 0.8rem; margin-left: 4px;">
+                            ({{ branch.branch_ratings|length }})
+                        </span>
                     </div>
                     {% endif %}
-                    <div class="branch-services">
-                        <h4>Available Services</h4>
-                        <div class="services-list">
-                            {% for service in branch.services.all|slice:":5" %}
-                                <span class="service-tag">{{ service.name }}</span>
+
+                    <div class="services-section">
+                        <span class="section-label">Available Services</span>
+                        <div class="tag-container">
+                            {% for service in branch.services.all|slice:":4" %}
+                                <span class="tag">{{ service.name }}</span>
                             {% endfor %}
-                            {% if branch.services.all|length > 5 %}
-                                <span class="service-tag">+{{ branch.services.all|length|add:"-5" }} more</span>
+                            {% if branch.services.all|length > 4 %}
+                                <span class="tag" style="background: #e0f2fe; color: #0369a1;">+{{ branch.services.all|length|add:"-4" }} More</span>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="branch-actions">
-                        <div class="btn btn-primary">
-                            <i class="fas fa-shopping-cart"></i> Order from this Branch
-                        </div>
-                    </div>
                 </div>
-            </div>
+
+                <div class="card-footer">
+                    <a href="{% url 'select_services_branch' shop.id branch.id %}" class="btn btn-primary">
+                        Order From This Branch
+                    </a>
+                </div>
+            </article>
             {% endfor %}
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="fas fa-map-marker-alt"></i>
-            <p>No branches available for ordering at this shop.</p>
-            <a href="{% url 'shop_detail' shop.id %}" class="btn btn-secondary" style="margin-top: 20px;">
-                <i class="fas fa-arrow-left"></i> Back to Shop
-            </a>
+            <i class="fas fa-map-location-dot" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1.5rem;"></i>
+            <h3>No Active Branches</h3>
+            <p style="color: var(--text-muted); margin: 10px 0 25px;">This shop hasn't listed any operational branches yet.</p>
+            <a href="{% url 'shop_detail' shop.id %}" class="btn btn-outline">Return to Shop Profile</a>
         </div>
         {% endif %}
     </div>
+
 </body>
 </html>

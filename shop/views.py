@@ -1009,46 +1009,46 @@ def select_branch_for_order(request, shop_id):
 
 @login_required
 def select_services(request, shop_id, branch_id=None):
-    """Renders the service selection page for a shop/branch."""
+    """Renders the service selection page for a specific branch."""
     shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
 
-    if branch_id:
-        # Services for specific branch
-        branch = get_object_or_404(Branch, id=branch_id, shop=shop)
-        services = Service.objects.filter(branch=branch).prefetch_related('cloth_prices__cloth')
-        context = {
-            'shop': shop,
-            'branch': branch,
-            'services': services,
-        }
-    else:
-        # Get all services for this shop across all branches (legacy support)
-        services = Service.objects.filter(branch__shop=shop).select_related('branch').prefetch_related('cloth_prices__cloth')
-        context = {
-            'shop': shop,
-            'services': services,
-        }
+    # 🔒 Branch is REQUIRED for placing an order
+    if not branch_id:
+        return redirect('select_branch_for_order', shop_id=shop.id)
 
-    # Get clothes available for this branch/shop
-    if branch_id:
-        # For specific branch
-        branch = get_object_or_404(Branch, id=branch_id, shop=shop)
-        available_cloth_ids = BranchCloth.objects.filter(branch=branch).values_list('cloth_id', flat=True)
-        clothes = Cloth.objects.filter(id__in=available_cloth_ids).order_by('name')
-    else:
-        # For all branches of the shop
-        available_cloth_ids = BranchCloth.objects.filter(branch__shop=shop).values_list('cloth_id', flat=True).distinct()
-        clothes = Cloth.objects.filter(id__in=available_cloth_ids).order_by('name')
+    # ✅ Branch guaranteed from here
+    branch = get_object_or_404(Branch, id=branch_id, shop=shop)
 
-    # Prepare cloth prices for each service
+    # Services for this branch only
+    services = Service.objects.filter(branch=branch).prefetch_related(
+        'cloth_prices__cloth'
+    )
+
+    service_clothes = {}
     cloth_prices = {}
+
     for service in services:
-        cloth_prices[service.id] = {cp.cloth.id: cp.price for cp in service.cloth_prices.all()}
+        service_clothes[service.id] = []
+        cloth_prices[service.id] = {}
 
-    context['clothes'] = clothes
-    context['cloth_prices'] = cloth_prices
+        for price_obj in service.cloth_prices.all():
+            # Ensure cloth belongs to this branch
+            if BranchCloth.objects.filter(
+                branch=branch,
+                cloth=price_obj.cloth
+            ).exists():
+                service_clothes[service.id].append(price_obj.cloth)
+                cloth_prices[service.id][price_obj.cloth.id] = float(price_obj.price)
 
-    return render(request, 'select_services.html', context)
+    context = {
+        "shop": shop,
+        "branch": branch,
+        "services": services,
+        "service_clothes": service_clothes,
+        "cloth_prices": cloth_prices,
+    }
+
+    return render(request, "select_services.html", context)
 
 @login_required
 def create_order(request, shop_id):
