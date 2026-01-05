@@ -902,28 +902,45 @@ function loadAllUsers() {
 }
 
 function approveShop(shopId) {
-    if (confirm('Are you sure you want to approve this shop?')) {
-        fetch(`/admin-panel/shop/${shopId}/approve/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Shop approved successfully!');
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while approving the shop.');
-        });
-    }
+    if (!confirm("Approve this shop?")) return;
+
+    fetch(`/admin-panel/shop/${shopId}/approve/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Shop approved successfully");
+            location.reload();
+        } else {
+            alert(data.message || "Approval failed");
+        }
+    });
 }
+
+function rejectShop(shopId) {
+    if (!confirm("Reject this shop?")) return;
+
+    fetch(`/admin-panel/shop/${shopId}/reject/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Shop rejected successfully");
+            location.reload();
+        } else {
+            alert(data.message || "Rejection failed");
+        }
+    });
+}
+
 const ordersForm = document.getElementById("ordersFilterForm");
 const ordersWrapper = document.getElementById("ordersTableWrapper");
 
@@ -945,30 +962,19 @@ function resetOrdersFilter() {
     ordersForm.reset();
     ordersForm.dispatchEvent(new Event("submit"));
 }
-function rejectShop(shopId) {
-    if (confirm('Are you sure you want to reject this shop?')) {
-        fetch(`/admin-panel/shop/${shopId}/reject/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Shop rejected successfully!');
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        document.cookie.split(";").forEach(cookie => {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while rejecting the shop.');
         });
     }
+    return cookieValue;
 }
+
 </script>
 </body>
 </html> 

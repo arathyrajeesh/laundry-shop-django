@@ -2825,20 +2825,21 @@ def manage_service_prices(request):
 
     if request.method == 'POST':
         action = request.POST.get('action')
-
+        
         if action == 'add_cloth':
             cloth_name = request.POST.get('cloth_name', '').strip()
             selected_branches = request.POST.getlist('branches')
 
             if cloth_name and selected_branches:
                 try:
-                    cloth = Cloth.objects.create(name=cloth_name)
+                    cloth, created = Cloth.objects.get_or_create(name=cloth_name)
+
 
                     # Add cloth to selected branches
                     for branch_id in selected_branches:
                         try:
                             branch = Branch.objects.get(id=branch_id, shop=shop)
-                            BranchCloth.objects.create(branch=branch, cloth=cloth)
+                            BranchCloth.objects.get_or_create(branch=branch, cloth=cloth)
                         except Branch.DoesNotExist:
                             continue
 
@@ -2851,6 +2852,19 @@ def manage_service_prices(request):
                 if not selected_branches:
                     messages.error(request, 'Please select at least one branch.')
             return redirect('manage_service_prices')
+        elif action == "add_existing_cloth":
+            cloth_id = request.POST.get("cloth_id")
+            selected_branches = request.POST.getlist("branches")
+
+            cloth = get_object_or_404(Cloth, id=cloth_id)
+
+            for branch_id in selected_branches:
+                branch = Branch.objects.get(id=branch_id, shop=shop)
+                BranchCloth.objects.get_or_create(branch=branch, cloth=cloth)
+            if not selected_branches:
+                    messages.error(request, "Please select at least one branch.")
+            messages.success(request, f'"{cloth.name}" added to selected branches')
+            return redirect("manage_service_prices")
 
         elif action == 'delete_cloth':
             cloth_id = request.POST.get('cloth_id')
@@ -2937,6 +2951,7 @@ def manage_service_prices(request):
         'clothes': clothes,
         'cloth_data': cloth_data,
         'branches': branches,
+        "all_cloths": Cloth.objects.all().order_by("name"),
     }
 
     return render(request, 'manage_service_prices.html', context)

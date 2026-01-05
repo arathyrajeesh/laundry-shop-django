@@ -161,6 +161,104 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+        /* ===== Add Existing Cloth Section ===== */
+
+        .add-existing-cloth {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .add-existing-cloth h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .add-existing-cloth-form {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        /* Select box */
+        .add-existing-cloth select {
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 220px;
+            transition: all 0.2s ease;
+        }
+
+        .add-existing-cloth select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(15, 51, 75, 0.15);
+        }
+
+        /* Branch checkboxes */
+        .branch-checkboxes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            max-width: 450px;
+        }
+
+        .branch-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .branch-checkbox:hover {
+            background: rgba(15, 51, 75, 0.08);
+            border-color: var(--primary-color);
+        }
+
+        .branch-checkbox input {
+            accent-color: var(--primary-color);
+        }
+
+        /* Button */
+        .add-existing-cloth .btn-primary {
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            background: var(--primary-color);
+            border: none;
+            color: #fff;
+            transition: all 0.25s ease;
+        }
+
+        .add-existing-cloth .btn-primary:hover {
+            background: #0a2538;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .add-existing-cloth-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-existing-cloth select {
+                width: 100%;
+            }
+        }
 
         @media (max-width: 768px) {
             .container {
@@ -206,8 +304,8 @@
                         <div>
                             <label for="cloth_name" style="display: block; font-weight: 600; margin-bottom: 5px;">Cloth Name:</label>
                             <input type="text" id="cloth_name" name="cloth_name" required
-                                   style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; min-width: 250px;"
-                                   placeholder="e.g., Cotton Shirt, Wool Sweater">
+                                    style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; min-width: 250px;"
+                                    placeholder="e.g., Cotton Shirt, Wool Sweater">
                         </div>
                         <div>
                             <label style="display: block; font-weight: 600; margin-bottom: 5px;">Available for Branches:</label>
@@ -226,6 +324,42 @@
                     </div>
                 </form>
             </div>
+            <div class="add-existing-cloth">
+            <h3>Add Existing Cloth</h3>
+
+            <form method="post" class="add-existing-cloth-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_existing_cloth">
+
+                <div>
+                    <label style="font-weight:600">Select Cloth</label><br>
+                    <select name="cloth_id" required>
+                        <option value="">-- Select Cloth --</option>
+                        {% for cloth in all_cloths %}
+                            <option value="{{ cloth.id }}">{{ cloth.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-weight:600">Available for Branches</label><br>
+                    <div class="branch-checkboxes">
+                        {% for branch in branches %}
+                            <label class="branch-checkbox">
+                                <input type="checkbox" name="branches" value="{{ branch.id }}">
+                                {{ branch.name }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add to Branches
+                </button>
+            </form>
+        </div>
+
+
 
             <div style="margin-bottom: 30px;">
                 <h3 style="color: var(--primary-color); margin-bottom: 15px;">Existing Cloth Types</h3>
