@@ -360,7 +360,9 @@
                 <button type="submit" class="search-btn-alt">Search</button>
             </form>
             <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px;">
-                <button id="useLiveLocationBtn"
+                    <button
+                        id="useLiveLocationBtn"
+                        onclick="useCurrentLocation()"
                         style="
                             background: rgba(255,255,255,0.15);
                             color: #fff;
@@ -369,10 +371,14 @@
                             border-radius: 999px;
                             font-size: 0.85rem;
                             cursor: pointer;
-                        ">
-                    <i class="fas fa-location-crosshairs"></i>
-                    Use Current Location
-                </button>
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 6px;
+                        "
+                    >
+                        <i class="fas fa-location-crosshairs"></i>
+                        Use Current Location
+                    </button>
 
                 <span id="liveLocationStatus"
                     style="font-size: 0.8rem; color: rgba(255,255,255,0.8);">
@@ -492,6 +498,62 @@
     </div>
 
     <script>
+        function useCurrentLocation() {
+            if (!navigator.geolocation) {
+                alert("Geolocation not supported");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+                        { headers: { "User-Agent": "ShineAndBright/1.0" } }
+                    );
+
+                    const data = await res.json();
+
+                    // 🔑 IMPORTANT: pick CITY, not village
+                    const city =
+                        data.address.city ||
+                        data.address.town ||
+                        data.address.county ||
+                        data.address.state_district ||
+                        data.address.state;
+
+                    if (!city) {
+                        alert("Unable to detect city");
+                        return;
+                    }
+
+                    // send to backend
+                    await fetch("/update-location/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCSRFToken(),
+                        },
+                        body: JSON.stringify({
+                            city: city,
+                            latitude: lat,
+                            longitude: lng,
+                        }),
+                    });
+
+                    // reload dashboard
+                    location.reload();
+                },
+                () => alert("Location permission denied")
+            );
+        }
+
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+
         const toggle = document.getElementById('profileToggle');
         const menu = document.getElementById('dropdownMenu');
 
@@ -639,63 +701,7 @@
                 .find(row => row.startsWith("csrftoken="))
                 ?.split("=")[1];
         }
-
-        document.getElementById("useLiveLocationBtn").addEventListener("click", () => {
-            const status = document.getElementById("liveLocationStatus");
-            status.textContent = "Detecting your current location…";
-
-            if (!navigator.geolocation) {
-                status.textContent = "Geolocation is not supported.";
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    const res = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
-                        { headers: { "User-Agent": "ShineBrightApp/1.0" } }
-                    );
-
-                    const data = await res.json();
-
-                    // 🔑 REPLACE city logic HERE
-                    const city =
-                        data.address?.city ||
-                        data.address?.town ||
-                        data.address?.county ||
-                        data.address?.state_district ||
-                        data.address?.state ||
-                        "";
-
-                    if (!city) {
-                        status.textContent = "Could not detect city.";
-                        return;
-                    }
-
-                    await fetch("{% url 'update_live_location' %}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            "X-CSRFToken": getCSRFToken()
-                        },
-                        body: new URLSearchParams({
-                            city: city,
-                            latitude: lat,
-                            longitude: lon
-                        })
-                    });
-
-                    window.location.reload();
-                },
-                () => {
-                    status.textContent = "Location permission denied.";
-                }
-            );
-        });
-        </script>
+    </script>
 
 
 </body>

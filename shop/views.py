@@ -3334,3 +3334,22 @@ def admin_orders_filter(request):
         "orders": orders,
         "delayed_orders_count": delayed_orders_count,
     })
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+
+@login_required
+@csrf_exempt
+def update_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        profile = request.user.profile
+        profile.city = data.get("city")
+        profile.latitude = data.get("latitude")
+        profile.longitude = data.get("longitude")
+        profile.save()
+
+        return JsonResponse({"success": True})
