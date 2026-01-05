@@ -23,11 +23,9 @@ urlpatterns = [
         # SHOPS
         path("shop/<int:shop_id>/", views.shop_detail, name="shop_detail"),
         path("shop/<int:shop_id>/select-branch/", views.select_branch_for_order, name="select_branch_for_order"),
-        path(
-        "shop/<int:shop_id>/branch/<int:branch_id>/select-services/",
-        views.select_services,
-        name="select_services"
-        ),
+        path("shop/<int:shop_id>/branch/<int:branch_id>/select-services/",views.select_services,name="select_services"),
+        path("notifications/mark-read/",views.mark_notifications_read,name="mark_notifications_read"),
+
         path("shop/<int:shop_id>/branch/<int:branch_id>/select-services/", views.select_services, name="select_services_branch"),
         path("shop/<int:shop_id>/branch/<int:branch_id>/create-order/",views.create_order,name="create_order"),
         path("user-details/", views.user_details, name="user_details"),
@@ -61,7 +59,7 @@ urlpatterns = [
         path("admin-panel/shop/<int:shop_id>/", views.admin_shop_detail, name="admin_shop_detail"),
         path("admin-panel/order/<int:order_id>/update-status/", views.admin_update_order_status, name="admin_update_order_status"),
         path("save-login-location/", views.save_login_location, name="save_login_location"),
-
+        path("notifications/mark-read/",views.mark_notifications_read,name="mark_notifications_read"),
         # SHOP AUTHENTICATION
         path("shop/register/", views.shop_register, name="shop_register"),
         path("shop/login/", views.shop_login, name="shop_login"),

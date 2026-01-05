@@ -3366,3 +3366,12 @@ def update_location(request):
         profile.save()
 
         return JsonResponse({"success": True})
+
+@login_required
+def mark_notifications_read(request):
+    if request.method == "POST":
+        Notification.objects.filter(
+            shop=request.user.shop,
+            is_read=False
+        ).update(is_read=True)
+        return JsonResponse({"status": "ok"})

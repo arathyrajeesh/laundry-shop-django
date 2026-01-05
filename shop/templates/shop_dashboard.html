@@ -102,15 +102,14 @@
 
         .notification-dropdown {
             position: absolute;
-            top: 45px;
+            top: 48px;
             right: 0;
-            width: 350px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            padding: 15px 0;
+            width: 340px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
             display: none;
-            z-index: 1000;
+            z-index: 9999;
         }
 
         .notification-dropdown.show {
@@ -118,12 +117,38 @@
         }
 
         .notification-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid #f0f0f0;
             display: flex;
-            align-items: flex-start;
-            transition: background 0.2s;
+            gap: 12px;
+            padding: 14px;
+            border-bottom: 1px solid #eee;
         }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-footer {
+            padding: 12px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .notification-footer a {
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
 
         .notification-item:hover {
             background: #f8f9fa;
@@ -648,8 +673,10 @@
             <div class="notification-container">
                 <button class="notification-btn" id="notification-trigger">
                     <i class="fas fa-bell"></i>
-                    {% if shop_notifications|length > 0 %}
-                        <span class="notification-badge">{{ shop_notifications|length }}</span>
+                    {% if unread_count > 0 %}
+                    <span id="notification-count" class="notification-count">
+                        {{ unread_count }}
+                    </span>
                     {% endif %}
                 </button>
 
@@ -1069,7 +1096,7 @@
                         </form>
 
                         <a href="{% url 'add_service_branch' branch.id %}"
-                           style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; transition: all 0.3s ease;">
+                            style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; transition: all 0.3s ease;">
                             <i class="fas fa-plus" style="margin-right: 6px;"></i>
                             Add Service
                         </a>
@@ -1165,17 +1192,41 @@
 
 
     <script>
-        document.getElementById('notification-trigger').addEventListener('click', function() {
-            var dropdown = document.getElementById('notification-dropdown-menu');
-            dropdown.classList.toggle('show');
+        document.addEventListener("DOMContentLoaded", function () {
+            const trigger = document.getElementById("notification-trigger");
+            const dropdown = document.getElementById("notification-dropdown-menu");
+            const badge = document.getElementById("notification-count");
+
+            if (!trigger || !dropdown) return;
+
+            trigger.addEventListener("click", function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle("show");
+
+                if (dropdown.classList.contains("show")) {
+                    // ✅ Hide count immediately
+                    if (badge) badge.style.display = "none";
+
+                    // ✅ Mark notifications as read in backend
+                    fetch("{% url 'mark_notifications_read' %}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        }
+                    });
+                }
+            });
         });
 
-        window.addEventListener('click', function(e) {
-            var container = document.querySelector('.notification-container');
-            if (!container.contains(e.target) && document.getElementById('notification-dropdown-menu').classList.contains('show')) {
-                document.getElementById('notification-dropdown-menu').classList.remove('show');
-            }
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("{% url 'mark_notifications_read' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            });
         });
+
 
         // Shop status toggle functionality
         const shopStatusToggle = document.getElementById('shop-status-toggle');
