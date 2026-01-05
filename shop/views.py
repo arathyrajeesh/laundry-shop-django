@@ -2330,7 +2330,10 @@ def shop_dashboard(request):
     # 🔒 PAID & UNPAID ORDERS (SEPARATED)
     paid_orders = Order.objects.filter(shop=shop, payment_status="Completed")
     one_week_ago = timezone.now() - timedelta(days=7)
-
+    recent_orders = Order.objects.filter(
+        shop=shop,
+        payment_status="Completed"
+    ).select_related('user', 'branch').order_by('-created_at')[:10]
     unpaid_orders = Order.objects.filter(
         shop=shop,
         payment_status="Pending",
@@ -2507,6 +2510,7 @@ def branch_orders(request, branch_id):
 
     # Statistics for this branch
     total_orders = branch_orders.count()
+    recent_orders = Order.objects.filter(branch=branch)
     pending_orders = branch_orders.filter(cloth_status="Pending").count()
     washing_orders = branch_orders.filter(cloth_status="Washing").count()
     drying_orders = branch_orders.filter(cloth_status="Drying").count()
@@ -2514,6 +2518,12 @@ def branch_orders(request, branch_id):
     ready_orders = branch_orders.filter(cloth_status="Ready").count()
     completed_orders = branch_orders.filter(cloth_status="Completed").count()
     total_revenue = branch_orders.aggregate(total=Sum('amount'))['total'] or 0
+    active_orders = Order.objects.filter(
+        branch=branch,
+        payment_status="Completed"
+    ).exclude(
+        cloth_status="Pending"
+    ).order_by("-created_at")
 
     # Today's revenue for this branch
     today_revenue = branch_orders.filter(
@@ -2566,6 +2576,7 @@ def branch_orders(request, branch_id):
         'today_revenue': today_revenue,
         'recent_orders': recent_orders,
         'services': services,
+        "active_orders": active_orders,
     }
 
     return render(request, 'branch_orders.html', context)
