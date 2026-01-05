@@ -4,810 +4,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Details - Shine & Bright</title>
+    <title>Checkout | {{ shop.name }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-secondary: #0f172a;
+            --success: #10b981;
+            --bg-muted: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
+            background-color: var(--bg-muted);
+            color: var(--text-main);
             min-height: 100vh;
-            padding: 20px;
-            background: linear-gradient(135deg, #060f36ff 0%, #b6eaf1ff 100%);
-            position: relative;
+            line-height: 1.5;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .progress-bar {
+        /* --- NAVBAR --- */
+        .top-nav {
             background: white;
-            border-radius: 15px;
-            padding: 20px 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .progress-steps {
+            padding: 1rem 5%;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
-        }
-
-        .progress-steps::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #e0e0e0;
-            z-index: 0;
-        }
-
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-            flex: 1;
-        }
-
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            border: 3px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: #999;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        .step.active .step-circle {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: #667eea;
-            color: white;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .step.completed .step-circle {
-            background: #2ecc71;
-            border-color: #2ecc71;
-            color: white;
-        }
-
-        .step-label {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .step.active .step-label {
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .main-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 20px;
-            background: white;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: white;
-            text-decoration: none;
-            padding: 12px 18px;
-            border-radius: 50px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.25);
-            transform: translateY(-50%) translateX(-5px);
-        }
-
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            opacity: 0.95;
-            font-size: 16px;
-            font-weight: 400;
-        }
-
-        .content-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 40px;
-        }
-
-        .order-info-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #e9ecef;
-            height: fit-content;
             position: sticky;
-            top: 20px;
+            top: 0;
+            z-index: 100;
         }
 
-        .order-info-card h3 {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 20px;
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--brand-secondary);
             display: flex;
             align-items: center;
             gap: 10px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #dee2e6;
         }
 
-        .info-item {
+        /* --- PROGRESS TRACKER --- */
+        .stepper-wrapper {
+            max-width: 600px;
+            margin: 2rem auto;
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: #666;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: #333;
-            font-size: 14px;
-            font-weight: 600;
-            text-align: right;
-        }
-
-        .info-value.amount {
-            color: #667eea;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .shop-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 18px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-section {
-            background: white;
-        }
-
-        .form-section h3 {
-            color: #333;
-            font-size: 22px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
             position: relative;
         }
 
-        .form-group label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .form-group label i {
-            color: #667eea;
-            width: 20px;
-        }
-
-        .form-control {
+        .stepper-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 18px;
+            left: 0;
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-            font-family: 'Poppins', sans-serif;
+            height: 2px;
+            background: var(--border);
+            z-index: 1;
         }
 
-        .form-control:focus {
-            border-color: #667eea;
+        .step-node {
+            position: relative;
+            z-index: 2;
+            background: var(--bg-muted);
+            padding: 0 10px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .node-dot {
+            width: 36px;
+            height: 36px;
             background: white;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            outline: none;
-        }
-
-        .form-control::placeholder {
-            color: #adb5bd;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .error-message {
-            color: #e74c3c;
-            font-size: 13px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .help-text {
-            color: #6c757d;
-            font-size: 12px;
-            margin-top: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            margin: 0 auto 8px;
+            transition: 0.3s;
+        }
+        /* Change this in your <style> section */
+        input[type="text"], 
+        input[type="number"], 
+        input[type="datetime-local"], 
+        input[type="tel"], 
+        textarea, 
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            font-size: 0.95rem;
+            transition: 0.2s;
+            outline: none;
+            background-color: white; /* Ensures it's not transparent */
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+        input:focus, textarea:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+        .step-node.active .node-dot {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
-        .submit-btn:active {
-            transform: translateY(0);
+        .step-node.complete .node-dot {
+            background: var(--brand-primary);
+            border-color: var(--brand-primary);
+            color: white;
         }
 
-        .required-indicator {
-            color: #e74c3c;
-            margin-left: 3px;
+        /* --- MAIN LAYOUT --- */
+        .checkout-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
         }
 
-        .alert {
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        h2.section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 14px;
         }
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
+        /* --- FORM STYLING --- */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
+        .form-group { margin-bottom: 1.5rem; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--brand-secondary);
         }
 
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-left: 4px solid #17a2b8;
+        .input-styled {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            font-size: 0.95rem;
+            transition: 0.2s;
+            outline: none;
         }
 
-        @media (max-width: 968px) {
-            .content-wrapper {
-                grid-template-columns: 1fr;
-            }
-
-            .order-info-card {
-                position: static;
-            }
+        .input-styled:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+        /* --- SUMMARY CARD --- */
+        .summary-card {
+            background: var(--brand-secondary);
+            color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
         }
 
-        @keyframes bounceArrow {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(5px);
-            }
+        .summary-header {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .scroll-indicator {
-            opacity: 0;
-            animation: fadeIn 0.5s ease-in forwards;
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.25rem;
+            font-weight: 800;
         }
 
-        .payment-section {
-            scroll-margin-top: 20px;
+        /* --- BUTTONS --- */
+        .btn-main {
+            width: 100%;
+            padding: 1rem;
+            background: var(--brand-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
+        .btn-main:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
 
-            .container {
-                margin: 0;
-            }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
 
-            .header {
-                padding: 30px 20px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .back-btn {
-                left: 15px;
-                padding: 10px 15px;
-                font-size: 12px;
-            }
-
-            .back-btn span {
-                display: none;
-            }
-
-            .content-wrapper {
-                padding: 20px;
-                gap: 20px;
-            }
-
-            .progress-bar {
-                padding: 15px 20px;
-            }
-
-            .step-label {
-                font-size: 10px;
-            }
-
-            .step-circle {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
+        @media (max-width: 900px) {
+            .checkout-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-steps">
-                <div class="step completed">
-                    <div class="step-circle">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="step-label">Order</div>
-                </div>
-                <div class="step {% if show_payment %}completed{% else %}active{% endif %}">
-                    <div class="step-circle">{% if show_payment %}<i class="fas fa-check"></i>{% else %}2{% endif %}</div>
-                    <div class="step-label">Delivery Details</div>
-                </div>
-                <div class="step {% if show_payment %}active{% endif %}">
-                    <div class="step-circle">{% if show_payment %}3{% else %}3{% endif %}</div>
-                    <div class="step-label">Payment</div>
-                </div>
-            </div>
+
+    <nav class="top-nav">
+        <div class="brand-name">
+            <i class="fas fa-bolt" style="color: var(--brand-primary);"></i>
+            {{ shop.name }}
         </div>
+        <a href="{% url 'dashboard' %}" class="btn-outline">Cancel</a>
+    </nav>
 
-        <!-- Main Card -->
-        <div class="main-card">
-            <div class="header">
-                <a href="{% url 'dashboard' %}" class="back-btn" id="back-link">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Back</span>
-                </a>
-                <h1><i class="fas fa-truck"></i> Delivery Information</h1>
-                <p>Please provide your delivery details to proceed with payment</p>
-            </div>
-
-            <div class="content-wrapper">
-                <!-- Order Information Card -->
-                <div class="order-info-card">
-                    <h3><i class="fas fa-receipt"></i> Order Summary</h3>
-                    
-                    <div class="info-item">
-                        <span class="info-label">Order ID</span>
-                        <span class="info-value">#{{ order.id }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Shop</span>
-                        <span class="info-value">{{ order.shop.name }}</span>
-                    </div>
-
-                    {% if order.branch %}
-                    <div class="info-item">
-                        <span class="info-label">Branch</span>
-                        <span class="info-value">{{ order.branch.name }}</span>
-                    </div>
-                    {% endif %}
-
-                    <div class="info-item">
-                        <span class="info-label">Status</span>
-                        <span class="info-value">
-                            {% if order.payment_status == "Completed" %}
-                                Paid
-                            {% else %}
-                                Payment Pending
-                            {% endif %}
-                        </span>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
-                        <span>Subtotal</span>
-                        <span>₹{{ order.base_amount }}</span>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
-                        <span>Platform Fee</span>
-                        <span>₹{{ order.platform_fee }}</span>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
-                        <span>Delivery Fee</span>
-                        <span>₹{{ order.delivery_fee }}</span>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; padding:8px 0;">
-                        <span>GST</span>
-                        <span>₹{{ order.gst_amount }}</span>
-                    </div>
-
-                    <div style="display:flex; justify-content:space-between; padding:12px 0; margin-top:10px; border-top:2px solid #dee2e6; font-size:18px; font-weight:700;">
-                        <span>Total Payable</span>
-                        <span style="color:#667eea;">₹{{ order.amount }}</span>
-                    </div>
-
-
-
-                    <div class="shop-badge">
-                        <i class="fas fa-store"></i>
-                            <span>Payment will be processed by Shine &amp; Bright Platform</span>
-                    </div>
-                </div>
-
-                <!-- Form Section -->
-                <div class="form-section">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">
-                                <i class="fas fa-
-                                    {% if 'success' in message.tags %}
-                                        check-circle
-                                    {% elif 'error' in message.tags %}
-                                        exclamation-circle
-                                    {% elif 'warning' in message.tags %}
-                                        exclamation-triangle
-                                    {% else %}
-                                        info-circle
-                                    {% endif %}
-                                "></i>
-                                {{ message }}
-                                <span onclick="this.parentElement.style.display='none'"
-                                    style="margin-left:auto; cursor:pointer; font-weight:bold;">&times;</span>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-
-                    <h3><i class="fas fa-clipboard-list"></i> Delivery Details</h3>
-
-                    <form method="POST">
-                        {% csrf_token %}
-
-                        <div class="form-group">
-                            <label for="{{ form.pickup_date.id_for_label }}">
-                                <i class="fas fa-calendar-alt"></i>
-                                Pickup Date & Time
-                                <span class="required-indicator">*</span>
-                            </label>
-                            {{ form.pickup_date }}
-                            {% if form.pickup_date.errors %}
-                                <div class="error-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    {{ form.pickup_date.errors.0 }}
-                                </div>
-                            {% endif %}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle"></i>
-                                Select when you want your laundry to be picked up
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.delivery_date.id_for_label }}">
-                                <i class="fas fa-calendar-check"></i>
-                                Delivery Date & Time
-                                <span class="required-indicator">*</span>
-                            </label>
-                            {{ form.delivery_date }}
-                            {% if form.delivery_date.errors %}
-                                <div class="error-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    {{ form.delivery_date.errors.0 }}
-                                </div>
-                            {% endif %}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle"></i>
-                                Select when you want your laundry to be delivered
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.delivery_name.id_for_label }}">
-                                <i class="fas fa-user"></i>
-                                Full Name for Delivery
-                                <span class="required-indicator">*</span>
-                            </label>
-                            {{ form.delivery_name }}
-                            {% if form.delivery_name.errors %}
-                                <div class="error-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    {{ form.delivery_name.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.delivery_address.id_for_label }}">
-                                <i class="fas fa-map-marker-alt"></i>
-                                Delivery Address
-                                <span class="required-indicator">*</span>
-                            </label>
-                            {{ form.delivery_address }}
-                            {% if form.delivery_address.errors %}
-                                <div class="error-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    {{ form.delivery_address.errors.0 }}
-                                </div>
-                            {% endif %}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle"></i>
-                                Please provide complete address with landmark
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.delivery_phone.id_for_label }}">
-                                <i class="fas fa-phone"></i>
-                                Contact Phone Number
-                                <span class="required-indicator">*</span>
-                            </label>
-                            {{ form.delivery_phone }}
-                            {% if form.delivery_phone.errors %}
-                                <div class="error-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    {{ form.delivery_phone.errors.0 }}
-                                </div>
-                            {% endif %}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle"></i>
-                                We'll use this number to contact you for delivery
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="{{ form.special_instructions.id_for_label }}">
-                                <i class="fas fa-sticky-note"></i>
-                                Special Instructions
-                            </label>
-                            {{ form.special_instructions }}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle"></i>
-                                Any special instructions for pickup or delivery (optional)
-                            </div>
-                        </div>
-
-                        <button type="submit" class="submit-btn">
-                            <i class="fas fa-save"></i>
-                            {% if show_payment %}Update Details{% else %}Save & Continue{% endif %}
-                        </button>
-                    </form>
-
-                    <!-- Scroll to Payment Arrow -->
-                    {% if show_payment and razorpay_order_id %}
-                    <div class="scroll-indicator" id="scroll-indicator" style="text-align: center; margin-top: 30px; padding: 20px; animation: bounce 2s infinite;">
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; border-radius: 50px; display: inline-flex; align-items: center; gap: 15px; cursor: pointer; box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);" onclick="scrollToPayment()">
-                            <span style="font-weight: 600; font-size: 16px;">Proceed to Payment</span>
-                            <i class="fas fa-arrow-down" style="font-size: 18px; animation: bounceArrow 1.5s infinite;"></i>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Payment Section -->
-                    {% if show_payment and razorpay_order_id %}
-                    <div id="payment-section" class="payment-section" style="margin-top: 40px; padding-top: 40px; border-top: 3px solid #e9ecef;">
-                        <h3><i class="fas fa-credit-card"></i> Payment</h3>
-                        
-                        <div class="order-items-summary" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-                            <h4 style="color: #333; margin-bottom: 15px; font-size: 16px;">Order Items:</h4>
-                            {% for item in order_items %}
-                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #dee2e6;">
-                                <span style="color: #666;">
-                                    {% if item.service.name %}{{ item.service.name }}{% else %}{{ item.service_name }}{% endif %} 
-                                    {% if item.quantity %}x{{ item.quantity }}{% endif %}
-                                </span>
-                                <span style="font-weight: 600; color: #333;">₹{{ item.total|default:item.price }}</span>
-                            </div>
-                            {% endfor %}
-                            <div style="display: flex; justify-content: space-between; padding: 12px 0; margin-top: 10px; border-top: 2px solid #dee2e6; font-size: 18px; font-weight: 700;">
-                                <span>Total Payable</span>
-                                <span style="color: #667eea;">₹{{ order.amount }}</span>
-                            </div>
-                        </div>
-
-                        <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2ecc71;">
-                            <strong style="color: #2ecc71;">
-                                <i class="fas fa-shield-alt"></i> Payment Platform
-                            </strong><br>
-                            <small style="color: #333;">
-                                Payment is securely processed by <b>Shine &amp; Bright Platform</b>
-                            </small>
-                        </div>
-
-
-                        <div class="payment-buttons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <button class="pay-btn" onclick="startPayment('card')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                <i class="fas fa-credit-card"></i> Card/Net Banking
-                            </button>
-                            <button class="pay-btn" onclick="startPayment('upi', 'googlepay')" style="background: #4285f4; color: white; padding: 15px 20px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                <i class="fab fa-google"></i> Google Pay
-                            </button>
-                            <button class="pay-btn" onclick="startPayment('upi', 'paytm')" style="background: #00baf2; color: white; padding: 15px 20px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                <i class="fas fa-mobile-alt"></i> Paytm
-                            </button>
-                        </div>
-
-                        <!-- UPI QR Modal -->
-                        <div id="upi-qr-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-                            <div style="background-color: #fefefe; margin: 15% auto; padding: 30px; border: none; width: 90%; max-width: 400px; border-radius: 15px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-                                <span onclick="closeUPIQR()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;">&times;</span>
-                                <h3 style="margin-bottom: 20px; color: #333;">Scan QR Code to Pay</h3>
-                                <div id="qrcode" style="margin: 20px auto; background: white; padding: 20px; border-radius: 10px;"></div>
-                                <p style="margin-top: 20px; color: #666; font-weight: 600;">Amount: ₹{{ order.amount }}</p>
-                                <p style="font-size: 12px; color: #999; margin-top: 10px;">Use any UPI app to scan and pay</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+    <div class="stepper-wrapper">
+        <div class="step-node complete">
+            <div class="node-dot"><i class="fas fa-check"></i></div>
+            Cart
+        </div>
+        <div class="step-node active">
+            <div class="node-dot">2</div>
+            Details
+        </div>
+        <div class="step-node">
+            <div class="node-dot">3</div>
+            Payment
         </div>
     </div>
+
+    <main class="checkout-grid">
+        <div class="form-column">
+            <div class="content-card">
+                <h2 class="section-title">
+                    <i class="fas fa-truck-fast" style="color: var(--brand-primary);"></i>
+                    Delivery Details
+                </h2>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pickup Date & Time</label>
+                            {{ form.pickup_date }}
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Delivery</label>
+                            {{ form.delivery_date }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Receiver's Full Name</label>
+                        {{ form.delivery_name }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Full Delivery Address</label>
+                        {{ form.delivery_address }}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Phone</label>
+                            {{ form.delivery_phone }}
+                        </div>
+                        <div class="form-group">
+                            <label>Landmark (Optional)</label>
+                            <input type="text" class="input-styled" placeholder="e.g. Near Metro Station">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Special Instructions</label>
+                        {{ form.special_instructions }}
+                    </div>
+
+                    <button type="submit" class="btn-main">
+                        Save & Continue to Payment
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            {% if show_payment and razorpay_order_id %}
+            <div class="content-card" style="margin-top: 2rem; border-left: 5px solid var(--success);" id="payment-gate">
+                <h2 class="section-title">
+                    <i class="fas fa-shield-check" style="color: var(--success);"></i>
+                    Secure Payment
+                </h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">
+                    Your transaction is encrypted and processed via Shine & Bright Secure Gateway.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <button class="btn-main" onclick="startPayment('upi')" style="background: #00baf2;">
+                        <i class="fas fa-mobile-screen"></i> UPI / QR
+                    </button>
+                    <button class="btn-main" onclick="startPayment('card')" style="background: var(--brand-secondary);">
+                        <i class="fas fa-credit-card"></i> Card
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <aside class="summary-column">
+            <div class="summary-card">
+                <div class="summary-header">
+                    <h3 style="font-size: 1.1rem; font-weight: 700;">Order Summary</h3>
+                    <p style="font-size: 0.75rem; color: #94a3b8;">ID: #{{ order.id }}</p>
+                </div>
+
+                <div class="fee-row">
+                    <span>Base Amount</span>
+                    <span>₹{{ order.base_amount }}</span>
+                </div>
+                <div class="fee-row">
+                    <span>Platform Fee</span>
+                    <span>₹{{ order.platform_fee }}</span>
+                </div>
+                <div class="fee-row">
+                    <span>Delivery Fee</span>
+                    <span>₹{{ order.delivery_fee }}</span>
+                </div>
+                <div class="fee-row">
+                    <span>Tax (GST)</span>
+                    <span>₹{{ order.gst_amount }}</span>
+                </div>
+
+                <div class="total-row">
+                    <span>Total</span>
+                    <span>₹{{ order.amount }}</span>
+                </div>
+
+                <div style="margin-top: 2rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 0.8rem;">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Expected Delivery: 48 Hours</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
 
     <!-- Razorpay Scripts -->
     {% if show_payment and razorpay_order_id %}
@@ -815,6 +415,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
 
     <script>
+        // Note: Ensure your Django form inputs have the class 'input-styled'
+    window.addEventListener('DOMContentLoaded', () => {
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            input.classList.add('input-styled');
+        });
+    });
+
+    function scrollToPayment() {
+        document.getElementById('payment-gate').scrollIntoView({ behavior: 'smooth' });
+    }
     /* =========================================================
     PAYMENT PAGE SCRIPT (MERGED & CLEAN)
     ========================================================= */
