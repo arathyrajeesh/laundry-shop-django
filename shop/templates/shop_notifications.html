@@ -248,7 +248,9 @@
                 <p>Track order updates and business milestones.</p>
             </div>
             {% if notifications %}
-            <a href="#" class="btn btn-outline" style="font-size: 0.75rem;">Mark all as read</a>
+            <a href="#" id="mark-all-read-btn" class="btn btn-outline">
+                Mark all as read
+            </a>
             {% endif %}
         </header>
 
@@ -281,27 +283,41 @@
             {% endif %}
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Mark all notifications as read when inbox page is opened
-            fetch("{% url 'mark_notifications_read' %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}"
-                }
-            })
-            .then(() => {
-                // Remove unread indicator dots visually
-                document.querySelectorAll(".notif-item.unread").forEach(el => {
-                    el.classList.remove("unread");
-                });
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const markAllBtn = document.getElementById("mark-all-read-btn");
 
-                // If a bell count badge exists in navbar, hide it
+    if (!markAllBtn) return;
+
+    markAllBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        fetch("{% url 'mark_notifications_read' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+                // Remove unread styling
+                document.querySelectorAll(".notif-item.unread")
+                    .forEach(item => item.classList.remove("unread"));
+
+                // Hide bell count badge if exists
                 const badge = document.getElementById("notification-count");
                 if (badge) badge.style.display = "none";
-            });
+
+                // Optional UX feedback
+                markAllBtn.innerText = "All notifications read";
+                markAllBtn.classList.add("disabled");
+            }
         });
-    </script>
+    });
+});
+</script>
+
 
 </body>
 </html>

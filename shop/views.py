@@ -3367,6 +3367,9 @@ def update_location(request):
 
         return JsonResponse({"success": True})
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def mark_notifications_read(request):
     if request.method == "POST":
@@ -3374,4 +3377,7 @@ def mark_notifications_read(request):
             shop=request.user.shop,
             is_read=False
         ).update(is_read=True)
+
         return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "invalid"}, status=400)
