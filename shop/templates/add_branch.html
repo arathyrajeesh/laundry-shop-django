@@ -4,29 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Location | {{ shop.name }}</title>
+    <title>New Location | {{ shop.name }}</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --brand-primary: #4f46e5; /* Modern Indigo */
+            --brand-primary: #4f46e5;
             --brand-hover: #4338ca;
+            --brand-soft: #eef2ff;
             --bg-main: #f8fafc;
             --text-heading: #0f172a;
-            --text-body: #475569;
+            --text-body: #64748b;
             --border-color: #e2e8f0;
             --input-focus: #c7d2fe;
             --danger: #ef4444;
             --success: #10b981;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
@@ -37,169 +39,179 @@
             justify-content: center;
             align-items: center;
             padding: 24px;
+            /* Subtle background pattern */
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         .form-card {
             width: 100%;
-            max-width: 520px;
+            max-width: 560px;
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
             overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card-header {
-            padding: 32px 32px 24px 32px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 40px 40px 30px 40px;
+            text-align: center;
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            background: var(--brand-soft);
+            color: var(--brand-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 20px;
         }
 
         .card-header h1 {
             color: var(--text-heading);
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
         .card-header p {
-            font-size: 0.875rem;
+            font-size: 0.95rem;
             color: var(--text-body);
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
         .card-body {
-            padding: 32px;
+            padding: 0 40px 40px 40px;
         }
 
-        /* Message Styling */
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-        }
-
-        .alert-error {
-            background-color: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fee2e2;
-        }
-
-        .alert-success {
-            background-color: #f0fdf4;
-            color: #15803d;
-            border: 1px solid #dcfce7;
-        }
-
-        /* Form Layout */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
-            font-size: 0.8125rem;
-            font-weight: 600;
+            font-size: 0.875rem;
+            font-weight: 700;
             color: var(--text-heading);
             margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
         }
 
-        /* Django Input Standardizing */
         input[type="text"], 
         input[type="tel"], 
         textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 18px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.9375rem;
+            border-radius: 12px;
+            font-size: 1rem;
             color: var(--text-heading);
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
             background-color: #ffffff;
         }
 
         input:focus, textarea:focus {
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 4px var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
-        textarea {
-            min-height: 100px;
-            resize: none;
+        textarea { min-height: 100px; resize: none; }
+
+        /* --- PREVIEW BOX --- */
+        .location-badge {
+            background: var(--brand-soft);
+            border: 1px solid var(--input-focus);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+            transition: 0.3s;
         }
 
-        .field-error {
-            color: var(--danger);
+        .location-badge .map-ico {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand-primary);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .location-data { flex: 1; }
+        .location-data .city-label {
+            font-weight: 800;
+            color: var(--brand-primary);
+            font-size: 0.9rem;
+        }
+        .location-data .coords {
             font-size: 0.75rem;
             font-weight: 500;
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            color: var(--text-body);
         }
 
-        /* Action Footer */
-        .card-footer {
-            padding: 24px 32px;
-            background-color: #f8fafc;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid transparent;
-            text-decoration: none;
-        }
-
-        .btn-primary {
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
             background-color: var(--brand-primary);
             color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
         }
 
-        .btn-primary:hover {
+        .btn-submit:hover {
             background-color: var(--brand-hover);
             transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
         }
 
-        .btn-secondary {
-            background-color: #ffffff;
-            color: var(--text-heading);
-            border-color: var(--border-color);
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-body);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
 
-        .btn-secondary:hover {
-            background-color: #f1f5f9;
+        .btn-cancel:hover { color: var(--text-heading); }
+
+        /* Loading Animation for Geolocation */
+        .loading-pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
         }
 
-        @media (max-width: 480px) {
-            .card-footer {
-                flex-direction: column;
-            }
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -207,72 +219,109 @@
 
     <div class="form-card">
         <div class="card-header">
-            <h1><i class="fas fa-plus-circle" style="color: var(--brand-primary);"></i> Register New Branch</h1>
-            <p>Enter the operational details for your new location.</p>
+            <div class="icon-circle">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <h1>Expand Your Network</h1>
+            <p>Establish a new operational branch for {{ shop.name }}.</p>
         </div>
 
-        <form method="post" novalidate>
-            {% csrf_token %}
-            
-            <div class="card-body">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                            <i class="fas {% if message.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
-                            {{ message }}
+        <div class="card-body">
+            <form method="post" id="branchForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Internal Branch Name</label>
+                    <input type="text" name="name" placeholder="e.g. Downtown Hub" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Physical Address</label>
+                    <textarea name="address" placeholder="Street number, Building, Landmark..." required></textarea>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <input type="tel" name="phone" placeholder="+91 00000 00000">
+                    </div>
+                </div>
+
+                <input type="hidden" name="city" id="city">
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <div class="form-group">
+                    <label>Geo-Verification</label>
+                    <div id="location-preview">
+                        <div class="location-badge" style="background: #f1f5f9; border-color: #cbd5e1;">
+                            <div class="map-ico"><i class="fas fa-satellite-dish"></i></div>
+                            <div class="location-data">
+                                <span class="city-label" id="city-text">Detecting your location...</span>
+                                <div class="coords" id="coords-text">Initializing GPS satellite link</div>
+                            </div>
                         </div>
-                    {% endfor %}
-                {% endif %}
-
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Branch Name</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                        <div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ form.name.errors.0 }}</div>
-                    {% endif %}
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="{{ form.address.id_for_label }}">Full Address</label>
-                    {{ form.address }}
-                    {% if form.address.errors %}
-                        <div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ form.address.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.phone.id_for_label }}">Contact Phone</label>
-                    {{ form.phone }}
-                    {% if form.phone.errors %}
-                        <div class="field-error"><i class="fas fa-circle-exclamation"></i> {{ form.phone.errors.0 }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card-footer">
-                <a href="{% url 'select_branch' %}" class="btn btn-secondary">
-                    Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check-circle"></i> Create Branch
+                <button type="submit" class="btn-submit">
+                    Confirm & Register Branch
                 </button>
-            </div>
-        </form>
+                
+                <a href="javascript:history.back()" class="btn-cancel">Go Back</a>
+            </form>
+        </div>
     </div>
 
-    <script>
-        // UX: Ensure Django inputs are correctly classed for styling
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('input, textarea');
-            inputs.forEach(el => {
-                if (!el.classList.contains('btn')) {
-                    el.classList.add('form-control');
-                    // Add placeholders if they don't exist
-                    if(el.name === 'name') el.placeholder = 'e.g. Downtown Central';
-                    if(el.name === 'phone') el.placeholder = '+1 (555) 000-0000';
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!navigator.geolocation) {
+            updateStatus("Geolocation not supported", "Error");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async function (position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                document.getElementById("latitude").value = lat;
+                document.getElementById("longitude").value = lon;
+                document.getElementById("coords-text").innerText = `LAT: ${lat.toFixed(4)} | LON: ${lon.toFixed(4)}`;
+
+                try {
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                        { headers: { "User-Agent": "LaundryBusinessPortal/1.0" } }
+                    );
+                    const data = await res.json();
+
+                    const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "Area Detected";
+
+                    document.getElementById("city").value = city;
+                    document.getElementById("city-text").innerText = city;
+                    
+                    // Style it as "Success"
+                    const badge = document.querySelector('.location-badge');
+                    badge.style.background = '#f0fdf4';
+                    badge.style.borderColor = '#bbf7d0';
+                    document.querySelector('.map-ico').style.color = '#10b981';
+
+                } catch (e) {
+                    updateStatus("Area detection limited", "GPS Active");
                 }
-            });
-        });
-    </script>
+            },
+            function () {
+                updateStatus("Permission Denied", "Manual location entry required");
+            }
+        );
+
+        function updateStatus(title, subtitle) {
+            document.getElementById("city-text").innerText = title;
+            document.getElementById("coords-text").innerText = subtitle;
+        }
+    });
+</script>
+
 </body>
 </html>

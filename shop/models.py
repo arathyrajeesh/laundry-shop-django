@@ -108,13 +108,13 @@ class Branch(models.Model):
     name = models.CharField(max_length=100)
     address = models.TextField()
     phone = models.CharField(max_length=15, blank=True)
+
+    # ✅ ADD THESE
+    city = models.CharField(max_length=100, blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
     created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        unique_together = ('shop', 'name')
-
-    def __str__(self):
-        return f"{self.shop.name} - {self.name}"
 
 class Service(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='services')

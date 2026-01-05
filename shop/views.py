@@ -2710,14 +2710,20 @@ def add_branch(request):
     shop_id = request.session.get('shop_id')
     shop = get_object_or_404(LaundryShop, id=shop_id)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = BranchForm(request.POST)
         if form.is_valid():
             branch = form.save(commit=False)
             branch.shop = shop
+
+            branch.city = request.POST.get("city", "")
+            branch.latitude = request.POST.get("latitude") or None
+            branch.longitude = request.POST.get("longitude") or None
+
             branch.save()
-            messages.success(request, 'Branch created successfully.')
-            return redirect('shop_dashboard')
+            messages.success(request, "Branch added with location")
+            return redirect("select_branch")
+
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
