@@ -572,15 +572,11 @@ def user_dashboard(request):
     cloth_status = get_cloth_status(request.user)
 
     # ===============================
-    # USER LOCATION
+    # USER LOCATION (FROM PROFILE)
     # ===============================
     search_query = request.GET.get("search", "").strip()
-    user_city = None
-
-    try:
-        user_city = request.user.profile.city.strip()
-    except:
-        user_city = None
+    profile = getattr(request.user, "profile", None)
+    user_city = profile.city.strip() if profile and profile.city else None
 
     services_nearby = []
     shops_nearby = []
@@ -589,45 +585,47 @@ def user_dashboard(request):
     # ===============================
     # SEARCH MODE
     # ===============================
+
     if search_query:
         services = (
             Service.objects
-            .filter(name__icontains=search_query)
+            .filter(
+                name__icontains=search_query,
+                branch__shop__is_approved=True
+            )
             .select_related("branch__shop")
-            .filter(branch__shop__is_approved=True)
         )
 
         if user_city:
-            city_services = services.filter(
+            services_nearby = services.filter(
                 branch__shop__city__iexact=user_city
-            )
-            services_nearby = city_services[:10] if city_services.exists() else services[:10]
+            )[:10]
         else:
             services_nearby = services[:10]
+
 
     # ===============================
     # LOCATION-BASED MODE
     # ===============================
     elif user_city:
-        # Services in user's city (LIMIT for display)
-        services_nearby = Service.objects.filter(
-            branch__shop__is_approved=True,
-            branch__shop__city__iexact=user_city
-        ).select_related('branch__shop')[:10]
-
-        # 🔑 ALL nearby shops (NO LIMIT, DISTINCT) — for COUNT
-        nearby_shops_qs = (
-            LaundryShop.objects
-            .filter(is_approved=True, city__iexact=user_city)
-            .order_by("id")   # 🔑 FORCE deterministic rows
-            .distinct()
+        services_nearby = (
+            Service.objects
+            .filter(
+                branch__shop__is_approved=True,
+                branch__shop__city__iexact=user_city
+            )
+            .select_related("branch__shop")[:10]
         )
 
 
-        # 🔑 LIMITED nearby shops — for DISPLAY
-        shops_nearby = nearby_shops_qs[:10]
+        nearby_shops_qs = (
+            LaundryShop.objects
+            .filter(is_approved=True, city__iexact=user_city)
+            .order_by("id")
+            .distinct()
+        )
 
-        # 🔑 ACCURATE nearby shop count
+        shops_nearby = nearby_shops_qs[:10]
         nearby_shop_count = nearby_shops_qs.count()
 
     # ===============================
@@ -636,32 +634,23 @@ def user_dashboard(request):
     create_order_notifications(request.user)
     create_welcome_notifications(request.user)
 
-    recent_notifications = (
+    recent_notifications = list(
         Notification.objects
         .filter(user=request.user, is_read=False)
-        .order_by("-created_at")[:5]
+        .order_by("-created_at")
+        .values(
+            "id", "title", "message",
+            "created_at", "icon", "color", "is_read"
+        )[:5]
     )
 
-    recent_notifications = [
-        {
-            "id": n.id,
-            "title": n.title,
-            "message": n.message,
-            "time": n.created_at,
-            "icon": n.icon,
-            "color": n.color,
-            "is_read": n.is_read,
-        }
-        for n in recent_notifications
-    ]
-
-    if hasattr(request.user, "profile") and request.user.profile.notifications_enabled:
-        unread_count = Notification.objects.filter(
-            user=request.user,
-            is_read=False
-        ).count()
-    else:
-        unread_count = 0
+    unread_count = (
+        Notification.objects
+        .filter(user=request.user, is_read=False)
+        .count()
+        if profile and profile.notifications_enabled
+        else 0
+    )
 
     # ===============================
     # PREVIOUS SHOPS
@@ -689,7 +678,7 @@ def user_dashboard(request):
             "cloth_status": cloth_status,
             "services_nearby": services_nearby,
             "shops_nearby": shops_nearby,
-            "nearby_shop_count": nearby_shop_count,   # 🔑 ACCURATE COUNT
+            "nearby_shop_count": nearby_shop_count,
             "search_query": search_query,
             "user_city": user_city,
             "recent_notifications": recent_notifications,
