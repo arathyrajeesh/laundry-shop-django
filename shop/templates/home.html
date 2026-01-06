@@ -924,6 +924,30 @@
             color: var(--accent-hover);
             border-color: var(--accent-hover);
         }
+        /* Learn Technologies Button */
+        .learn-tech-wrapper {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background: transparent;
+            color: #1a0c3dff;
+            border: 2px solid #1a0c3dff;
+            padding: 10px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #1a0c3dff;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
 
         /* Responsiveness for Branches */
         @media (max-width: 768px) {
@@ -1133,7 +1157,20 @@
             </button>
         </form>
         <div id="aiResult"></div>
+        <div class="learn-tech-wrapper">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    Learn New Technologies
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="btn btn-secondary">
+                    Learn New Technologies
+                </a>
+            {% endif %}
+        </div>
+
     </section>
+
     <section class="pricing-section-container" id="pricing">
         <h2 class="section-title">Transparent & Affordable Pricing</h2>
         
