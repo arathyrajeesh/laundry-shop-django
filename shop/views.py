@@ -7,6 +7,10 @@ from .payment_utils import (
     calculate_commission,
     get_razorpay_client,
 )
+from datetime import timedelta
+from django.utils import timezone
+from shop.utils.delivery_ai import predict_delivery_hours
+from .models import Order, OrderItem
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 import random
@@ -1333,6 +1337,35 @@ def payment_success(request):
         title="Payment Successful",
         message=f"Payment successful for Order #{order.id}. Please prepare your items for pickup."
     )
+    
+    # =========================
+# 🤖 AI DELIVERY PREDICTION
+# =========================
+
+# 1️⃣ Calculate branch workload (active paid orders)
+    # 🤖 AI DELIVERY PREDICTION
+    branch_load = Order.objects.filter(
+        branch=order.branch,
+        payment_status="Completed",
+        cloth_status__in=["Pickup", "Washing", "Drying", "Ironing"]
+    ).count()
+
+    items_count = sum(
+        item.quantity for item in order.order_items.all()
+    )
+
+    first_item = order.order_items.first()
+
+    if first_item:
+        predicted_hours = predict_delivery_hours(
+            cloth=first_item.cloth.name,
+            service=first_item.service.name,
+            branch_load=branch_load,
+            items=items_count
+        )
+
+        order.predicted_delivery = timezone.now() + timedelta(hours=predicted_hours)
+        order.save()
 
 
     # 📄 Prepare order items for PDF

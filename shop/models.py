@@ -175,21 +175,11 @@ class Order(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, null=True)
+    branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # 💰 AMOUNTS
-    base_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    platform_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    gst_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        help_text="Final payable amount (base + fees + GST)"
-    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    # 📦 STATUS
     cloth_status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -202,24 +192,26 @@ class Order(models.Model):
     )
 
     # 🚚 DELIVERY
+    # 🚚 DELIVERY
     pickup_date = models.DateTimeField(blank=True, null=True)
     delivery_date = models.DateTimeField(blank=True, null=True)
+
+    # 🤖 AI PREDICTION
+    predicted_delivery = models.DateTimeField(null=True, blank=True)
+    
+    # 📦 DELIVERY DETAILS
     delivery_name = models.CharField(max_length=100, blank=True)
-    delivery_address = models.TextField(blank=True)
     delivery_phone = models.CharField(max_length=15, blank=True)
+    delivery_address = models.TextField(blank=True)
     special_instructions = models.TextField(blank=True)
-
-    # 🕒 META
+    platform_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(default=timezone.now)
-    delay_notified = models.BooleanField(default=False)
-    thank_you_sent = models.BooleanField(default=False)
-
-    # 💳 PAYMENT REFERENCE (MAIN ACCOUNT ONLY)
+    gst_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    base_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
-
-    def __str__(self):
-        return f"Order #{self.id} - {self.user.username}"
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

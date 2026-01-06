@@ -231,9 +231,21 @@
                         {% if order.display_status == 'Payment Incomplete' or order.cloth_status == 'Pending' %}status-pending
                         {% elif order.cloth_status == 'Completed' %}status-completed
                         {% else %}status-processing{% endif %}">
-                        {{ order.display_status }}
+                        {{ order.display_status|default:order.cloth_status }}
                     </span>
                 </div>
+                {% if order.predicted_delivery %}
+                    <div class="delivery-info-box" style="margin-bottom: 15px;">
+                        <h5>
+                            <i class="fas fa-robot"></i>
+                            AI Estimated Delivery
+                        </h5>
+                        <p style="margin: 0; font-weight: 600;">
+                            {{ order.predicted_delivery|date:"d M Y, h:i A" }}
+                        </p>
+                    </div>
+                {% endif %}
+
 
                 <div class="details-grid">
                     <div class="detail-item">
