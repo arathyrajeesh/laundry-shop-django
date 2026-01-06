@@ -598,7 +598,7 @@ def user_dashboard(request):
 
         if user_city:
             services_nearby = services.filter(
-                branch__shop__city__iexact=user_city
+                branch__city__iexact=user_city
             )[:10]
         else:
             services_nearby = services[:10]
@@ -611,16 +611,20 @@ def user_dashboard(request):
         services_nearby = (
             Service.objects
             .filter(
-                branch__shop__is_approved=True,
-                branch__shop__city__iexact=user_city
+                branch__city__iexact=user_city,   
+                branch__shop__is_approved=True
             )
-            .select_related("branch__shop")[:10]
+            .select_related("branch", "branch__shop")[:10]
         )
+
 
 
         nearby_shops_qs = (
             LaundryShop.objects
-            .filter(is_approved=True, city__iexact=user_city)
+            .filter(
+                is_approved=True,
+                branches__city__iexact=user_city   
+            )
             .order_by("id")
             .distinct()
         )
