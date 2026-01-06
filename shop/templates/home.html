@@ -719,7 +719,7 @@
         }
 
         #aiForm:hover {
-            border-color: #007bff;
+            border-color: #07112eff;
         }
 
         /* File Input Styling */
@@ -731,7 +731,7 @@
 
         /* Primary Button */
         .btn-primary {
-            background-color: #007bff;
+            background-color: #1a0c3dff;
             color: white;
             border: none;
             padding: 12px 30px;
@@ -744,12 +744,55 @@
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background-color: #133151ff;
             transform: translateY(-2px);
         }
 
         .btn-primary:active {
             transform: translateY(0);
+        }
+        /* Custom File Upload Box */
+        .file-upload-box {
+            width: 100%;
+            max-width: 420px;
+            cursor: pointer;
+        }
+
+        .upload-content {
+            border-radius: 14px;
+            padding: 30px 20px;
+            background: #f8faff;
+            transition: all 0.3s ease;
+        }
+
+        .upload-content:hover {
+            background: #eef3ff;
+            border-color: #1a0c3dff;
+        }
+
+        .upload-content i {
+            font-size: 40px;
+            color: #1a0c3dff;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .file-name {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #1a0c3dff;
+            font-weight: 600;
         }
 
         /* AI Result Box Enhancements */
@@ -1063,12 +1106,28 @@
             id="aiForm"
         >
             {% csrf_token %}
-            <input
-                type="file"
-                name="cloth_image"
-                accept=".jpg,.jpeg,.png"
-                required
-            >
+            <label class="file-upload-box">
+                <input
+                    type="file"
+                    name="cloth_image"
+                    accept=".jpg,.jpeg,.png"
+                    required
+                    id="clothInput"
+                    hidden
+                >
+
+                <div class="upload-content">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p class="upload-text">
+                        Click to upload or drag & drop
+                    </p>
+                    <span class="upload-hint">
+                        JPG, PNG (max 5MB)
+                    </span>
+                    <span id="fileName" class="file-name"></span>
+                </div>
+            </label>
+
             <button type="submit" class="btn btn-primary">
                 Analyze with AI
             </button>
@@ -1459,7 +1518,10 @@
         }
         return cookieValue;
     }
-
+    document.getElementById("clothInput").addEventListener("change", function () {
+        const fileName = this.files[0]?.name || "";
+        document.getElementById("fileName").textContent = fileName;
+    });
     </script>
 
 </body>
