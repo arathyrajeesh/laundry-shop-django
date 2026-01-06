@@ -3444,35 +3444,37 @@ def mark_notifications_read(request):
     return JsonResponse({"status": "invalid"}, status=400)
 
 
-import os
-from cloudinary.uploader import upload
+# shop/views.py
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
+from shop.ai.cloth_ai import detect_cloth_type
+from shop.ai.stain_rules import detect_stain
+from shop.ai.washing_advice import suggest_washing
+import tempfile
 
 def cloth_ai_upload(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid request"}, status=400)
+    if request.method == "POST":
+        try:
+            image = request.FILES.get("cloth_image")
 
-    image_file = request.FILES.get("cloth_image")
-    if not image_file:
-        return JsonResponse({"error": "No image uploaded"}, status=400)
+            if not image:
+                return JsonResponse({"error": "No image uploaded"}, status=400)
 
-    # Upload to Cloudinary
-    cloudinary_result = upload(image_file, folder="ai_cloth_uploads")
-    image_url = cloudinary_result["secure_url"]
+            # save temp file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp:
+                for chunk in image.chunks():
+                    temp.write(chunk)
+                image_path = temp.name
 
-    # Download temporarily for AI
-    temp_path = download_cloudinary_image(image_url)
+            cloth = detect_cloth_type(image_path)
+            stain = detect_stain(image_path)
+            wash = suggest_washing(cloth, stain)
 
-    try:
-        cloth = ai_detect_cloth(temp_path)
-        stain = detect_stain(temp_path)
-        washing = suggest_washing(cloth, stain)
-    finally:
-        os.remove(temp_path)
+            return JsonResponse({
+                "cloth_type": cloth,
+                "stain": stain,
+                "recommended_wash": wash
+            })
 
-    return JsonResponse({
-        "cloth_type": cloth,
-        "stain": stain,
-        "recommended_wash": washing
-    })
+        except Exception as e:
+            print("AI ERROR:", e)   # 👈 VERY IMPORTANT
+            return JsonResponse({"error": "AI failed"}, status=500)
