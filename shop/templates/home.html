@@ -604,6 +604,111 @@
             transition: transform 0.3s;
         }
         .up-arrow-btn:hover { transform: scale(1.1); }
+        /* ===== AI CLOTH ANALYSIS ===== */
+
+        #ai-laundry {
+            background: linear-gradient(135deg, #f9fbff, #eef4ff);
+        }
+
+        .ai-subtitle {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .ai-card {
+            max-width: 520px;
+            margin: auto;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(15, 51, 75, 0.15);
+        }
+
+        /* Upload box */
+        .upload-box {
+            border: 2px dashed var(--primary-color);
+            border-radius: 14px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            display: block;
+            transition: 0.3s;
+            color: var(--primary-color);
+        }
+
+        .upload-box:hover {
+            background: rgba(15, 51, 75, 0.05);
+        }
+
+        .upload-box i {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .upload-box span {
+            display: block;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .upload-box input {
+            display: none;
+        }
+
+        /* Button */
+        .ai-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .ai-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Result */
+        .ai-result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f4f8ff;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .ai-result h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .ai-result p {
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .chatbot {
             width: 350px;
@@ -975,7 +1080,31 @@
             <div class="swiper-pagination"></div>
         </div>
     </section>
+    <section class="section" id="ai-laundry">
+        <h2 class="section-title">🤖 AI Cloth Analysis</h2>
 
+        <p class="ai-subtitle">
+            Upload your cloth photo and get an instant AI-powered washing recommendation.
+        </p>
+
+        <div class="ai-card">
+            <form action="{% url 'cloth_ai_upload' %}" method="POST" enctype="multipart/form-data" id="aiForm">
+                {% csrf_token %}
+
+                <label class="upload-box">
+                    <input type="file" name="cloth_image" accept="image/*" required>
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Click or Drag & Drop Image</span>
+                </label>
+
+                <button type="submit" class="ai-btn">
+                    Analyze with AI
+                </button>
+            </form>
+
+            <div id="aiResult" class="ai-result"></div>
+        </div>
+    </section>
 
     <section class="pricing-section-container" id="pricing">
         <h2 class="section-title">Transparent & Affordable Pricing</h2>
@@ -1305,6 +1434,45 @@
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    document.getElementById("aiForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch("{% url 'cloth_ai_upload' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("aiResult").innerHTML = `
+                <h4 style="color:#0f334b;">AI Result</h4>
+                <p><b>Cloth Type:</b> ${data.cloth_type}</p>
+                <p><b>Stain:</b> ${data.stain}</p>
+                <p><b>Recommended Wash:</b> ${data.recommended_wash}</p>
+            `;
+        })
+        .catch(() => alert("AI analysis failed"));
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     </script>
 
 </body>

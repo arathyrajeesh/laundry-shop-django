@@ -7,6 +7,13 @@ from .payment_utils import (
     calculate_commission,
     get_razorpay_client,
 )
+def ai_detect_cloth(image_path):
+    from shop.ai.cloth_ai import detect_cloth_type
+    return detect_cloth_type(image_path)
+
+from shop.ai.stain_rules import detect_stain
+from shop.ai.washing_advice import suggest_washing
+from shop.ai.image_loader import download_cloudinary_image
 from datetime import timedelta
 from django.utils import timezone
 from shop.utils.delivery_ai import predict_delivery_hours
@@ -3435,3 +3442,37 @@ def mark_notifications_read(request):
         return JsonResponse({"status": "ok"})
 
     return JsonResponse({"status": "invalid"}, status=400)
+
+
+import os
+from cloudinary.uploader import upload
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+def cloth_ai_upload(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    image_file = request.FILES.get("cloth_image")
+    if not image_file:
+        return JsonResponse({"error": "No image uploaded"}, status=400)
+
+    # Upload to Cloudinary
+    cloudinary_result = upload(image_file, folder="ai_cloth_uploads")
+    image_url = cloudinary_result["secure_url"]
+
+    # Download temporarily for AI
+    temp_path = download_cloudinary_image(image_url)
+
+    try:
+        cloth = ai_detect_cloth(temp_path)
+        stain = detect_stain(temp_path)
+        washing = suggest_washing(cloth, stain)
+    finally:
+        os.remove(temp_path)
+
+    return JsonResponse({
+        "cloth_type": cloth,
+        "stain": stain,
+        "recommended_wash": washing
+    })
