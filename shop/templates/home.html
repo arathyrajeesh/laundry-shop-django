@@ -1445,46 +1445,6 @@
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    
-    document.getElementById("aiForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        fetch("{% url 'cloth_ai_upload' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken")
-            }
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("Server error");
-            return res.json();
-        })
-        .then(data => {
-            document.getElementById("aiResult").innerHTML = `
-                <div style="
-                    margin-top:20px;
-                    padding:20px;
-                    background:#f1f5ff;
-                    border-radius:12px;
-                    box-shadow:0 6px 18px rgba(0,0,0,0.08);
-                    text-align:left;
-                    animation: fadeIn 0.4s ease">
-                    
-                    <h4>🤖 AI Result</h4>
-                    <p><b>Cloth Type:</b> ${data.cloth_type}</p>
-                    <p><b>Stain:</b> ${data.stain}</p>
-                    <p><b>Recommended Wash:</b> ${data.recommended_wash}</p>
-                </div>
-            `;
-        })
-        .catch(err => {
-            console.error(err);
-            alert("We couldn’t analyze the image. Please try a clearer photo.");
-        });
-    });
 
 
     function getCookie(name) {
