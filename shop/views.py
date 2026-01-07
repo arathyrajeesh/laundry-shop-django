@@ -7,7 +7,8 @@ from .payment_utils import (
     calculate_commission,
     get_razorpay_client,
 )
-
+from shop.utils.wash_ai import get_wash_recommendation
+from .models import WashRecommendation
 from datetime import timedelta
 from django.utils import timezone
 from shop.utils.delivery_ai import predict_delivery_hours
@@ -1159,12 +1160,27 @@ def create_order(request, shop_id, branch_id):
     session_items = []
 
     for item in order_items_data:
-        OrderItem.objects.create(
+        order_item = OrderItem.objects.create(
             order=order,
             service=item["service"],
             cloth=item["cloth"],
             quantity=item["quantity"],
         )
+
+        # 🤖 AI WASH RECOMMENDATION
+        rec = get_wash_recommendation(
+            cloth_name=item["cloth"].name,
+            service_name=item["service"].name
+        )
+
+        WashRecommendation.objects.create(
+            order_item=order_item,
+            water_temperature=rec["water"],
+            wash_cycle=rec["cycle"],
+            detergent=rec["detergent"],
+            drying_method=rec["dry"],
+        )
+
 
         session_items.append({
             "service_name": item["service"].name,

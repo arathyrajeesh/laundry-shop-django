@@ -310,3 +310,20 @@ class PasswordResetOTP(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.otp}"
+
+class WashRecommendation(models.Model):
+    order_item = models.OneToOneField(
+        OrderItem,
+        on_delete=models.CASCADE,
+        related_name="wash_recommendation"
+    )
+
+    water_temperature = models.CharField(max_length=50)
+    wash_cycle = models.CharField(max_length=50)
+    detergent = models.CharField(max_length=50)
+    drying_method = models.CharField(max_length=50)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Wash AI for OrderItem #{self.order_item.id}"

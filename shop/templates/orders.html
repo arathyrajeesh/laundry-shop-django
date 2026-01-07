@@ -277,6 +277,29 @@
                     </div>
                 </div>
                 {% endif %}
+                <!-- 🧺 AI Washing Instructions -->
+                {% if order.order_items.exists %}
+                <div class="delivery-info-box" style="margin-top:16px;">
+                    <h5>
+                        <i class="fas fa-tshirt"></i>
+                        AI Washing Instructions
+                    </h5>
+
+                    {% for item in order.order_items.all %}
+                        {% if item.wash_recommendation %}
+                            <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px dashed #cbd5e0;">
+                                <strong>{{ item.cloth.name }} – {{ item.service.name }}</strong>
+                                <ul style="margin:6px 0 0 18px; font-size:14px;">
+                                    <li> Water: {{ item.wash_recommendation.water_temperature }}</li>
+                                    <li>Cycle: {{ item.wash_recommendation.wash_cycle }}</li>
+                                    <li>Detergent: {{ item.wash_recommendation.detergent }}</li>
+                                    <li>Drying: {{ item.wash_recommendation.drying_method }}</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' and order.branch %}
                 <div class="rating-section">
