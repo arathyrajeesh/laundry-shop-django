@@ -714,7 +714,6 @@
             background: #f8f9fa;
             padding: 30px;
             border-radius: 15px;
-            border: 2px dashed #d1d8e0;
             transition: border-color 0.3s ease;
         }
 
@@ -759,6 +758,7 @@
         }
 
         .upload-content {
+            border: 1px solid #e1e7ff;
             border-radius: 14px;
             padding: 30px 20px;
             background: #f8faff;
@@ -1116,60 +1116,6 @@
             <div class="swiper-pagination"></div>
         </div>
     </section>
-    <section class="section" id="ai-laundry">
-        <h2 class="section-title">
-            🤖 AI Cloth Analysis
-        </h2>
-
-        <p style="max-width:600px;margin:0 auto 25px;color:#555;">
-            Upload a photo of your cloth and our AI will suggest the best washing method.
-        </p>
-        <form
-            method="POST"
-            enctype="multipart/form-data"
-            id="aiForm"
-        >
-            {% csrf_token %}
-            <label class="file-upload-box">
-                <input
-                    type="file"
-                    name="cloth_image"
-                    accept=".jpg,.jpeg,.png"
-                    required
-                    id="clothInput"
-                    hidden
-                >
-
-                <div class="upload-content">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p class="upload-text">
-                        Click to upload or drag & drop
-                    </p>
-                    <span class="upload-hint">
-                        JPG, PNG (max 5MB)
-                    </span>
-                    <span id="fileName" class="file-name"></span>
-                </div>
-            </label>
-
-            <button type="submit" class="btn btn-primary">
-                Analyze with AI
-            </button>
-        </form>
-        <div id="aiResult"></div>
-        <div class="learn-tech-wrapper">
-            {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                    Learn New Technologies
-                </a>
-            {% else %}
-                <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="btn btn-secondary">
-                    Learn New Technologies
-                </a>
-            {% endif %}
-        </div>
-
-    </section>
 
     <section class="pricing-section-container" id="pricing">
         <h2 class="section-title">Transparent & Affordable Pricing</h2>
@@ -1509,7 +1455,7 @@
             method: "POST",
             body: formData,
             headers: {
-                "X-CSRFToken": "{{ csrf_token }}"
+                "X-CSRFToken": getCookie("csrftoken")
             }
         })
         .then(res => {
@@ -1536,7 +1482,7 @@
         })
         .catch(err => {
             console.error(err);
-            alert("AI failed");
+            alert("We couldn’t analyze the image. Please try a clearer photo.");
         });
     });
 

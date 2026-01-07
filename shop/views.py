@@ -7,13 +7,7 @@ from .payment_utils import (
     calculate_commission,
     get_razorpay_client,
 )
-def ai_detect_cloth(image_path):
-    from shop.ai.cloth_ai import detect_cloth_type
-    return detect_cloth_type(image_path)
 
-from shop.ai.stain_rules import detect_stain
-from shop.ai.washing_advice import suggest_washing
-from shop.ai.image_loader import download_cloudinary_image
 from datetime import timedelta
 from django.utils import timezone
 from shop.utils.delivery_ai import predict_delivery_hours
@@ -3442,39 +3436,3 @@ def mark_notifications_read(request):
         return JsonResponse({"status": "ok"})
 
     return JsonResponse({"status": "invalid"}, status=400)
-
-
-# shop/views.py
-from django.http import JsonResponse
-from shop.ai.cloth_ai import detect_cloth_type
-from shop.ai.stain_rules import detect_stain
-from shop.ai.washing_advice import suggest_washing
-import tempfile
-
-def cloth_ai_upload(request):
-    if request.method == "POST":
-        try:
-            image = request.FILES.get("cloth_image")
-
-            if not image:
-                return JsonResponse({"error": "No image uploaded"}, status=400)
-
-            # save temp file
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp:
-                for chunk in image.chunks():
-                    temp.write(chunk)
-                image_path = temp.name
-
-            cloth = detect_cloth_type(image_path)
-            stain = detect_stain(image_path)
-            wash = suggest_washing(cloth, stain)
-
-            return JsonResponse({
-                "cloth_type": cloth,
-                "stain": stain,
-                "recommended_wash": wash
-            })
-
-        except Exception as e:
-            print("AI ERROR:", e)   # 👈 VERY IMPORTANT
-            return JsonResponse({"error": "AI failed"}, status=500)

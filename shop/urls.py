@@ -82,7 +82,6 @@ urlpatterns = [
         path('shop/service/<int:service_id>/edit/', views.edit_service, name='edit_service'),
         path('shop/service/<int:service_id>/delete/', views.delete_service, name='delete_service'),
         path('shop/manage-service-prices/', views.manage_service_prices, name='manage_service_prices'),
-        path("ai/cloth-upload/", views.cloth_ai_upload, name="cloth_ai_upload"),
 
         # Shop status toggle
         path('shop/toggle-shop-status/', views.toggle_shop_status, name='toggle_shop_status'),
