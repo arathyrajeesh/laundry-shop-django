@@ -307,13 +307,12 @@
             return "";
         }
     }
-
     setTimeout(() => {
         const errorBox = document.querySelector('.error-box');
         if (errorBox) {
             errorBox.style.display = 'none';
         }
-    }, 5000);
+    }, 5000); 
     const detectBtn = document.getElementById("detectLocationBtn");
 
     detectBtn.addEventListener("click", async () => {

@@ -233,8 +233,8 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-                {{ message }}
+            <div class="error-box">
+                <i class="fas fa-circle-exclamation"></i> {{ message }}
             </div>
         {% endfor %}
     {% endif %}
@@ -397,7 +397,12 @@
             return "";
         }
     }
-
+    setTimeout(() => {
+        const errorBox = document.querySelector('.error-box');
+        if (errorBox) {
+            errorBox.style.display = 'none';
+        }
+    }, 5000); 
     function togglePassword(id) {
         const passwordInput = document.getElementById(id);
         const toggleBtn = passwordInput.nextElementSibling;
