@@ -96,11 +96,12 @@
             height: 70vh;
             background: url("{% static 'images/hero.jpg' %}") no-repeat center center/cover;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            justify-content: flex-start; /* move content to left */
+            align-items: center;         /* vertical center */
+            text-align: left;            /* left align text */
             color: white;
             overflow: hidden;
+            padding-left: 80px;          /* space from left */
         }
 
         /* Dark cover overlay */
@@ -118,16 +119,17 @@
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 700px;
-            padding: 20px;
+            max-width: 600px;
         }
 
+        /* Heading */
         .hero-content h1 {
             font-size: 50px;
             margin-bottom: 15px;
             text-shadow: 0 4px 15px rgba(0,0,0,0.7);
         }
 
+        /* Paragraph */
         .hero-content p {
             font-size: 20px;
             margin-bottom: 25px;
