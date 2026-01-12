@@ -176,7 +176,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True)
-
+    pending_notification_sent = models.BooleanField(default=False)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 

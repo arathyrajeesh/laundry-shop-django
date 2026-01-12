@@ -651,6 +651,21 @@
 </head>
 <body>
     <!-- CENTER ALERT MODAL -->
+    {% if pending_orders > 0 %}
+    <div style="
+        background:#fff7ed;
+        border-left:5px solid #f59e0b;
+        padding:16px;
+        border-radius:12px;
+        margin-bottom:20px;
+        color:#92400e;
+    ">
+        <i class="fas fa-bell"></i>
+        You have <strong>{{ pending_orders }}</strong> new pending order(s).
+        Please start washing to avoid delays.
+    </div>
+    {% endif %}
+
     <div id="center-alert-overlay" class="center-alert-overlay">
         <div class="center-alert-box">
             <h3 id="center-alert-title">Confirm Action</h3>

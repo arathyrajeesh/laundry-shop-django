@@ -138,5 +138,5 @@ urlpatterns = [
 
         path("shop/reset/", views.shop_reset_request, name="shop_reset_request"),
         path("shop/reset/<str:token>/", views.shop_reset_confirm, name="shop_reset_confirm"),
-
+        path("send-order-reminder/<int:order_id>/", views.send_order_reminder, name="send_order_reminder"),
 ]

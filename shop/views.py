@@ -237,11 +237,12 @@ def get_cloth_status(user):
         {
             'cloth_name': f"Order #{order.id}",
             'status': order.cloth_status,
-            'delivery_date': order.created_at,
+            'delivery_date': order.delivery_date or order.predicted_delivery,
             'shop_name': order.shop.name
         }
         for order in orders
     ]
+
 
 # --- Notification Helper Functions ---
 
@@ -682,6 +683,7 @@ def user_dashboard(request):
         request,
         "user_dashboard.html",
         {
+            "today_str": timezone.now().date().strftime("%Y-%m-%d"),
             "pending_count": pending,
             "completed_count": completed,
             "total_spent": spent,
@@ -2532,6 +2534,7 @@ def shop_dashboard(request):
         # Delayed
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
+        "now": timezone.now(),
     }
 
     return render(request, 'shop_dashboard.html', context)
@@ -3452,3 +3455,35 @@ def mark_notifications_read(request):
         return JsonResponse({"status": "ok"})
 
     return JsonResponse({"status": "invalid"}, status=400)
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+
+@login_required
+@require_POST
+def send_order_reminder(request, order_id):
+    order = Order.objects.get(id=order_id)
+
+    # Prevent spam
+    if order.last_reminder_sent and \
+        (timezone.now() - order.last_reminder_sent).seconds < 3600:
+        return JsonResponse({
+            "success": False,
+            "message": "Reminder already sent recently"
+        })
+
+    # 🔔 Create notification for shop
+    Notification.objects.create(
+        shop=order.shop,
+        title="Delayed Order Reminder",
+        message=f"Order #{order.id} is delayed. Please update the status.",
+        icon="fas fa-bell",
+        color="#e74c3c"
+    )
+
+    order.last_reminder_sent = timezone.now()
+    order.save()
+
+    return JsonResponse({"success": True})

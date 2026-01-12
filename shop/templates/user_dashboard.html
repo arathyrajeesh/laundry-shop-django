@@ -276,6 +276,50 @@
             border: 2px solid white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        .status-pending {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-processing {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-delayed {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .delayed-row {
+            background: #fff5f5;
+        }
+        .reminder-btn {
+            margin-left: 10px;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reminder-btn:hover {
+            background: #fecaca;
+        }
+
+        .reminder-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
         .dropdown-menu {
             position: absolute;
@@ -473,6 +517,7 @@
         </div>
         
         <div class="table-container">
+            {% now "Y-m-d" as today_str %}
             <table class="modern-table">
                 <thead>
                     <tr>
@@ -487,7 +532,25 @@
                     <tr>
                         <td style="font-weight: 600;">{{ cloth.cloth_name }}</td>
                         <td style="color: var(--text-muted); font-size: 0.9rem;">{{ cloth.shop_name }}</td>
-                        <td><span class="status-pill">{{ cloth.status }}</span></td>
+                        <td>
+                            {% if cloth.delivery_date and cloth.delivery_date|date:"Y-m-d" < today_str and cloth.status != "Completed" %}
+                                <span class="status-pill status-delayed">
+                                    DELAYED – {{ cloth.status }}
+                                </span>
+
+                                <button class="reminder-btn"
+                                        onclick="sendReminder({{ cloth.order_id }})">
+                                    <i class="fas fa-bell"></i> Send Reminder
+                                </button>
+                            {% else %}
+                                <span class="status-pill 
+                                    {% if cloth.status == 'Pending' %}status-pending
+                                    {% elif cloth.status == 'Completed' %}status-completed
+                                    {% else %}status-processing{% endif %}">
+                                    {{ cloth.status }}
+                                </span>
+                            {% endif %}
+                        </td>
                         <td style="font-size: 0.9rem;">{% if cloth.delivery_date %}{{ cloth.delivery_date|date:"d M" }}{% else %}Calculating...{% endif %}</td>
                     </tr>
                     {% empty %}
@@ -497,8 +560,22 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% if pending_count > 0 %}
+            <div style="
+                background:#fff7ed;
+                border:1px solid #fed7aa;
+                padding:14px;
+                border-radius:12px;
+                color:#9a3412;
+                font-size:0.9rem;
+                margin-top:1.5rem;
+            ">
+                <i class="fas fa-info-circle"></i>
+                You have <strong>{{ pending_count }}</strong> pending order(s).
+                Please wait while the shop processes your laundry.
+            </div>
+            {% endif %}
         </div>
-
     </div>
 
     <script>
@@ -554,9 +631,6 @@
             );
         }
 
-        function getCSRFToken() {
-            return document.querySelector('[name=csrfmiddlewaretoken]').value;
-        }
 
         const toggle = document.getElementById('profileToggle');
         const menu = document.getElementById('dropdownMenu');
@@ -570,7 +644,7 @@
             menu.classList.remove('show');
         });
         
-        document.getElementById('profile-trigger').addEventListener('click', function() {
+        document.getElementById('profileToggle').addEventListener('click', function() {
             var dropdown = document.getElementById('profile-dropdown-menu');
             dropdown.classList.toggle('show');
 
@@ -705,6 +779,30 @@
                 .find(row => row.startsWith("csrftoken="))
                 ?.split("=")[1];
         }
+        function sendReminder(orderId) {
+            if (!confirm("Send reminder to shop for this delayed order?")) return;
+
+            fetch(`/send-order-reminder/${orderId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Reminder sent successfully ✅");
+                } else {
+                    alert(data.message || "Failed to send reminder");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Something went wrong");
+            });
+        }
+
     </script>
 
 
