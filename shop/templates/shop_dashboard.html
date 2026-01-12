@@ -497,11 +497,6 @@
         .order-item.open .order-header i {
             transform: rotate(180deg);
         }
-
-        .status-pending {
-            background: #fff3cd; 
-            color: #856404; 
-        }
         .status-washing { 
             background: #d1ecf1; 
             color: #0c5460; 
@@ -675,7 +670,7 @@
                 <button class="notification-btn" id="notification-trigger">
                     <i class="fas fa-bell"></i>
                     {% if unread_count > 0 %}
-                    <span id="notification-count" class="notification-count">
+                    <span id="notification-count" class="notification-badge">
                         {{ unread_count }}
                     </span>
                     {% endif %}
@@ -953,7 +948,11 @@
             {% if recent_orders %}
             <div class="order-dropdown-list">
                 {% for order in recent_orders %}
-                <div class="order-item">
+                <div class="order-item 
+                {% if order.delivery_date < now and order.cloth_status != 'Completed' %}
+                    delayed-section
+                {% endif %}
+                ">
                     <!-- ORDER HEADER -->
                     <div class="order-header" onclick="toggleOrder('{{ order.id }}')">
                         <div>
@@ -970,9 +969,15 @@
                                     Payment Incomplete
                                 </span>
                             {% else %}
-                                <span class="status-badge status-{{ order.cloth_status|lower }}">
-                                    {{ order.cloth_status }}
-                                </span>
+                                {% if order.delivery_date < now and order.cloth_status != "Completed" %}
+                                    <span class="status-badge status-delayed">
+                                        OVERDUE – {{ order.cloth_status }}
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge status-{{ order.cloth_status|lower }}">
+                                        {{ order.cloth_status }}
+                                    </span>
+                                {% endif %}
                             {% endif %}
                             <i class="fas fa-chevron-down"></i>
                         </div>
@@ -1026,8 +1031,8 @@
                 </div>
             {% endif %}
         </div>
-        
 
+        
         <div class="dashboard-section">
             <div class="section-header">
                 <h2><i class="fas fa-store-alt"></i> Branches & Services</h2>
