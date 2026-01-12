@@ -190,7 +190,7 @@ class Order(models.Model):
         choices=PAYMENT_CHOICES,
         default='Pending'
     )
-
+    overdue_notification_sent = models.BooleanField(default=False)
     # 🚚 DELIVERY
     # 🚚 DELIVERY
     pickup_date = models.DateTimeField(blank=True, null=True)
@@ -327,3 +327,12 @@ class WashRecommendation(models.Model):
 
     def __str__(self):
         return f"Wash AI for OrderItem #{self.order_item.id}"
+
+class ShopNotification(models.Model):
+    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    icon = models.CharField(max_length=50, default="fas fa-exclamation-triangle")
+    color = models.CharField(max_length=20, default="#e74c3c")
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
