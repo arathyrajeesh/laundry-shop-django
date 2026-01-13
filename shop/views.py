@@ -2453,67 +2453,70 @@ def shop_dashboard(request):
             'average_rating': branch_average_rating,
             'total_ratings': branch_ratings.count(),
         })
+# =====================
+        # 🔔 SHOP NOTIFICATIONS (DICT ONLY)
+        # =====================
+        shop_notifications = [] 
+        now = timezone.now()
 
-    # =====================
-    # 🔔 SHOP NOTIFICATIONS
-    # =====================
-    shop_notifications = []
-    now = timezone.now()
-    
-    shop_notifications = Notification.objects.filter(
-        shop=shop,
-        notification_type="shop_order_reminder"
-    ).order_by("-created_at")[:5]
-
-    unread_count = Notification.objects.filter(
-        shop=shop,
-        notification_type="shop_order_reminder",
-        is_read=False
-    ).count()
-
-
-    recent_orders_for_notifications = Order.objects.filter(
-        shop=shop
-    ).order_by('-created_at')[:10]
-
-    delayed_orders = paid_orders.select_related(
-        'user', 'branch'
-    ).filter(
-        delivery_date__isnull=False,
-        delivery_date__lt=now,
-        cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
-    ).order_by('delivery_date')
-
-    for order in recent_orders_for_notifications:
-        if order.payment_status != "Completed":
+        # 1️⃣ Notifications from DB (convert to dict)
+        db_notifications = Notification.objects.filter(
+            shop=shop,
+            notification_type="shop_order_reminder"
+        ).order_by("-created_at")[:5]
+        delayed_orders = paid_orders.select_related( 'user', 'branch' ).filter( delivery_date__isnull=False, delivery_date__lt=now, cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing'] ).order_by('delivery_date')
+        for n in db_notifications:
             shop_notifications.append({
-                'title': f'Payment Pending - Order #{order.id}',
-                'message': f'Customer {order.user.username} has not completed payment',
-                'time': order.created_at,
-                'icon': 'fas fa-exclamation-circle',
-                'color': '#e74c3c'
-            })
-        elif order.cloth_status == 'Pending':
-            shop_notifications.append({
-                'title': f'New Order #{order.id}',
-                'message': f'Order from {order.user.username} - ₹{order.amount}',
-                'time': order.created_at,
-                'icon': 'fas fa-shopping-cart',
-                'color': '#28a745'
+                "title": n.title,
+                "message": n.message,
+                "time": n.created_at,
+                "icon": n.icon,
+                "color": n.color,
+                "is_read": n.is_read,
             })
 
-    if not shop_notifications:
-        shop_notifications = [
-            {
-                'title': 'Welcome to Shop Dashboard',
-                'message': 'Manage your orders and track your business performance',
-                'time': timezone.now(),
-                'icon': 'fas fa-store',
-                'color': '#3498db'
-            }
-        ]
+        # 2️⃣ Auto-generated order notifications
+        recent_orders_for_notifications = Order.objects.filter(
+            shop=shop
+        ).order_by('-created_at')[:10]
 
-    shop_notifications.sort(key=lambda x: x['time'], reverse=True)
+        for order in recent_orders_for_notifications:
+            if order.payment_status != "Completed":
+                shop_notifications.append({
+                    "title": f"Payment Pending - Order #{order.id}",
+                    "message": f"Customer {order.user.username} has not completed payment",
+                    "time": order.created_at,
+                    "icon": "fas fa-exclamation-circle",
+                    "color": "#e74c3c",
+                    "is_read": False,
+                })
+            elif order.cloth_status == "Pending":
+                shop_notifications.append({
+                    "title": f"New Order #{order.id}",
+                    "message": f"Order from {order.user.username} - ₹{order.amount}",
+                    "time": order.created_at,
+                    "icon": "fas fa-shopping-cart",
+                    "color": "#28a745",
+                    "is_read": False,
+                })
+
+        # 3️⃣ Default message
+        if not shop_notifications:
+            shop_notifications.append({
+                "title": "Welcome to Shop Dashboard",
+                "message": "Manage your orders and track your business performance",
+                "time": timezone.now(),
+                "icon": "fas fa-store",
+                "color": "#3498db",
+                "is_read": True,
+            })
+
+        # 4️⃣ SORT (NOW SAFE ✅)
+        shop_notifications.sort(key=lambda x: x["time"], reverse=True)
+
+        # 5️⃣ LIMIT
+        shop_notifications = shop_notifications[:5]
+
 
     # =====================
     # ⭐ SHOP RATINGS
@@ -2554,6 +2557,7 @@ def shop_dashboard(request):
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
         "now": timezone.now(),
+        "shop_notifications": shop_notifications,
     }
 
     return render(request, 'shop_dashboard.html', context)
