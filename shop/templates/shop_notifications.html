@@ -258,8 +258,8 @@
         <div class="notif-card">
             {% if notifications %}
                 {% for notification in notifications %}
-                    <div class="notif-item notif-{{ notification.type }} {% if not notification.is_read %}unread{% endif %}">
-                        <div class="icon-box">
+                    <div class="notif-item notif-{{ notification.notification_type }} {% if not notification.is_read %}unread{% endif %}">
+                        <div class="icon-box" style="background: {{ notification.color }};">
                             <i class="{{ notification.icon }}"></i>
                         </div>
                         <div class="notif-content">
@@ -267,7 +267,8 @@
                             <div class="notif-msg">{{ notification.message }}</div>
                             <div class="notif-meta">
                                 <i class="far fa-clock"></i>
-                                {{ notification.time|date:"M d" }} &bull; {{ notification.time|date:"H:i" }}
+                                {{ notification.created_at|date:"M d" }} &bull;
+                                {{ notification.created_at|date:"H:i" }}
                             </div>
                         </div>
                     </div>

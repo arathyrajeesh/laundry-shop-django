@@ -401,6 +401,7 @@
         <div class="search-wrapper">
             <h2>Find the perfect laundry care</h2>
             <form method="GET" class="modern-search-bar">
+                {% csrf_token %}
                 <input type="text" name="search" value="{{ search_query }}" placeholder="Search wash & fold, dry cleaning, premium care...">
                 <button type="submit" class="search-btn-alt">Search</button>
             </form>
@@ -539,7 +540,7 @@
                                 </span>
 
                                 <button class="reminder-btn"
-                                        onclick="sendReminder({{ cloth.order_id }})">
+                                        onclick="sendReminder(this, {{ cloth.order_id }})">
                                     <i class="fas fa-bell"></i> Send Reminder
                                 </button>
                             {% else %}
@@ -774,37 +775,43 @@
             }, 5000); // Mark as read after 5 seconds of viewing
         });
         function getCSRFToken() {
-            return document.cookie
-                .split("; ")
-                .find(row => row.startsWith("csrftoken="))
-                ?.split("=")[1];
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value
+                || document.cookie.split('; ')
+                    .find(row => row.startsWith('csrftoken='))
+                    ?.split('=')[1];
         }
-        function sendReminder(orderId) {
+        function sendReminder(btn, orderId) {
             if (!confirm("Send reminder to shop for this delayed order?")) return;
+
+            // ✅ Safe: btn is guaranteed to exist
+            btn.disabled = true;
+            btn.innerHTML = "⏳ Sending...";
 
             fetch(`/send-order-reminder/${orderId}/`, {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": getCSRFToken(),
-                    "Content-Type": "application/json"
                 }
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert("Reminder sent successfully ✅");
+                    btn.innerHTML = "✅ Reminder Sent";
                 } else {
+                    btn.innerHTML = "🔔 Send Reminder";
+                    btn.disabled = false;
                     alert(data.message || "Failed to send reminder");
                 }
             })
             .catch(err => {
                 console.error(err);
+                btn.innerHTML = "🔔 Send Reminder";
+                btn.disabled = false;
                 alert("Something went wrong");
             });
         }
 
+
     </script>
-
-
 </body>
 </html>

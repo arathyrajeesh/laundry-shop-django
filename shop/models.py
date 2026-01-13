@@ -172,7 +172,7 @@ class Order(models.Model):
         ('Pending', 'Pending'),
         ('Completed', 'Completed'),
     ]
-
+    last_reminder_sent = models.DateTimeField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True)
@@ -214,7 +214,9 @@ class Order(models.Model):
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    shop = models.ForeignKey(LaundryShop, null=True, blank=True, on_delete=models.CASCADE)
+
     title = models.CharField(max_length=200)
     message = models.TextField()
     notification_type = models.CharField(max_length=50)
@@ -222,9 +224,6 @@ class Notification(models.Model):
     color = models.CharField(max_length=20, default='#3498db')
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.title}"
 
 class ShopRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
