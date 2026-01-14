@@ -467,17 +467,28 @@ th{
     <div class="sidebar-brand">Bright & Shine</div>
 
     <ul class="nav-menu">
-        <li class="nav-item active" onclick="showSection('dashboard',this)">
-            <a><i class="fas fa-th-large"></i> Dashboard</a>
+        <li class="nav-item active">
+    <a onclick="showSection('dashboard', this.parentElement)">
+        <i class="fas fa-th-large"></i> Dashboard
+            </a>
         </li>
-        <li class="nav-item" onclick="showSection('users',this)">
-            <a><i class="fas fa-users"></i> Users</a>
+
+        <li class="nav-item">
+            <a onclick="showSection('users', this.parentElement)">
+                <i class="fas fa-users"></i> Users
+            </a>
         </li>
-        <li class="nav-item" onclick="showSection('orders',this)">
-            <a><i class="fas fa-list"></i> Orders</a>
+
+        <li class="nav-item">
+            <a onclick="showSection('orders', this.parentElement)">
+                <i class="fas fa-list"></i> Orders
+            </a>
         </li>
-        <li class="nav-item" onclick="showSection('shops',this)">
-            <a><i class="fas fa-store"></i> Shops</a>
+
+        <li class="nav-item">
+            <a onclick="showSection('shops', this.parentElement)">
+                <i class="fas fa-store"></i> Shops
+            </a>
         </li>
         <li class="nav-item">
             <a href="{% url 'logout' %}">
@@ -502,75 +513,74 @@ th{
             <strong>{{ request.user.username }}</strong>
         </div>
     </div>
+    <div id ="dashboard" class="content-section active">
+        <div class="dashboard-section" style="margin-top:30px">
+            <h3 class="section-title">
+                <i class="fas fa-chart-line"></i> Today at a Glance
+            </h3>
 
-    <div class="dashboard-section" style="margin-top:30px">
-        <h3 class="section-title">
-            <i class="fas fa-chart-line"></i> Today at a Glance
-        </h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Orders</h4>
+                    <div class="value">{{ total_orders }}</div>
+                    <div class="icon-circle"><i class="fas fa-shopping-bag"></i></div>
+                </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Total Orders</h4>
-                <div class="value">{{ total_orders }}</div>
-                <div class="icon-circle"><i class="fas fa-shopping-bag"></i></div>
-            </div>
+                <div class="stat-card">
+                    <h4>Total Revenue</h4>
+                    <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
+                    <div class="icon-circle"><i class="fas fa-rupee-sign"></i></div>
+                </div>
 
-            <div class="stat-card">
-                <h4>Total Revenue</h4>
-                <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
-                <div class="icon-circle"><i class="fas fa-rupee-sign"></i></div>
-            </div>
-
-            <div class="stat-card">
-                <h4>Today Revenue</h4>
-                <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
-                <div class="icon-circle"><i class="fas fa-calendar-day"></i></div>
+                <div class="stat-card">
+                    <h4>Today Revenue</h4>
+                    <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
+                    <div class="icon-circle"><i class="fas fa-calendar-day"></i></div>
+                </div>
             </div>
         </div>
-    </div>
     <!-- ================= CHARTS ================= -->
-    <div class="dashboard-section dashboard-charts">
-        <div style="display:flex;gap:8px;margin-bottom:15px">
-            <a href="?range=7{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-            class="btn btn-secondary {% if range_days == 7 %}btn-primary{% endif %}">
-                7 Days
-            </a>
+        <div class="dashboard-section dashboard-charts">
+            <h3 class="section-title">
+                <i class="fas fa-chart-line"></i> Performance Overview
+            </h3>
+            <div style="display:flex;gap:8px;margin-bottom:15px">
+                <a href="?range=7{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                class="btn btn-secondary {% if range_days == 7 %}btn-primary{% endif %}">
+                    7 Days
+                </a>
 
-            <a href="?range=30"
-            class="btn btn-secondary {% if range_days == 30 %}btn-primary{% endif %}">
-                30 Days
-            </a>
+                <a href="?range=30"
+                class="btn btn-secondary {% if range_days == 30 %}btn-primary{% endif %}">
+                    30 Days
+                </a>
 
-            <a href="?range=90"
-            class="btn btn-secondary {% if range_days == 90 %}btn-primary{% endif %}">
-                90 Days
-            </a>
-        </div>
-        <h3 class="section-title">
-            <i class="fas fa-chart-line"></i> Performance Overview
-        </h3>
-
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
-
-            <!-- Revenue Trend -->
-            <div class="table-box">
-                <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
-                    Revenue Trend
-                </h4>
-                <canvas id="revenueChart" height="120"></canvas>
+                <a href="?range=90"
+                class="btn btn-secondary {% if range_days == 90 %}btn-primary{% endif %}">
+                    90 Days
+                </a>
             </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
 
-            <!-- Orders Per Day -->
-            <div class="table-box">
-                <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
-                    Orders Per Day
-                </h4>
-                <canvas id="ordersChart" height="120"></canvas>
+                <!-- Revenue Trend -->
+                <div class="table-box">
+                    <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
+                        Revenue Trend
+                    </h4>
+                    <canvas id="revenueChart" height="120"></canvas>
+                </div>
+
+                <!-- Orders Per Day -->
+                <div class="table-box">
+                    <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
+                        Orders Per Day
+                    </h4>
+                    <canvas id="ordersChart" height="120"></canvas>
+                </div>
+
             </div>
-
         </div>
     </div>
-
     <!-- ===== USER CONTROL ===== -->
     <div id="users" class="content-section">
         <div class="filters">
@@ -835,13 +845,19 @@ th{
 </div>
 
 <script>
-function showSection(id,el){
-    document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+function showSection(id, el) {
+    document.querySelectorAll('.content-section')
+        .forEach(s => s.classList.remove('active'));
 
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const section = document.getElementById(id);
+    if (section) section.classList.add('active');
+
+    document.querySelectorAll('.nav-item')
+        .forEach(n => n.classList.remove('active'));
+
     el.classList.add('active');
 }
+
 function showDelayedOrders() {
     // Switch to Orders tab
     showSection('orders', document.querySelector('.nav-item[onclick*="orders"]'));
@@ -987,45 +1003,56 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ---------- Revenue Trend Chart ---------- */
 const revenueCtx = document.getElementById("revenueChart");
 
-new Chart(revenueCtx, {
-    type: "line",
-    data: {
-        labels: {{ chart_labels|safe }},
-        datasets: [{
-            label: "Revenue (₹)",
-            data: {{ revenue_chart_data|safe }},
-            tension: 0.35,
-            fill: true,
-            backgroundColor: "rgba(45,138,99,0.12)",
-            borderColor: "#2d8a63",
-            borderWidth: 2,
-            pointRadius: 3,
-            pointBackgroundColor: "#2d8a63"
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                callbacks: {
-                    label: ctx => " ₹" + ctx.raw.toFixed(2)
+if (revenueCtx) {
+    const gradient = revenueCtx.getContext("2d").createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, "rgba(45,138,99,0.35)");
+    gradient.addColorStop(1, "rgba(45,138,99,0.05)");
+
+    new Chart(revenueCtx, {
+        type: "line",
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                data: {{ revenue_chart_data|safe }},
+                borderColor: "#2d8a63",
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.45,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: "#2d8a63",
+                pointBorderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: "#0f334b",
+                    padding: 12,
+                    callbacks: {
+                        label: ctx => ` Revenue: ₹${ctx.raw}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: "#6b7280", font: { size: 11 } }
+                },
+                y: {
+                    grid: { color: "#eef2f0" },
+                    ticks: {
+                        color: "#6b7280",
+                        callback: v => "₹" + v
+                    }
                 }
             }
-        },
-        scales: {
-            y: {
-                ticks: {
-                    callback: value => "₹" + value
-                },
-                grid: { color: "#eef2f0" }
-            },
-            x: {
-                grid: { display: false }
-            }
         }
-    }
-});
+    });
+}
 
 /* ---------- Orders Per Day Chart ---------- */
 const ordersCtx = document.getElementById("ordersChart");
