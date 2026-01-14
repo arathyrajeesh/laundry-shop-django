@@ -397,7 +397,9 @@
 
                 <div class="total-row">
                     <span>Total</span>
-                    <span>₹{{ order.amount }}</span>
+                    <span>
+                    ₹{{ order.base_amount|add:order.platform_fee|add:order.delivery_fee|add:order.gst_amount }}
+                    </span>
                 </div>
 
                 <div style="margin-top: 2rem; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
@@ -475,7 +477,7 @@
     function startPayment(method, upiApp = null) {
         const options = {
             key: '{{ razorpay_key_id }}',
-            amount: {{ order.amount|floatformat:0 }} * 100,
+            amount: {{ total_amount }} * 100,
             currency: 'INR',
             name: 'Shine & Bright',
             description: 'Laundry Service Order #{{ order.id }}',

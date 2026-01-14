@@ -1151,20 +1151,28 @@ def create_order(request, shop_id, branch_id):
             shop_id=shop.id,
             branch_id=branch.id
         )
+    base_amount = total_amount
+    platform_fee = settings.PLATFORM_FEE
+    delivery_fee = settings.DELIVERY_FEE
+    gst_amount = 0  # or calculate GST if needed
+
+    final_amount = base_amount + platform_fee + delivery_fee + gst_amount
 
     # ---------- CREATE ORDER ----------
     order = Order.objects.create(
         user=request.user,
         shop=shop,
         branch=branch,
-        base_amount=total_amount,
-        platform_fee=settings.PLATFORM_FEE,
-        delivery_fee=settings.DELIVERY_FEE,
-        gst_amount=0,
-        amount=total_amount,
+        base_amount=base_amount,
+        platform_fee=platform_fee,
+        delivery_fee=delivery_fee,
+        gst_amount=gst_amount,
+        amount=final_amount,   # ✅ MUST BE final_amount
         cloth_status="Pending",
         payment_status="Pending",
     )
+
+
 
     session_items = []
 
@@ -1224,28 +1232,24 @@ def user_details(request):
         form = UserDetailsForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Delivery details saved successfully.')
-            show_payment = True
-            
-            # Get order items from session
-            order_items = request.session.get('order_items', [])
-            total_amount = request.session.get('total_amount', order.amount)
-            
-            # Create Razorpay order
-            shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
-            shop_key_id = order.shop.razorpay_key_id if hasattr(order.shop, 'razorpay_key_id') and order.shop.razorpay_key_id else None
-            shop_key_secret = order.shop.razorpay_key_secret if hasattr(order.shop, 'razorpay_key_secret') and order.shop.razorpay_key_secret else None
 
             try:
-                razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
-                razorpay_order_id = razorpay_order['id']
-                request.session['razorpay_order_id'] = razorpay_order_id
+                total_amount = order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount
 
-                # Store order ID in database for tracking
+                razorpay_order = create_razorpay_order(total_amount)
+                razorpay_order_id = razorpay_order["id"]
+
                 order.razorpay_order_id = razorpay_order_id
                 order.save()
+
+                request.session["razorpay_order_id"] = razorpay_order_id
+                show_payment = True
+
+                messages.success(request, "Delivery details saved. Proceed to payment.")
+
             except Exception as e:
-                messages.error(request, f'Unable to process payment at this time: {str(e)}')
+                show_payment = False
+                messages.error(request, "Payment initialization failed. Try again.")
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -1255,7 +1259,7 @@ def user_details(request):
             show_payment = True
             # Get order items from session
             order_items = request.session.get('order_items', [])
-            total_amount = request.session.get('total_amount', order.amount)
+            total_amount = order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount
             
             # Create Razorpay order if not exists
             if not order.razorpay_order_id:
@@ -1276,7 +1280,7 @@ def user_details(request):
 
     # Get order items and total amount for payment section
     order_items = request.session.get('order_items', [])
-    total_amount = request.session.get('total_amount', order.amount)
+    total_amount = order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount
     
     # If no order_items in session, create a dummy item
     if not order_items:
@@ -1294,14 +1298,14 @@ def user_details(request):
         'order': order,
         'show_payment': show_payment,
         'order_items': order_items,
-        'total_amount': total_amount,
+        'total_amount': order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount,
         'razorpay_order_id': razorpay_order_id,
         'razorpay_key_id': razorpay_key_id,
         'shop': order.shop,
     }
 
     return render(request, 'user_details.html', context)
-    
+
 def create_status_update_notification(user, title, message, notification_type="payment"):
     Notification.objects.create(
         user=user,
@@ -1341,7 +1345,11 @@ def payment_success(request):
         messages.error(request, 'No order found. Please start over.')
         return redirect('dashboard')
 
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(
+        Order,
+        razorpay_order_id=razorpay_order_id,
+        user=request.user
+    )
 
     # ✅ Store payment details
     order.razorpay_payment_id = razorpay_payment_id
