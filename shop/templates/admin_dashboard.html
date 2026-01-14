@@ -5,147 +5,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard</title>
+
 <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+/* ================= RESET & VARIABLES ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
 
 :root{
     --sidebar:#0f334b;
-    --bg:#e9f0eb;
-    --card:#fff;
-    --text-muted:#7a7a7a;
-    --primary-color: #0f334bff;
+    --primary:#2d8a63;
+    --primary-dark:#256f57;
+    --bg:#eef3f1;
+    --card:#ffffff;
 
-}
-.dashboard-section {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    margin-bottom: 30px;
-}
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eef2f0;
+    --text:#1f2937;
+    --text-muted:#6b7280;
+
+    --radius-sm:10px;
+    --radius-md:16px;
+    --radius-lg:22px;
+
+    --shadow-sm:0 4px 12px rgba(0,0,0,0.05);
+    --shadow-md:0 10px 30px rgba(15, 14, 14, 0.06);
 }
 
-.section-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #0f334bff;
-}
-.shop-section {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-    transition: transform 0.3s ease;
-}
-
-.shop-section:hover {
-    transform: translateY(-3px);
-}
-.shop-section h3 {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-}
-
-.status-badge {
-    padding: 4px 12px;
-    font-size: 11px;
-    border-radius: 999px;
-    font-weight: 600;
-}
-
-.status-completed {
-    background: #e6f4ef;
-    color: #2d8a63;
-}
-
-.status-pending {
-    background: #fff4e5;
-    color: #c47a12;
-}
-.shop-section .btn {
-    border-radius: 999px;
-    font-size: 12px;
-    padding: 6px 14px;
-}
-
-.shop-section .btn-primary {
-    background: #2d8a63;
-    border: none;
-}
-
-.shop-section .btn-primary:hover {
-    background: #256f57;
-}
-
-.shop-section .btn-secondary {
-    background: #f1f5f3;
-    color: #444;
-    border: none;
-}
-
-.shop-section .btn-secondary:hover {
-    background: #e5ece9;
-}
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-.data-table thead {
-    background: #f7faf9;
-}
-
-.data-table th {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #7a8f87;
-    padding: 12px;
-}
-
-.data-table td {
-    padding: 12px;
-    font-size: 13px;
-    border-bottom: 1px solid #eef2f0;
-}
-.empty-state {
-    text-align: center;
-    padding: 30px;
-    color: #9aa6a0;
-}
-
-.empty-state i {
-    font-size: 36px;
-    margin-bottom: 10px;
-    color: #cbd5cf;
-}
-
+/* ================= BODY ================= */
 body{
     display:flex;
-    background:var(--bg);
     min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
 }
 
-/* ---------- SIDEBAR ---------- */
+/* ================= SIDEBAR ================= */
 .sidebar{
     width:260px;
-    background:var(--sidebar);
-    color:#fff;
+    background:linear-gradient(180deg,#0f334b,#0b2638);
+    color:white;
     position:fixed;
     height:100vh;
     display:flex;
@@ -155,46 +59,64 @@ body{
 .sidebar-brand{
     padding:30px;
     font-size:22px;
-    font-weight:600;
+    font-weight:700;
+    letter-spacing:.5px;
 }
 
-.nav-menu{list-style:none;flex:1}
+.nav-menu{
+    list-style:none;
+    flex:1;
+}
 
 .nav-item a{
     display:flex;
     align-items:center;
     gap:15px;
-    padding:15px 30px;
+    padding:14px 30px;
     color:rgba(255,255,255,.85);
     text-decoration:none;
+    transition:.25s ease;
     cursor:pointer;
 }
 
+.nav-item a:hover{
+    background:rgba(255,255,255,.08);
+    padding-left:36px;
+}
+
 .nav-item.active a{
-    background:var(--bg);
+    background:white;
     color:var(--sidebar);
     border-radius:40px 0 0 40px;
     margin-left:20px;
     font-weight:600;
+    box-shadow:var(--shadow-sm);
 }
 
 .sidebar-footer{
-    padding:20px;
     text-align:center;
+    padding:20px;
+    font-size:12px;
+    opacity:.8;
 }
 
-/* ---------- MAIN CONTENT ---------- */
+/* ================= MAIN CONTENT ================= */
 .main-content{
     margin-left:260px;
-    padding:40px;
+    padding:35px;
     width:100%;
 }
 
+/* ================= TOP BAR ================= */
 .top-bar{
+    background:white;
+    padding:18px 25px;
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
     display:flex;
     justify-content:space-between;
+    align-items:center;
     margin-bottom:30px;
-    font-size:20px;
 }
 
 .user-info{
@@ -204,43 +126,66 @@ body{
 }
 
 .user-info img{
-    width:36px;
-    height:36px;
+    width:38px;
+    height:38px;
     border-radius:50%;
 }
 
-/* ---------- SECTIONS ---------- */
-.content-section{display:none;animation:fade .3s}
-.content-section.active{display:block}
+/* ================= SECTIONS ================= */
+.content-section{
+    display:none;
+    animation:fade .3s ease;
+}
+
+.content-section.active{
+    display:block;
+}
 
 @keyframes fade{
     from{opacity:0;transform:translateY(6px)}
     to{opacity:1}
 }
 
-/* ---------- DASHBOARD CARDS ---------- */
+/* ================= DASHBOARD CARDS ================= */
 .stats-grid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
     gap:25px;
-    margin-bottom:30px;
 }
 
 .stat-card{
     background:var(--card);
     padding:25px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,.05);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-md);
     position:relative;
+    transition:.25s ease;
 }
 
-.stat-card h4{font-size:14px;color:var(--text-muted)}
-.stat-card .value{font-size:28px;font-weight:700}
+.stat-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 20px 40px rgba(0,0,0,0.08);
+}
+
+.stat-card h4{
+    font-size:13px;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    letter-spacing:.04em;
+}
+
+.stat-card .value{
+    font-size:30px;
+    font-weight:700;
+    margin-top:5px;
+}
+
 .icon-circle{
     position:absolute;
     top:20px;
     right:20px;
-    width:36px;height:36px;
+    width:40px;
+    height:40px;
     background:#eef6f2;
     border-radius:50%;
     display:flex;
@@ -248,210 +193,259 @@ body{
     justify-content:center;
     color:var(--sidebar);
 }
-.btn {
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-    border: none;
-    cursor: pointer;
-    display: inline-block;
+
+/* ================= COMMON UI ================= */
+.dashboard-section{
+    background:var(--card);
+    padding:30px;
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-md);
 }
 
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-#shops .dashboard-section {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-}
-.shops-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-}
-.shop-card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.04);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.section-title{
+    font-size:20px;
+    font-weight:600;
+    margin-bottom:25px;
+    color:var(--sidebar);
 }
 
-.shop-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 32px rgba(0,0,0,0.08);
-}
-.shop-card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color:var(--primary-color);
-    margin-bottom: 10px;
-}
-.filter-select {
-    padding: 10px 40px 10px 15px;
-    font-size: 14px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    background: #fff;
-    color: #333;
-    min-width: 180px;
-    appearance: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23777' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 12px;
+/* ================= BUTTONS ================= */
+.btn{
+    padding:10px 20px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    transition:.25s ease;
 }
 
-.filter-select:hover {
-    border-color: var(--sidebar);
+.btn-primary{
+    background:red;
+    color:white;
 }
 
-.filter-select:focus {
-    outline: none;
-    border-color: var(--sidebar);
-    box-shadow: 0 0 0 2px rgba(45, 138, 99, 0.15);
+.btn-primary:hover{
+    background:var(--primary-dark);
+    transform:translateY(-1px);
 }
 
-.shop-card p {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 6px;
-}
-.shop-card .status {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-top: 8px;
+.btn-secondary{
+    background:#f3f4f6;
+    color:#374151;
 }
 
-.status-open {
-    background: #e6f4ef;
-    color: #2d8a63;
+.btn-secondary:hover{
+    background:#e5e7eb;
 }
 
-.status-closed {
-    background: #fdecea;
-    color: #e74c3c;
+/* ================= FILTERS ================= */
+.filters{
+    background:white;
+    padding:20px;
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-sm);
+    margin-bottom:25px;
 }
 
-.status-approved {
-    background: #e6f4ef;
-    color: #2d8a63;
+.filters form{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
 }
 
-.status-pending-approval {
-    background: #fff4e5;
-    color: #c47a12;
-}
-.shop-card .btn {
-    border-radius: 999px;
-    font-size: 12px;
-    padding: 6px 14px;
-    margin-right: 6px;
+.filters input,
+.filter-select{
+    padding:10px 15px;
+    border-radius:var(--radius-sm);
+    border:1px solid #ddd;
+    font-size:14px;
 }
 
-.shop-card .btn-primary {
-    background: #2d8a63;
-    border: none;
-    color: white;
-}
-
-.shop-card .btn-primary:hover {
-    background: #256f57;
-}
-
-.shop-card .btn-secondary {
-    background: #f1f5f3;
-    color: #374151;
-    border: none;
-}
-
-.shop-card .btn-secondary:hover {
-    background: #e5ece9;
-}
-#shops .empty-state {
-    text-align: center;
-    padding: 40px;
-    color: #9aa6a0;
-}
-
-#shops .empty-state i {
-    font-size: 40px;
-    margin-bottom: 10px;
-    color: #cbd5cf;
-}
-
-.filters {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-}
-
-.filters form {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.filters input {
-    flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-}
-.status-washing {
-    background: #d1ecf1;
-    color: #0c5460;
-}
-
-.status-drying {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-ironing {
-    background: #e2e3e5;
-    color: #383d41;
-}
-
-.status-ready {
-    background: #cce5ff;
-    color: #004085;
-}
-
-.status-completed {
-    background: #e6f4ef;
-    color: #2d8a63;
-}
-
-.status-pending {
-    background: #fff4e5;
-    color: #c47a12;
-}
-
-/* ---------- TABLE ---------- */
+/* ================= TABLE ================= */
 .table-box{
-    background:#fff;
+    background:white;
     padding:25px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,.05);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-md);
 }
 
-table{width:100%;border-collapse:collapse}
-th,td{padding:14px;text-align:left;border-bottom:1px solid #eee}
-th{color:#666;font-size:13px}
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:14px;
+    text-align:left;
+    border-bottom:1px solid #eee;
+}
+
+th{
+    font-size:12px;
+    text-transform:uppercase;
+    color:var(--text-muted);
+}
+
+/* ================= STATUS BADGES ================= */
+.status{
+    padding:4px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.status-open{background:#e6f4ef;color:#2d8a63}
+.status-closed{background:#fdecea;color:#e74c3c}
+.status-approved{background:#e6f4ef;color:#2d8a63}
+.status-pending{background:#fff4e5;color:#c47a12}
+/* ================= MANAGE SHOPS ================= */
+
+#shops .dashboard-section{
+    background:var(--sidebar);
+    padding:24px;
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-sm);
+}
+
+/* ---------- GRID ---------- */
+.shops-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:16px;
+}
+
+/* ---------- SHOP CARD ---------- */
+.shop-card{
+    background:#ffffff;
+    border-radius:var(--radius-sm);
+    padding:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
+    border-left:3px solid white;
+    transition:box-shadow .2s ease, transform .2s ease;
+}
+
+.shop-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+/* ---------- HEADER ---------- */
+.shop-card h3{
+    font-size:14px;
+    font-weight:600;
+    color:var(--sidebar);
+    margin-bottom:6px;
+}
+
+/* ---------- DETAILS ---------- */
+.shop-card p{
+    font-size:12px;
+    color:var(--sidebar);
+    margin-bottom:4px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.shop-card p i{
+    font-size:11px;
+}
+
+/* ---------- STATUS ---------- */
+.shop-card .status{
+    display:inline-flex;
+    align-items:center;
+    padding:3px 10px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:600;
+    margin-top:6px;
+}
+
+/* State colors */
+.status-open{
+    background:#e6f4ef;
+    color:#0f334b;
+}
+
+.status-closed{
+    background:#fdecea;
+    color:#0f334b;
+}
+
+.status-approved{
+    background:#e6f4ef;
+    color:#0f334b;
+}
+
+.status-pending-approval{
+    background:#fff4e5;
+    color:#a16207;
+}
+
+/* ---------- ACTIONS ---------- */
+.shop-card .actions{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #eef2f0;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+/* ---------- BUTTONS ---------- */
+.shop-card .btn{
+    font-size:11px;
+    padding:5px 12px;
+    border-radius:999px;
+    font-weight:600;
+    line-height:1;
+}
+
+.shop-card .btn-primary{
+    background:var(--primary);
+    color:#ffffff;
+}
+
+.shop-card .btn-primary:hover{
+    background:var(--primary-dark);
+}
+
+.shop-card .btn-secondary{
+    background:#f3f4f6;
+    color:#374151;
+}
+
+.shop-card .btn-secondary:hover{
+    background:#e5e7eb;
+}
+
+/* ---------- EMPTY ---------- */
+#shops .empty-state{
+    text-align:center;
+    padding:40px 20px;
+    color:#9aa6a0;
+}
+
+#shops .empty-state i{
+    font-size:34px;
+    margin-bottom:8px;
+    color:#cbd5cf;
+}
+
+.section-title{
+    font-size:20px;
+    font-weight:600;
+    margin-bottom:25px;
+    color:var(--sidebar);
+}
+.section-titles{
+    font-size:20px;
+    font-weight:600;
+    margin-bottom:25px;
+    color:white;
+}
 </style>
 </head>
 
@@ -459,87 +453,48 @@ th{color:#666;font-size:13px}
 
 <!-- ================= SIDEBAR ================= -->
 <div class="sidebar">
-    <div class="sidebar-brand">Bright and Shine</div>
+    <div class="sidebar-brand">Bright & Shine</div>
 
     <ul class="nav-menu">
         <li class="nav-item active" onclick="showSection('dashboard',this)">
-            <a>
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard</span>
-            </a>
+            <a><i class="fas fa-th-large"></i> Dashboard</a>
         </li>
-
         <li class="nav-item" onclick="showSection('users',this)">
-            <a>
-                <i class="fas fa-user-friends"></i>
-                <span>User Control</span>
-            </a>
+            <a><i class="fas fa-users"></i> Users</a>
         </li>
-
-        <li class="nav-item" onclick="showSection('access',this)">
-            <a>
-                <i class="fas fa-key"></i>
-                <span>Access Request</span>
-            </a>
+        <li class="nav-item" onclick="showSection('orders',this)">
+            <a><i class="fas fa-list"></i> Orders</a>
         </li>
-
-        <!-- ✅ FIXED MANAGE SHOPS -->
         <li class="nav-item" onclick="showSection('shops',this)">
-            <a>
-                <i class="fas fa-store"></i>
-                <span>Manage Shops</span>
-            </a>
+            <a><i class="fas fa-store"></i> Shops</a>
         </li>
-
-        <li class="nav-item" onclick="showSection('orders', this)">
-            <a>
-                <i class="fas fa-list-alt"></i>
-                <span>Orders</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="/admin/" target="_blank">
-                <i class="fas fa-cog"></i>
-                <span>Django Admin</span>
-            </a>
-        </li>
-
         <li class="nav-item">
             <a href="{% url 'logout' %}">
-                <i class="fas fa-power-off"></i>
-                <span>Quit</span>
+                <i class="fas fa-power-off"></i> Logout
             </a>
         </li>
     </ul>
 
-
     <div class="sidebar-footer">
         <i class="fas fa-headset"></i>
-        <p style="font-size:11px">24/7 Support</p>
+        <p>24/7 Support</p>
     </div>
 </div>
 
-<!-- ================= MAIN CONTENT ================= -->
+<!-- ================= MAIN ================= -->
 <div class="main-content">
 
     <div class="top-bar">
         <h3>Admin Panel</h3>
         <div class="user-info">
-            <img 
-            src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0f334b&color=ffffff" 
-            alt="User Avatar"
-            >
+            <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0f334b&color=fff">
             <strong>{{ request.user.username }}</strong>
         </div>
     </div>
 
-    <!-- ===== DASHBOARD ===== -->
+    <!-- DASHBOARD -->
     <div id="dashboard" class="content-section active">
-
-        <!-- ================= STATISTICS GRID ================= -->
         <div class="stats-grid">
-
             <div class="stat-card">
                 <h4>Total Orders</h4>
                 <div class="value">{{ total_orders }}</div>
@@ -553,37 +508,12 @@ th{color:#666;font-size:13px}
             </div>
 
             <div class="stat-card">
-                <h4>Today's Revenue</h4>
+                <h4>Today Revenue</h4>
                 <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
                 <div class="icon-circle"><i class="fas fa-calendar-day"></i></div>
             </div>
-
-            <div class="stat-card">
-                <h4>Total Shops</h4>
-                <div class="value">{{ total_shops }}</div>
-                <div class="icon-circle"><i class="fas fa-store"></i></div>
-            </div>
-
-            <div class="stat-card">
-                <h4>Pending Approvals</h4>
-                <div class="value" style="color:#e74c3c">{{ pending_approvals }}</div>
-                <div class="icon-circle">
-                    <i class="fas fa-hourglass-half"></i>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <h4>Delayed Orders</h4>
-                <div class="value" style="color:#e74c3c">{{ delayed_orders_count }}</div>
-                <div class="icon-circle"><i class="fas fa-exclamation-triangle"></i></div>
-            </div>
-
         </div>
-        <!-- ================= END STATISTICS GRID ================= -->
-
     </div>
-
-
     <!-- ===== USER CONTROL ===== -->
     <div id="users" class="content-section">
         <div class="filters">
@@ -618,8 +548,8 @@ th{color:#666;font-size:13px}
 
         <div class="dashboard-section">
             <div class="section-header">
-                <h2 style="margin-bottom:20px;color:var(--sidebar)">
-                                <i class="fas fa-list-alt"></i> All Orders
+                <h2 class="section-title">
+                    <i class="fas fa-list-alt"></i> All Orders
                 </h2>
             </div>
 
@@ -672,7 +602,10 @@ th{color:#666;font-size:13px}
 
         <div class="dashboard-section">
             <div class="section-header">
-                <h2 style="margin-bottom:20px;color:var(--sidebar)"><i class="fas fa-store"></i> Shops and Branches</h2>
+                <h2 class="section-title">
+                    <i class="fas fa-store"></i>
+                    Shops and Branches
+                </h2>
             </div>
 
             {% if shops_with_branches %}
@@ -772,10 +705,9 @@ th{color:#666;font-size:13px}
 
         </div>
     </div>
-
     <div id="shops" class="content-section">
         <div class="dashboard-section">
-            <h2 style="margin-bottom:20px;color:var(--sidebar)">
+            <h2 class="section-titles">
                 <i class="fas fa-store"></i> Manage Shops
             </h2>
 
@@ -806,7 +738,7 @@ th{color:#666;font-size:13px}
                         </span>
                     </div>
 
-                    <div style="margin-top:15px">
+                    <div class="actions">
                         {% if not shop.is_approved %}
                         <button onclick="approveShop({{ shop.id }})"
                                 class="btn btn-primary"
@@ -843,16 +775,14 @@ th{color:#666;font-size:13px}
 
 
     </div>
+</div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
 function showSection(id,el){
-    document.querySelectorAll('.content-section')
-        .forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 
-    document.querySelectorAll('.nav-item')
-        .forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     el.classList.add('active');
 }
 function showDelayedOrders() {
@@ -980,7 +910,23 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+document.addEventListener("DOMContentLoaded", function () {
 
+    const hash = window.location.hash;
+
+    if (hash === "#shops") {
+
+        // Find the sidebar item safely
+        const shopsNavItem = [...document.querySelectorAll(".nav-item")]
+            .find(item => item.getAttribute("onclick")?.includes("shops"));
+
+        if (shopsNavItem && typeof showSection === "function") {
+            showSection("shops", shopsNavItem);
+        }
+    }
+
+});
 </script>
+
 </body>
-</html> 
+</html>

@@ -212,7 +212,7 @@
             <h1><i class="fas fa-store"></i> Merchant Administration</h1>
         </div>
         <nav>
-            <a href="{% url 'admin_shops' %}" class="btn btn-outline">
+            <a href="{% url 'admin_dashboard' %}#shops" class="btn btn-outline">
                 <i class="fas fa-chevron-left"></i> Back to List
             </a>
         </nav>
@@ -301,14 +301,6 @@
         document.querySelectorAll('input, select, textarea').forEach(element => {
             if (element.type !== 'checkbox') {
                 element.classList.add('form-control');
-            }
-        });
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.location.hash === "#shops") {
-                const shopsNav = document.querySelector(".nav-item[onclick*='shops']");
-                if (shopsNav) {
-                    showSection('shops', shopsNav);
-                }
             }
         });
     </script>

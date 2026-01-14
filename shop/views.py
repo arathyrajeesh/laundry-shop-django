@@ -2069,7 +2069,7 @@ def admin_edit_shop(request, shop_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Shop updated successfully.')
-            return redirect('admin_dashboard')
+            return redirect(f"{reverse('admin_dashboard')}#shops")
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
