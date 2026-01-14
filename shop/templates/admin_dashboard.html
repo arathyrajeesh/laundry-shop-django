@@ -856,7 +856,15 @@ function showSection(id, el) {
         .forEach(n => n.classList.remove('active'));
 
     el.classList.add('active');
+
+    // 🔥 Fix Chart.js resize when dashboard becomes visible
+    setTimeout(() => {
+        if (window.Chart) {
+            Object.values(Chart.instances).forEach(chart => chart.resize());
+        }
+    }, 200);
 }
+
 
 function showDelayedOrders() {
     // Switch to Orders tab
