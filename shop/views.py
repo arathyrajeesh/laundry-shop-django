@@ -2453,7 +2453,7 @@ def shop_dashboard(request):
             'average_rating': branch_average_rating,
             'total_ratings': branch_ratings.count(),
         })
-# =====================
+
         # 🔔 SHOP NOTIFICATIONS (DICT ONLY)
         # =====================
         shop_notifications = [] 

@@ -785,7 +785,7 @@
 
             // ✅ Safe: btn is guaranteed to exist
             btn.disabled = true;
-            btn.innerHTML = "⏳ Sending...";
+            btn.innerHTML = " Sending...";
 
             fetch(`/send-order-reminder/${orderId}/`, {
                 method: "POST",
