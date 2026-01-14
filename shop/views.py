@@ -1373,33 +1373,44 @@ def payment_success(request):
     )
     
     # =========================
-# 🤖 AI DELIVERY PREDICTION
-# =========================
+    # 🤖 AI DELIVERY PREDICTION (FIXED)
+    # =========================
 
-# 1️⃣ Calculate branch workload (active paid orders)
-    # 🤖 AI DELIVERY PREDICTION
     branch_load = Order.objects.filter(
         branch=order.branch,
         payment_status="Completed",
         cloth_status__in=["Pickup", "Washing", "Drying", "Ironing"]
     ).count()
 
-    items_count = sum(
-        item.quantity for item in order.order_items.all()
-    )
+    total_hours = 0
+    total_items = 0
 
-    first_item = order.order_items.first()
-
-    if first_item:
-        predicted_hours = predict_delivery_hours(
-            cloth=first_item.cloth.name,
-            service=first_item.service.name,
+    for item in order.order_items.all():
+        hours = predict_delivery_hours(
+            cloth=item.cloth.name,
+            service=item.service.name,
             branch_load=branch_load,
-            items=items_count
+            items=item.quantity
         )
 
-        order.predicted_delivery = timezone.now() + timedelta(hours=predicted_hours)
-        order.save()
+        total_hours += hours * item.quantity
+        total_items += item.quantity
+
+    # SAFETY CHECK
+    if total_items > 0:
+        predicted_hours = round(total_hours / total_items)
+    else:
+        predicted_hours = 24  # fallback
+
+    # 🕒 Add buffer (realistic)
+    predicted_hours += 2
+
+    # ⏱ Normalize time (clean UI)
+    delivery_time = timezone.now() + timedelta(hours=predicted_hours)
+    delivery_time = delivery_time.replace(minute=0, second=0, microsecond=0)
+
+    order.predicted_delivery = delivery_time
+    order.save()
 
 
     # 📄 Prepare order items for PDF
