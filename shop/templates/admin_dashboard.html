@@ -9,6 +9,7 @@
 <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 /* ================= RESET & VARIABLES ================= */
@@ -446,6 +447,16 @@ th{
     margin-bottom:25px;
     color:white;
 }
+.dashboard-charts{
+    margin-top:30px;
+}
+
+.dashboard-charts .range-toggle{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+}
+
 </style>
 </head>
 
@@ -492,8 +503,11 @@ th{
         </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="content-section active">
+    <div class="dashboard-section" style="margin-top:30px">
+        <h3 class="section-title">
+            <i class="fas fa-chart-line"></i> Today at a Glance
+        </h3>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <h4>Total Orders</h4>
@@ -503,7 +517,7 @@ th{
 
             <div class="stat-card">
                 <h4>Total Revenue</h4>
-                <div class="value">₹{{ total_revenue|floatformat:2 }}</div>
+                <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
                 <div class="icon-circle"><i class="fas fa-rupee-sign"></i></div>
             </div>
 
@@ -514,6 +528,49 @@ th{
             </div>
         </div>
     </div>
+    <!-- ================= CHARTS ================= -->
+    <div class="dashboard-section dashboard-charts">
+        <div style="display:flex;gap:8px;margin-bottom:15px">
+            <a href="?range=7{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+            class="btn btn-secondary {% if range_days == 7 %}btn-primary{% endif %}">
+                7 Days
+            </a>
+
+            <a href="?range=30"
+            class="btn btn-secondary {% if range_days == 30 %}btn-primary{% endif %}">
+                30 Days
+            </a>
+
+            <a href="?range=90"
+            class="btn btn-secondary {% if range_days == 90 %}btn-primary{% endif %}">
+                90 Days
+            </a>
+        </div>
+        <h3 class="section-title">
+            <i class="fas fa-chart-line"></i> Performance Overview
+        </h3>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+
+            <!-- Revenue Trend -->
+            <div class="table-box">
+                <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
+                    Revenue Trend
+                </h4>
+                <canvas id="revenueChart" height="120"></canvas>
+            </div>
+
+            <!-- Orders Per Day -->
+            <div class="table-box">
+                <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
+                    Orders Per Day
+                </h4>
+                <canvas id="ordersChart" height="120"></canvas>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ===== USER CONTROL ===== -->
     <div id="users" class="content-section">
         <div class="filters">
@@ -926,6 +983,82 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+
+/* ---------- Revenue Trend Chart ---------- */
+const revenueCtx = document.getElementById("revenueChart");
+
+new Chart(revenueCtx, {
+    type: "line",
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: "Revenue (₹)",
+            data: {{ revenue_chart_data|safe }},
+            tension: 0.35,
+            fill: true,
+            backgroundColor: "rgba(45,138,99,0.12)",
+            borderColor: "#2d8a63",
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: "#2d8a63"
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => " ₹" + ctx.raw.toFixed(2)
+                }
+            }
+        },
+        scales: {
+            y: {
+                ticks: {
+                    callback: value => "₹" + value
+                },
+                grid: { color: "#eef2f0" }
+            },
+            x: {
+                grid: { display: false }
+            }
+        }
+    }
+});
+
+/* ---------- Orders Per Day Chart ---------- */
+const ordersCtx = document.getElementById("ordersChart");
+
+new Chart(ordersCtx, {
+    type: "bar",
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: "Orders",
+            data: {{ orders_chart_data|safe }},
+            backgroundColor: "#0f334b",
+            borderRadius: 6,
+            maxBarThickness: 28
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: "#eef2f0" }
+            },
+            x: {
+                grid: { display: false }
+            }
+        }
+    }
+});
+
 </script>
 
 </body>

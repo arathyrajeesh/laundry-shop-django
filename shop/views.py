@@ -7,6 +7,9 @@ from .payment_utils import (
     calculate_commission,
     get_razorpay_client,
 )
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Sum, Count
 from shop.utils.wash_ai import get_wash_recommendation
 from .models import WashRecommendation
 from datetime import timedelta
@@ -1591,6 +1594,39 @@ def admin_dashboard(request):
     today_revenue = paid_orders.filter(
         created_at__date=today
     ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    # =====================
+    # 📅 DATE RANGE (7 / 30 / 90)
+    # =====================
+    try:
+        range_days = int(request.GET.get("range", 7))
+        if range_days not in [7, 30, 90]:
+            range_days = 7
+    except ValueError:
+        range_days = 7
+
+    # =====================
+    # 📈 CHART DATA (DYNAMIC RANGE)
+    # =====================
+    chart_labels = []
+    revenue_chart_data = []
+    orders_chart_data = []
+
+    for i in range(range_days - 1, -1, -1):
+        day = today - timedelta(days=i)
+        chart_labels.append(day.strftime("%b %d"))
+
+        daily_revenue = paid_orders.filter(
+            created_at__date=day
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        daily_orders = paid_orders.filter(
+            created_at__date=day
+        ).count()
+
+        revenue_chart_data.append(float(daily_revenue))
+        orders_chart_data.append(daily_orders)
+
 
     # =====================
     # 👤 USERS
@@ -1684,9 +1720,14 @@ def admin_dashboard(request):
 
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
+        'chart_labels': chart_labels,
+        'revenue_chart_data': revenue_chart_data,
+        'orders_chart_data': orders_chart_data,
+        'range_days': range_days,
     }
 
     return render(request, 'admin_dashboard.html', context)
+
 def admin_user_search(request):
     query = request.GET.get("q", "")
 
