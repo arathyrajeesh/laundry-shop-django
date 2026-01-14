@@ -866,19 +866,6 @@ def notifications_view(request):
 
 
 @login_required
-def mark_notifications_read(request):
-    if request.method == "POST":
-        Notification.objects.filter(
-            user=request.user,
-            is_read=False
-        ).update(is_read=True)
-
-        return JsonResponse({"status": "ok"})
-
-    return JsonResponse({"status": "invalid"}, status=400)
-
-
-@login_required
 @require_POST
 def mark_notification_read(request, notification_id):
     """Mark a single notification as read."""
@@ -1219,7 +1206,7 @@ def create_order(request, shop_id, branch_id):
 @login_required
 def user_details(request):
     """Collect user delivery details and show payment section."""
-    order_id = request.session.get('order_id')
+    order_id = request.GET.get('order_id') or request.session.get('order_id')
     if not order_id:
         messages.error(request, 'No order found. Please start over.')
         return redirect('dashboard')
@@ -1344,6 +1331,7 @@ def payment_success(request):
     if not order_id:
         messages.error(request, 'No order found. Please start over.')
         return redirect('dashboard')
+
 
     order = get_object_or_404(
         Order,
@@ -1482,67 +1470,25 @@ Shine & Bright Team
 
 @login_required
 def payment_failed(request):
-    """Handle failed payment."""
+    """Handle failed payment (ALLOW RETRY)."""
+
     order_id = request.session.get('order_id')
-    order = None
     if order_id:
         order = get_object_or_404(Order, id=order_id, user=request.user)
 
-        # Send payment failure email
-        payment_failure_message = f"""
-Hi {order.user.get_full_name() or order.user.username},
+        # ✅ KEEP ORDER, JUST MARK PAYMENT FAILED
+        order.payment_status = "Pending"
+        order.cloth_status = "Pending"
+        order.save()
 
-We regret to inform you that your payment for Order #{order.id} could not be processed at this time.
-
-Order Details:
-- Order ID: #{order.id}
-- Shop: {order.shop.name}
-- Amount: ₹{order.amount}
-
-Possible reasons for payment failure:
-- Insufficient funds in your account
-- Payment gateway issues
-- Network connectivity problems
-- Card/payment method declined
-
-You can try placing your order again or contact our support team for assistance.
-
-For your security, please ensure:
-- Your payment method has sufficient funds
-- Your internet connection is stable
-- Your payment details are entered correctly
-
-Thank you for choosing Shine & Bright!
-
-Best regards,
-Shine & Bright Team
-🧺✨
-"""
-
-        try:
-            send_mail(
-                subject=f"Payment Failed - Order #{order.id}",
-                message=payment_failure_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[order.user.email],
-                fail_silently=True,
-            )
-        except Exception as e:
-            # Log the error but don't fail the payment failure process
-            print(f"Failed to send payment failure email: {e}")
-
-        # Delete the order since payment failed
-        order.delete()
-
-    # Clear session
-    request.session.pop('order_items', None)
-    request.session.pop('order_id', None)
-    request.session.pop('shop_id', None)
+    # 🧹 Clear payment session only
     request.session.pop('razorpay_order_id', None)
 
-    messages.error(request, 'Payment failed. Please try again.')
-    return redirect('dashboard')
-
+    messages.error(
+        request,
+        "Payment failed. You can continue payment from My Orders."
+    )
+    return redirect('orders')
 
 # --- ADMIN DASHBOARD VIEWS ---
 
@@ -2727,7 +2673,11 @@ def shop_update_order_status(request, order_id):
     order.save()
 
     # 🔔 Create notification for user
-    create_status_update_notification(order, new_status)
+    create_status_update_notification(
+        user=order.user,
+        title="Order Status Updated",
+        message=f"Your Order #{order.id} status changed to {new_status}."
+    )
 
     # 📧 Send notification emails
     try:
@@ -3291,7 +3241,11 @@ def update_order_status(request, order_id):
     order.save()
 
     # Create notification for user
-    create_status_update_notification(order, new_status)
+    create_status_update_notification(
+        user=order.user,
+        title="Order Status Updated",
+        message=f"Your Order #{order.id} status changed to {new_status}."
+    )
 
     return JsonResponse({
         "success": True
