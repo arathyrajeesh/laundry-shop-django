@@ -122,6 +122,68 @@
             font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
         }
         @media (max-width: 1024px) { .right-panel { display: none; } .left-panel { width: 100%; } }
+        /* ===============================
+        RESPONSIVE LOGIN BACKGROUND
+        =============================== */
+
+        @media (max-width: 1024px) {
+            .page-wrapper {
+                background: 
+                    linear-gradient(
+                        rgba(15, 51, 75, 0.85),
+                        rgba(15, 51, 75, 0.85)
+                    ),
+                    url("{% static 'images/login.webp' %}") center/cover no-repeat;
+                    min-height: 100vh;   /* instead of fixed height */
+                    height: auto;
+                    overflow-y: auto;
+            }
+
+            .right-panel {
+                display: none; /* hide right panel */
+            }
+
+            .left-panel {
+                width: 100%;
+                background: transparent;
+                padding: 30px 20px;
+            }
+
+            .login-box {
+                background: white;
+                padding: 32px 28px;
+                border-radius: 16px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            }
+        }
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 26px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .login-btn {
+                padding: 13px;
+                font-size: 14px;
+            }
+        }
+        @media (max-width: 480px) {
+            .login-box {
+                max-width: 100%;
+                width: 100%;
+                padding: 28px 22px;
+            }
+            .left-panel {
+                justify-content: center;
+                padding: 20px 16px;
+            }
+            .page-wrapper {
+                min-height: 100svh;   /* ✅ iOS safe viewport */
+            }
+        }
     </style>
 </head>
 
