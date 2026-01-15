@@ -101,7 +101,14 @@
         .login-btn:hover { background: #1a4a6b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15, 51, 75, 0.2); }
 
         /* --- FOOTER LINKS --- */
-        .combined-links { margin-top: 32px; padding-top: 24px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 14px; }
+/* Desktop: combined links in one line */
+        .combined-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 24px;   /* 👈 space from login button */
+            gap: 12px;
+        }
         .combined-links a { color: var(--indigo); font-weight: 700; text-decoration: none; }
         .divider { color: #e2e8f0; margin: 0 8px; }
 
@@ -168,9 +175,6 @@
             }
             .page-wrapper {
                 min-height: 100svh;   /* ✅ iOS safe viewport */
-                }
-            .combined-links {
-                font-size: 12px;      /* overall text smaller */
             }
 
             .combined-links a {
@@ -193,14 +197,6 @@
                 padding: 13px;
                 font-size: 14px;
             }
-            .mobile-grid {
-                display: grid;
-                grid-template-columns: 1fr auto 1fr;
-                align-items: center;
-                gap: 12px;
-                text-align: center;
-                font-size: 13px;
-            }
 
             .link-col {
                 display: flex;
@@ -220,6 +216,44 @@
 
             .divider {
                 color: #cbd5e1;
+            }
+        }
+        @media (max-width: 480px) {
+            .combined-links {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                grid-template-areas:
+                    "signup divider shop"
+                    "signup-link divider shop-link";
+                gap: 10px;
+                text-align: center;
+                font-size: 13px;
+                margin-top: 28px;
+            }
+
+            .signup { grid-area: signup; }
+            .shop { grid-area: shop; }
+
+            .signup a { grid-area: signup-link; }
+            .shop a { grid-area: shop-link; }
+
+            .divider {
+                grid-area: divider;
+                color: #cbd5e1;
+            }
+
+            .link-col {
+                display: contents; /* magic ✨ */
+            }
+
+            .link-col span {
+                color: #475569;
+                font-size: 13px;
+            }
+
+            .link-col a {
+                font-weight: 700;
+                font-size: 14px;
             }
         }
 
@@ -272,15 +306,15 @@
                 <button type="submit" class="login-btn">Sign in to Account</button>
             </form>
 
-            <div class="combined-links mobile-grid">
-                <div class="link-col">
+            <div class="combined-links">
+                <div class="link-col signup">
                     <span>Don’t have an account?</span>
                     <a href="{% url 'signup' %}">Sign up</a>
                 </div>
 
                 <span class="divider">|</span>
 
-                <div class="link-col">
+                <div class="link-col shop">
                     <span>Shop Owner?</span>
                     <a href="{% url 'shop_splash' %}">Login here</a>
                 </div>
