@@ -157,20 +157,6 @@
             }
         }
         @media (max-width: 480px) {
-            h2 {
-                font-size: 26px;
-            }
-
-            .subtitle {
-                font-size: 13px;
-            }
-
-            .login-btn {
-                padding: 13px;
-                font-size: 14px;
-            }
-        }
-        @media (max-width: 480px) {
             .login-box {
                 max-width: 100%;
                 width: 100%;
@@ -182,8 +168,61 @@
             }
             .page-wrapper {
                 min-height: 100svh;   /* ✅ iOS safe viewport */
+                }
+            .combined-links {
+                font-size: 12px;      /* overall text smaller */
+            }
+
+            .combined-links a {
+                font-size: 12px;      /* links smaller */
+                font-weight: 600;     /* slightly lighter */
+            }
+
+            .divider {
+                margin: 0 6px;
+            }
+                        h2 {
+                font-size: 26px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .login-btn {
+                padding: 13px;
+                font-size: 14px;
+            }
+            .mobile-grid {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+                gap: 12px;
+                text-align: center;
+                font-size: 13px;
+            }
+
+            .link-col {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .link-col span {
+                color: #475569;
+                font-size: 13px;
+            }
+
+            .link-col a {
+                font-weight: 700;
+                font-size: 14px;
+            }
+
+            .divider {
+                color: #cbd5e1;
             }
         }
+
     </style>
 </head>
 
@@ -233,10 +272,18 @@
                 <button type="submit" class="login-btn">Sign in to Account</button>
             </form>
 
-            <div class="combined-links">
-                Don’t have an account? <a href="{% url 'signup' %}">Sign up</a>
+            <div class="combined-links mobile-grid">
+                <div class="link-col">
+                    <span>Don’t have an account?</span>
+                    <a href="{% url 'signup' %}">Sign up</a>
+                </div>
+
                 <span class="divider">|</span>
-                Shop Owner? <a href="{% url 'shop_splash' %}">Login here</a>
+
+                <div class="link-col">
+                    <span>Shop Owner?</span>
+                    <a href="{% url 'shop_splash' %}">Login here</a>
+                </div>
             </div>
         </div>
     </div>
