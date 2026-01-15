@@ -219,6 +219,79 @@
             font-size: 13px;
             margin-bottom: 20px;
         }
+        /* ===============================
+        RESPONSIVE – SHOP REGISTRATION
+        ================================ */
+
+        /* Tablets */
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 36px;
+                max-width: 94%;
+                border-radius: 18px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+                min-height: 100svh; /* iOS safe viewport */
+                align-items: flex-start;
+            }
+
+            .register-container {
+                padding: 28px 22px;
+                border-radius: 16px;
+                width: 100%;
+            }
+
+            .logo {
+                width: 56px;
+                height: 56px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            label {
+                font-size: 12px;
+            }
+
+            input {
+                font-size: 14px;
+                padding: 11px 13px;
+            }
+
+            button[type="submit"],
+            #detectLocationBtn {
+                font-size: 14px;
+                padding: 13px;
+            }
+
+            #locationStatus {
+                font-size: 12px;
+            }
+
+            .footer-text {
+                font-size: 12px;
+                margin-top: 18px;
+            }
+        }
+
     </style>
 
 </head>
