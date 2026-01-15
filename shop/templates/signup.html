@@ -24,9 +24,18 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
 
-        body { background: var(--bg-soft); color: var(--text-main); height: 100vh; overflow: hidden; }
+        body {
+            background: var(--bg-soft);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        .page-wrapper { display: flex; height: 100vh; width: 100%; }
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
 
         /* --- LEFT PANEL: BRANDING --- */
         .left-panel {
@@ -108,6 +117,65 @@
         @media (max-width: 900px) {
             .left-panel { display: none; }
             .right-panel { width: 100%; }
+        }
+
+
+        @media (max-width: 900px) {
+            .page-wrapper {
+                background:
+                    linear-gradient(
+                        rgba(12, 15, 45, 0.85),
+                        rgba(12, 15, 45, 0.85)
+                    ),
+                    url("{% static 'images/login.webp' %}") center / cover no-repeat;
+
+                min-height: 100svh;   /* iOS safe */
+                height: auto;
+                flex-direction: column;
+            }
+
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                width: 100%;
+                background: transparent;
+                padding: 30px 20px;
+
+                /* ✅ THIS IS THE KEY PART */
+                min-height: 100svh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .signup-box {
+                background: white;
+                max-width: 100%;
+                width: 100%;
+                padding: 32px 26px;
+                border-radius: 18px;
+                box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+            }
+        }
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 26px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            button[type="submit"] {
+                font-size: 14px;
+                padding: 13px;
+            }
+
+            .signup-box {
+                padding: 28px 22px;
+            }
         }
     </style>
 </head>
