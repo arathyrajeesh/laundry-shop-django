@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Settings | Shine & Bright</title>
+    <title>Edit Profile | Shine & Bright</title>
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,8 +12,8 @@
 
     <style>
         :root {
-            --primary-orange: #0f172a;
-            --primary-orange-light: #fff5eb;
+            --primary: #0f172a;
+            --accent: #3b82f6;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --bg-body: #f8fafc;
@@ -23,17 +23,16 @@
             --shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background: var(--bg-body);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
+            display: flex;
+            justify-content: center;
         }
 
         .dashboard-container {
@@ -45,35 +44,71 @@
             overflow: hidden;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
+            height: fit-content;
         }
 
-        /* Sidebar Style */
+        /* --- Sidebar Redesign --- */
         .sidebar {
-            width: 280px;
+            width: 300px;
             background: #fff;
             border-right: 1px solid var(--border);
-            padding: 40px 20px;
             display: flex;
             flex-direction: column;
         }
 
-        .avatar-container { text-align: center; margin-bottom: 25px; }
-        .avatar-wrapper { position: relative; display: inline-block; margin-bottom: 12px; }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #f1f5f9; }
-        .avatar-btn { position: absolute; bottom: 2px; right: 2px; background: var(--primary-orange); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; font-size: 12px; }
-        
-        .user-name { font-weight: 700; font-size: 1.1rem; color: var(--primary-orange); }
-        .user-role { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
-
-        .side-nav { width: 100%; margin-top: 25px; }
-        
-        /* New Dashboard Back Link in Sidebar */
-        .nav-home {
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 15px;
-            padding-bottom: 15px;
+        /* Professional Profile Branding (Mirrors Profile Page) */
+        .sidebar-header {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--primary) 50%, #fff 50%);
         }
 
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .avatar-fallback {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--accent);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: 0.2s;
+        }
+
+        .sidebar-info h2 { font-size: 1.1rem; font-weight: 700; margin-top: 15px; color: var(--primary); }
+        .sidebar-info p { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        .side-nav { padding: 20px; }
         .nav-item {
             display: flex;
             align-items: center;
@@ -81,93 +116,73 @@
             text-decoration: none;
             color: var(--text-muted);
             border-radius: 10px;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             font-weight: 500;
             font-size: 14px;
             transition: 0.2s;
         }
+        .nav-item i { margin-right: 12px; width: 20px; text-align: center; }
+        .nav-item:hover, .nav-item.active { background: #f1f5f9; color: var(--primary); }
+        .nav-item.active { background: #eff6ff; color: var(--accent); }
 
-        .nav-item i { margin-right: 12px; width: 20px; font-size: 16px; }
-        .nav-item:hover { background: #f1f5f9; color: var(--primary-orange); }
-        .nav-item.active { background: var(--primary-orange-light); color: var(--primary-orange); }
+        /* --- Main Content --- */
+        .main-content { flex: 1; padding: 40px; }
+        .main-content h1 { font-size: 24px; font-weight: 700; margin-bottom: 30px; }
 
-        /* Main Content Style */
-        .main-content { flex: 1; padding: 50px; }
-
-        /* Professional Top Back Button */
-        .btn-back-link {
-            display: inline-flex;
-            align-items: center;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: 0.2s;
-        }
-        .btn-back-link:hover { color: var(--primary-orange); }
-        .btn-back-link i { margin-right: 8px; font-size: 10px; }
-
-        .main-content h1 { font-size: 26px; font-weight: 700; color: var(--primary-orange); margin-bottom: 30px; letter-spacing: -0.02em; }
-
-        /* Grid Layout for Form */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .full-width { grid-column: span 2; }
-        .section-label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+        
+        .form-section label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
 
         .form-input {
             width: 100%;
             background: var(--input-bg);
             border: 1px solid var(--border);
-            padding: 14px 18px;
+            padding: 12px 15px;
             border-radius: 10px;
             font-size: 14px;
             transition: 0.2s;
-            color: var(--text-main);
         }
 
-        .form-input:focus {
-            outline: none;
-            background: #fff;
-            border-color: var(--primary-orange);
-            box-shadow: 0 0 0 4px rgba(242, 129, 0, 0.1);
-        }
+        .form-input:focus { border-color: var(--accent); outline: none; background: #fff; }
 
-        /* Location Utility */
         .util-card {
             background: #f8fafc;
             border: 1px dashed var(--border);
+            padding: 20px;
             border-radius: 15px;
-            padding: 24px;
             margin: 25px 0;
             grid-column: span 2;
         }
 
-        .btn-detect {
-            background: var(--primary-orange);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            margin-top: 12px;
-            transition: 0.2s;
-        }
-        .btn-detect:hover { background: #1e293b; }
-
-        /* Bottom Buttons */
         .footer-actions { display: flex; gap: 15px; margin-top: 30px; }
-        .discard-btn { flex: 1; padding: 16px; background: #fff; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; font-weight: 600; text-align: center; text-decoration: none; transition: 0.2s; }
-        .discard-btn:hover { background: #f1f5f9; color: var(--primary-orange); }
-        .submit-btn { flex: 2; background: var(--primary-orange); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .submit-btn:hover { background: #260f3fff; transform: translateY(-1px); }
+        .submit-btn { flex: 2; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .discard-btn { flex: 1; padding: 15px; background: #fff; border: 1px solid var(--border); text-align: center; text-decoration: none; color: var(--text-muted); border-radius: 12px; font-weight: 600; }
 
-        @media (max-width: 900px) {
+        /* --- Responsive Queries --- */
+        @media (max-width: 992px) {
             .dashboard-container { flex-direction: column; }
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+            .sidebar-header { padding: 30px 20px; background: var(--primary); color: white; }
+            .sidebar-info h2 { color: white; }
+            .side-nav { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; }
+            .nav-item { white-space: nowrap; margin-bottom: 0; }
+            .main-content { padding: 30px 20px; }
+        }
+
+        @media (max-width: 600px) {
             .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .footer-actions { flex-direction: column; }
+            .submit-btn, .discard-btn { width: 100%; order: 1; }
+            .discard-btn { order: 2; }
         }
     </style>
 </head>
@@ -176,44 +191,43 @@
 
 <div class="dashboard-container">
     <aside class="sidebar">
-        <div class="avatar-container">
+        <div class="sidebar-header">
             <div class="avatar-wrapper">
-                <img id="imgPreview" 
-                        src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" 
-                        class="profile-img" 
-                        alt="User profile">
-                <label for="{{ form.profile_image.id_for_label }}" class="avatar-btn">
+                {% if profile.profile_image %}
+                    <img id="imgPreview" src="{{ profile.profile_image.url }}" class="profile-img">
+                {% else %}
+                    <div id="imgPreview" class="profile-img avatar-fallback">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+                <label for="{{ form.profile_image.id_for_label }}" class="avatar-edit-btn">
                     <i class="fa-solid fa-camera"></i>
                 </label>
             </div>
-            <h2 class="user-name">{{ profile.full_name|default:"User Name" }}</h2>
-            <p class="user-role">Verified Customer</p>
+            <div class="sidebar-info">
+                <h2>{{ profile.full_name|default:request.user.username }}</h2>
+                <p>Personal Settings</p>
+            </div>
         </div>
 
         <nav class="side-nav">
-            <div class="nav-home">
-                <a href="{% url 'dashboard' %}" class="nav-item">
-                    <i class="fa-solid fa-arrow-left"></i> Return to Dashboard
-                </a>
-            </div>
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </a>
             <a href="{% url 'edit_profile' %}" class="nav-item active">
-                <i class="fa-solid fa-circle-user"></i> Personal Details
+                <i class="fa-solid fa-user-pen"></i> Edit Profile
             </a>
-            <a href="{% url 'password_change' %}" class="nav-item ">
-                <i class="fa-solid fa-shield-halved"></i> Login & Security
+            <a href="{% url 'password_change' %}" class="nav-item">
+                <i class="fa-solid fa-lock"></i> Security
             </a>
-            <a href="{% url 'logout' %}" class="nav-item" style="margin-top: 20px;">
-                <i class="fa-solid fa-power-off"></i> Sign Out
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fa-solid fa-power-off"></i> Logout
             </a>
         </nav>
     </aside>
 
     <main class="main-content">
-        <a href="{% url 'dashboard' %}" class="btn-back-link">
-            <i class="fa-solid fa-chevron-left"></i> Back to Dashboard
-        </a>
-
-        <h1>Personal Information</h1>
+        <h1>Personal Details</h1>
         
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -221,105 +235,79 @@
 
             <div class="form-grid">
                 <div class="form-section">
-                    <label class="section-label">Full Name</label>
+                    <label>Full Name</label>
                     {{ form.full_name }}
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label">Phone Number</label>
+                    <label>Phone Number</label>
                     {{ form.phone }}
                 </div>
 
                 <div class="form-section full-width">
-                    <label class="section-label">Email Address</label>
-                    <div style="position:relative">
-                        <input type="email" class="form-input" value="{{ request.user.email }}" readonly style="background:#f1f5f9; color:#94a3b8;">
-                        <span style="position:absolute; right:15px; top:14px; color:#10b981; font-size: 11px; font-weight:700">
-                                <i class="fa-solid fa-circle-check"></i> VERIFIED
-                        </span>
+                    <label>Email Address (Verified)</label>
+                    <input type="email" class="form-input" value="{{ request.user.email }}" readonly style="background:#f1f5f9; color:#94a3b8; cursor:not-allowed;">
+                </div>
+
+                <div class="form-section">
+                    <label>City</label>
+                    {{ form.city }}
+                </div>
+                
+                <div class="form-section">
+                    <label>GPS Status</label>
+                    <div id="detectedLocation" style="font-size:13px; color:var(--text-muted); padding:10px 0;">
+                        {% if profile.latitude %} <i class="fa-solid fa-check-circle" style="color:#10b981"></i> Location Saved {% else %} No coordinates captured {% endif %}
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <label class="section-label">City</label>
-                    {{ form.city }}
+                <div class="util-card">
+                    <h3 style="font-size: 14px; margin-bottom: 5px;"><i class="fa-solid fa-location-crosshairs"></i> Precise Delivery</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Update your location to help our drivers find you faster.</p>
+                    <button type="button" id="geoBtn" class="submit-btn" style="padding: 10px; font-size: 13px; background: var(--accent);">
+                        Update Current Location
+                    </button>
+                    <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
+                    <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default:'' }}">
+                    <div id="statusMsg" style="margin-top: 10px; font-size: 12px;"></div>
                 </div>
-                <div class="form-section">
-                    <label class="section-label">Postal Code</label>
-                    <input type="text" class="form-input" placeholder="e.g. 10001">
-                </div>
-            </div>
-
-            <div class="util-card">
-                <h3 style="font-size: 15px; color: var(--primary-orange);">
-                    <i class="fa-solid fa-location-dot" style="color: var(--primary-orange);"></i> Precise Logistics
-                </h3>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Capture your GPS coordinates to ensure faster and more accurate deliveries.</p>
-                <button type="button" id="geoBtn" class="btn-detect">Capture Location</button>
-                <div id="detectedLocation"
-                    style="margin-top:10px;font-size:13px;color:#334155;font-weight:500;">
-                </div>
-                <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
-                <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default:'' }}">
-                
-                <div id="statusMsg" style="margin-top: 10px; font-size: 12px; font-weight: 500;"></div>
             </div>
 
             <div class="footer-actions">
-                <a href="{% url 'dashboard' %}" class="discard-btn">Discard</a>
-                <button type="submit" class="submit-btn">Save Changes</button>
+                <a href="{% url 'dashboard' %}" class="discard-btn">Cancel</a>
+                <button type="submit" class="submit-btn">Save Profile</button>
             </div>
         </form>
     </main>
 </div>
 
 <script>
-    // Styling Django inputs
-    document.querySelectorAll('input, select').forEach(el => {
-        if(!el.classList.contains('form-input')) el.classList.add('form-input');
+    // Style the Django-generated inputs automatically
+    document.querySelectorAll('input:not([type="hidden"]), select').forEach(el => {
+        el.classList.add('form-input');
     });
 
-    // Image Preview logic
+    // Handle Image Preview
     const fileInput = document.getElementById("{{ form.profile_image.id_for_label }}");
     if (fileInput) {
         fileInput.onchange = e => {
             const [file] = e.target.files;
-            if (file) document.getElementById("imgPreview").src = URL.createObjectURL(file);
+            if (file) {
+                const preview = document.getElementById("imgPreview");
+                if(preview.tagName === 'IMG') {
+                    preview.src = URL.createObjectURL(file);
+                } else {
+                    // If it was a div (fallback), replace with img
+                    const newImg = document.createElement('img');
+                    newImg.src = URL.createObjectURL(file);
+                    newImg.className = 'profile-img';
+                    newImg.id = 'imgPreview';
+                    preview.replaceWith(newImg);
+                }
+            }
         };
     }
-    document.addEventListener("DOMContentLoaded", function () {
-        const lat = document.getElementById("lat").value;
-        const lng = document.getElementById("lng").value;
-        const box = document.getElementById("detectedLocation");
 
-        if (lat && lng) {
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-                .then(res => res.json())
-                .then(data => {
-                    const city =
-                        data.address.city ||
-                        data.address.town ||
-                        data.address.village ||
-                        data.address.county ||   
-                        data.address.state ||
-                        "Detected location";
-
-
-                    box.innerHTML = `
-                        <i class="fa-solid fa-location-dot" style="color:#10b981"></i>
-                        ${city}
-                    `;
-                        // OPTIONAL: auto-fill city input
-                    const cityInput = document.getElementById("cityInput");
-                    if (cityInput && !cityInput.value) {
-                        cityInput.value = city;
-                    }
-                })
-                .catch(() => {
-                    box.innerHTML = `📍 ${lat}, ${lng}`;
-                });
-        }
-    });
     // Geolocation logic
     document.getElementById("geoBtn").onclick = function() {
         const msg = document.getElementById("statusMsg");
@@ -329,15 +317,14 @@
             pos => {
                 document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
                 document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
-                msg.innerHTML = '<span style="color: #10b981"><i class="fa-solid fa-check"></i> Coordinates captured successfully.</span>';
-                this.innerHTML = 'Location Saved';
+                msg.innerHTML = '<span style="color: #10b981">Location captured!</span>';
+                this.innerHTML = 'Location Updated';
                 this.style.background = "#10b981";
             },
             () => {
-                msg.innerHTML = '<span style="color: #ef4444">Location access denied. Please enable GPS.</span>';
+                msg.innerHTML = '<span style="color: #ef4444">Permission denied.</span>';
                 this.innerHTML = 'Retry Capture';
-            },
-            { enableHighAccuracy: true }
+            }
         );
     };
 </script>
