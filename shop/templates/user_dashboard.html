@@ -348,7 +348,83 @@
         .dropdown-menu.show { display: block; animation: slideIn 0.2s ease; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- Responsive Adjustments --- */
 
+        /* 1. Dashboard Padding for smaller screens */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .search-wrapper {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+
+            .search-wrapper h2 {
+                font-size: 1.25rem;
+            }
+
+            /* Stack Search Bar elements */
+            .modern-search-bar {
+                flex-direction: column;
+                gap: 10px;
+                background: transparent;
+                border: none;
+                padding: 0;
+            }
+
+            .modern-search-bar input {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                width: 100%;
+            }
+
+            .search-btn-alt {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            /* 2. Responsive Table (Scrollable) */
+            .table-container {
+                overflow-x: auto; /* Enables horizontal swipe on mobile */
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .modern-table {
+                min-width: 600px; /* Ensures table doesn't squish too much */
+            }
+
+            /* 3. Adjust Stat Cards */
+            .stats-row {
+                grid-template-columns: 1fr; /* Stack cards on mobile */
+                gap: 1rem;
+            }
+
+            /* 4. Navigation Adjustments */
+            .top-nav {
+                padding: 1rem;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* 5. Mobile-specific Table optimizations */
+        @media (max-width: 480px) {
+            .section-header h2 {
+                font-size: 1.1rem;
+            }
+
+            /* Optional: Hide less important columns on very small screens */
+            .modern-table th:nth-child(2), 
+            .modern-table td:nth-child(2) {
+                display: none; 
+            }
+        }
     </style>
 </head>
 <body>
