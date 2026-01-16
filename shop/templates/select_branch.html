@@ -226,6 +226,67 @@
                 gap: 1.5rem;
             }
         }
+        /* --- RESPONSIVE REFINEMENTS --- */
+
+        /* 1. Handle Navigation on small screens */
+        @media (max-width: 480px) {
+            .top-nav {
+                padding: 1rem;
+            }
+            .nav-brand span {
+                display: none; /* Hide text, keep icon if name is too long */
+            }
+        }
+
+        /* 2. Scale Typography for Mobile */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: stretch; /* Buttons take full width */
+                gap: 1.5rem;
+                margin: 2rem auto;
+            }
+
+            .header-content h1 {
+                font-size: 1.5rem;
+            }
+
+            /* Make "New Branch" button full width on mobile */
+            .page-header .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 3. Fluid Grid Adjustments */
+        .branches-grid {
+            display: grid;
+            /* Use 1fr for mobile, and minmax for larger screens */
+            grid-template-columns: 1fr; 
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 640px) {
+            .branches-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        /* 4. Touch-friendly improvements */
+        .btn {
+            min-height: 44px; /* Better for thumb taps */
+        }
+
+        .branch-card {
+            /* Prevents cards from feeling too "squished" on small devices */
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        /* Ensure images/icons don't overflow */
+        img, svg {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
