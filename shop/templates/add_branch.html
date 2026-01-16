@@ -214,6 +214,57 @@
             50% { transform: scale(1.5); opacity: 0.5; }
             100% { transform: scale(1); opacity: 1; }
         }
+        /* --- RESPONSIVE REFINEMENTS --- */
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px; /* Less padding around the card on small screens */
+                align-items: flex-start; /* Start from top if screen is short */
+            }
+
+            .form-card {
+                border-radius: 16px; /* Slightly sharper corners for mobile */
+            }
+
+            .card-header {
+                padding: 30px 20px 20px 20px; /* Reduce header padding */
+            }
+
+            .card-body {
+                padding: 0 20px 30px 20px; /* Reduce body padding */
+            }
+
+            .card-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .icon-circle {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            input[type="text"], 
+            input[type="tel"], 
+            textarea {
+                font-size: 16px; /* Prevents iOS auto-zoom on focus */
+                padding: 12px 14px;
+            }
+
+            .location-badge {
+                flex-direction: column; /* Stack icon and text on very small screens */
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        /* Landscape mode/Small Height fixes */
+        @media (max-height: 700px) {
+            body {
+                display: block; /* Allow natural scrolling */
+            }
+        }
     </style>
 </head>
 <body>
