@@ -2940,10 +2940,16 @@ def manage_service_prices(request):
             selected_branches = request.POST.getlist('branches')
 
             if cloth_name and selected_branches:
-                try:
-                    cloth, created = Cloth.objects.get_or_create(name=cloth_name)
+                # 1. Check if this cloth already exists globally
+                cloth, created = Cloth.objects.get_or_create(name__iexact=cloth_name, defaults={'name': cloth_name})
 
-
+                # 2. Check if this cloth is already linked to ANY of the selected branches
+                already_linked = BranchCloth.objects.filter(branch_id__in=selected_branches, cloth=cloth)
+                
+                if already_linked.exists():
+                    # If it already exists in the selected branches, show error
+                    messages.error(request, f'Notice: "{cloth_name}" already exists in the selected branches.')
+                else:
                     # Add cloth to selected branches
                     for branch_id in selected_branches:
                         try:
@@ -2951,15 +2957,10 @@ def manage_service_prices(request):
                             BranchCloth.objects.get_or_create(branch=branch, cloth=cloth)
                         except Branch.DoesNotExist:
                             continue
-
-                    messages.success(request, f'Cloth type "{cloth_name}" added successfully to {len(selected_branches)} branch(es)!')
-                except IntegrityError:
-                    messages.error(request, f'Cloth type "{cloth_name}" already exists!')
+                    messages.success(request, f'Cloth type "{cloth_name}" added successfully!')
             else:
-                if not cloth_name:
-                    messages.error(request, 'Please enter a cloth name.')
-                if not selected_branches:
-                    messages.error(request, 'Please select at least one branch.')
+                messages.error(request, 'Please provide both a name and at least one branch.')
+            
             return redirect('manage_service_prices')
         elif action == "add_existing_cloth":
             cloth_id = request.POST.get("cloth_id")

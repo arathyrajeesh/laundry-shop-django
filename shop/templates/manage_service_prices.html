@@ -4,499 +4,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Service Cloth Prices - {{ shop.name }}</title>
+    <title>Manage Prices - {{ shop.name }}</title>
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            font-family: "Poppins", sans-serif;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #f5f7fa;
-        }
-
         :root {
             --primary-color: #0f334bff;
             --accent-color: #2ecc71;
             --secondary-color: #6c757d;
+            --bg-gray: #f5f7fa;
+            --border-color: #e5e7eb;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+        body { background: var(--bg-gray); color: #333; line-height: 1.6; }
+
+        /* --- Header --- */
         .header {
             background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 5%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column; /* Stack on mobile */
+            gap: 1rem;
+            text-align: center;
         }
 
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 24px;
+        @media (min-width: 768px) {
+            .header { flex-direction: row; justify-content: space-between; text-align: left; }
         }
 
+        .header h1 { color: var(--primary-color); font-size: 1.25rem; }
+
+        /* --- Buttons --- */
         .btn {
             padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
             border: none;
             cursor: pointer;
-            display: inline-block;
+            width: 100%; /* Full width on mobile */
         }
 
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
+        @media (min-width: 768px) { .btn { width: auto; } }
 
-        .btn-primary:hover {
-            background: #0a2538;
-        }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-secondary { background: var(--secondary-color); color: white; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        .btn-secondary {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 40px;
-        }
-
+        /* --- Layout --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
         .section {
             background: white;
-            padding: 30px;
+            padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
         }
+        .section h2 { font-size: 1.25rem; color: var(--primary-color); margin-bottom: 1rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 0.5rem; }
 
-        .section h2 {
-            color: var(--primary-color);
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .price-table {
+        /* --- Forms --- */
+        .form-group { margin-bottom: 1.25rem; width: 100%; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        
+        input[type="text"], input[type="number"], select {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        .price-table th {
-            background: var(--primary-color);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            border: 1px solid #ddd;
-        }
-
-        .price-table td {
-            padding: 15px;
-            border: 1px solid #ddd;
-            background: white;
-        }
-
-        .price-table tr:nth-child(even) td {
-            background: #f8f9fa;
-        }
-
-        .price-input {
-            width: 100px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .service-header {
-            background: #f8f9fa;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
+            font-size: 1rem;
+        }
+        /* --- Service Card Selector --- */
+        .service-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 1.5rem;
         }
 
-        .service-header h3 {
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        .service-header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-actions {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        /* ===== Add Existing Cloth Section ===== */
-
-        .add-existing-cloth {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .add-existing-cloth h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .add-existing-cloth-form {
-            display: flex;
-            gap: 20px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        /* Select box */
-        .add-existing-cloth select {
-            padding: 10px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            min-width: 220px;
-            transition: all 0.2s ease;
-        }
-
-        .add-existing-cloth select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(15, 51, 75, 0.15);
-        }
-
-        /* Branch checkboxes */
-        .branch-checkboxes {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            max-width: 450px;
-        }
-
-        .branch-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            font-size: 13px;
+        .service-card {
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            background: #fff;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .branch-checkbox:hover {
-            background: rgba(15, 51, 75, 0.08);
-            border-color: var(--primary-color);
-        }
-
-        .branch-checkbox input {
-            accent-color: var(--primary-color);
-        }
-
-        /* Button */
-        .add-existing-cloth .btn-primary {
-            padding: 10px 22px;
-            border-radius: 999px;
-            font-size: 14px;
-            font-weight: 600;
-            background: var(--primary-color);
-            border: none;
-            color: #fff;
             transition: all 0.25s ease;
         }
 
-        .add-existing-cloth .btn-primary:hover {
-            background: #0a2538;
-            transform: translateY(-1px);
+        .service-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .add-existing-cloth-form {
-                flex-direction: column;
-                align-items: stretch;
-            }
+        .service-card.active {
+            border-color: var(--primary-color);
+            background: rgba(15, 51, 75, 0.05);
+        }
 
-            .add-existing-cloth select {
+        .service-card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .service-card-sub {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Mobile optimisation */
+        @media (max-width: 600px) {
+            .service-card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Ensure options don't overflow on small screens */
+        select option {
+            font-size: 16px; /* Prevents iOS zoom-on-focus */
+            padding: 10px;
+        }
+        /* --- Branch Selection Pills --- */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .pill-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .pill-checkbox input { accent-color: var(--primary-color); }
+
+        /* --- Responsive Table to Cards --- */
+        @media (max-width: 767px) {
+            .price-table thead { display: none; } /* Hide headers on mobile */
+            .price-table, .price-table tbody, .price-table tr, .price-table td {
+                display: block;
                 width: 100%;
             }
+            .price-table tr {
+                border: 1px solid var(--border-color);
+                border-radius: 10px;
+                margin-bottom: 1rem;
+                padding: 1rem;
+                background: #fff;
+            }
+            .price-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: none;
+                padding: 0.5rem 0;
+            }
+            .price-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--secondary-color);
+            }
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-            .price-table {
-                font-size: 14px;
-            }
-            .price-table th,
-            .price-table td {
-                padding: 8px 6px;
-            }
-            .price-input {
-                width: 80px;
-                padding: 6px;
-            }
+        @media (min-width: 768px) {
+            .price-table { width: 100%; border-collapse: collapse; }
+            .price-table th { background: #f8fafc; text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); }
+            .price-table td { padding: 12px; border-bottom: 1px solid var(--border-color); }
+        }
+
+        /* --- Cloth Grid --- */
+        .cloth-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .cloth-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            position: relative;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ef4444;
+            background: #fee2e2;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #service-search {
+            margin-bottom: 12px;
         }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <div>
-            <h1><i class="fas fa-store"></i> {{ shop.name }} - Manage Prices</h1>
-        </div>
-        <div>
-            <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
+        <h1><i class="fas fa-store"></i> {{ shop.name }}</h1>
+        <a href="{% url 'shop_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
     </div>
 
     <div class="container">
-        <div class="section">
-            <h2><i class="fas fa-tshirt"></i> Manage Cloth Types</h2>
-            <p>Add new cloth types that customers can select for your services.</p>
-
-            <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                <h3 style="color: var(--primary-color); margin-bottom: 15px;">Add New Cloth Type</h3>
-                <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="add_cloth">
-                    <div style="display: flex; gap: 15px; align-items: end;">
-                        <div>
-                            <label for="cloth_name" style="display: block; font-weight: 600; margin-bottom: 5px;">Cloth Name:</label>
-                            <input type="text" id="cloth_name" name="cloth_name" required
-                                    style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; min-width: 250px;"
-                                    placeholder="e.g., Cotton Shirt, Wool Sweater">
-                        </div>
-                        <div>
-                            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Available for Branches:</label>
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                {% for branch in branches %}
-                                    <label style="display: flex; align-items: center; gap: 5px; background: white; padding: 8px 12px; border-radius: 5px; border: 1px solid #ddd;">
-                                        <input type="checkbox" name="branches" value="{{ branch.id }}" checked>
-                                        {{ branch.name }}
-                                    </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add Cloth
-                        </button>
+        {% if messages %}
+            <div id="message-container" style="margin-bottom: 20px; transition: opacity 0.5s ease;">
+                {% for message in messages %}
+                    <div class="alert-box" style="padding: 15px; border-radius: 8px; margin-bottom: 10px; position: relative;
+                        {% if message.tags == 'success' %} background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                        {% elif message.tags == 'error' %} background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+                        {% else %} background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8d9; {% endif %}">
+                        
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                        
+                        <span onclick="this.parentElement.style.display='none'" style="position: absolute; right: 15px; top: 15px; cursor: pointer; opacity: 0.5;">&times;</span>
                     </div>
-                </form>
+                {% endfor %}
             </div>
-            <div class="add-existing-cloth">
-            <h3>Add Existing Cloth</h3>
-
-            <form method="post" class="add-existing-cloth-form">
+        {% endif %}
+        <div class="section">
+            <h2><i class="fas fa-plus-circle"></i> Add Cloth Type</h2>
+            
+            <form method="post">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="add_existing_cloth">
-
-                <div>
-                    <label style="font-weight:600">Select Cloth</label><br>
-                    <select name="cloth_id" required>
-                        <option value="">-- Select Cloth --</option>
-                        {% for cloth in all_cloths %}
-                            <option value="{{ cloth.id }}">{{ cloth.name }}</option>
-                        {% endfor %}
-                    </select>
+                <input type="hidden" name="action" value="add_cloth">
+                
+                <div class="form-group">
+                    <label>Cloth Name</label>
+                    <input type="text" name="cloth_name" placeholder="e.g. Silk Saree" required>
                 </div>
 
-                <div>
-                    <label style="font-weight:600">Available for Branches</label><br>
-                    <div class="branch-checkboxes">
+                <div class="form-group">
+                    <label>Assign to Branches</label>
+                    <div class="checkbox-grid">
                         {% for branch in branches %}
-                            <label class="branch-checkbox">
-                                <input type="checkbox" name="branches" value="{{ branch.id }}">
-                                {{ branch.name }}
-                            </label>
+                        <label class="pill-checkbox">
+                            <input type="checkbox" name="branches" value="{{ branch.id }}" checked>
+                            {{ branch.name }}
+                        </label>
                         {% endfor %}
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add to Branches
-                </button>
+                <button type="submit" class="btn btn-primary">Add New Cloth</button>
+            </form>
+
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #eee;">
+
+            <h3>Existing Cloths</h3>
+            <div class="cloth-grid">
+                {% for cloth_item in cloth_data %}
+                <div class="cloth-card">
+                    <form method="post" onsubmit="return confirm('Delete this cloth?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_cloth">
+                        <input type="hidden" name="cloth_id" value="{{ cloth_item.cloth.id }}">
+                        <button type="submit" class="delete-btn"><i class="fas fa-trash"></i></button>
+                    </form>
+                    <strong>{{ cloth_item.cloth.name }}</strong>
+                    <div style="margin-top: 8px;">
+                        {% for branch_name in cloth_item.available_branches %}
+                            <span style="font-size: 0.7rem; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 10px; margin-right: 4px;">{{ branch_name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: #999;">No cloths added yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-tag"></i> Set Service Prices</h2>
+            
+            <div class="form-group">
+                <label>Select Service to Edit</label>
+                <input 
+                    type="text" 
+                    id="service-search"
+                    placeholder="Search by service or branch name..."
+                >
+                <div class="service-card-grid">
+                    {% for service_data in services_data %}
+                    <div class="service-card"
+                        data-target="service-{{ service_data.service.id }}">
+                        
+                        <div class="service-card-title">
+                            {{ service_data.service.name }}
+                        </div>
+                        <div class="service-card-sub">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ service_data.service.branch.name }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                {% for service_data in services_data %}
+                <div id="service-{{ service_data.service.id }}" class="service-price-section" style="display: none;">
+                    
+                    <div style="background: var(--primary-color); color: white; padding: 10px; border-radius: 8px 8px 0 0; margin-top: 1rem;">
+                        <strong>{{ service_data.service.name }}</strong> - <small>{{ service_data.service.branch.name }}</small>
+                    </div>
+
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th>Cloth Type</th>
+                                <th>Current Price</th>
+                                <th>New Price (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cloth_item in service_data.cloth_data %}
+                            <tr>
+                                <td data-label="Cloth Type"><strong>{{ cloth_item.cloth.name }}</strong></td>
+                                <td data-label="Current Price">₹{{ cloth_item.price|default:"0" }}</td>
+                                <td data-label="New Price">
+                                    <input type="number" 
+                                            name="price_{{ service_data.service.id }}_{{ cloth_item.cloth.id }}" 
+                                            value="{{ cloth_item.price|default:'' }}" 
+                                            class="price-input" 
+                                            placeholder="0.00">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">Update {{ service_data.service.name }} Prices</button>
+                    </div>
+                </div>
+                {% endfor %}
             </form>
         </div>
 
+    </div>
 
+    <script>
+    // Auto-hide messages after 4 seconds
+        window.onload = function() {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                setTimeout(() => {
+                    messageContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        messageContainer.style.display = 'none';
+                    }, 500);
+                }, 4000);
+            }
+        };
 
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: var(--primary-color); margin-bottom: 15px;">Existing Cloth Types</h3>
-                {% if cloth_data %}
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
-                        {% for cloth_item in cloth_data %}
-                            <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <strong style="color: var(--primary-color); font-size: 16px;">{{ cloth_item.cloth.name }}</strong>
-                                    <form method="post" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this cloth type? This action cannot be undone.');">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="delete_cloth">
-                                        <input type="hidden" name="cloth_id" value="{{ cloth_item.cloth.id }}">
-                                        <button type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer; padding: 5px; border-radius: 3px;" title="Delete cloth type" onmouseover="this.style.background='#ffeaea'" onmouseout="this.style.background='none'">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                <div style="font-size: 14px; color: #666;">
-                                    <strong>Available at:</strong>
-                                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
-                                        {% for branch_name in cloth_item.available_branches %}
-                                            <span style="background: #e8f5e8; color: #2e7d32; padding: 3px 8px; border-radius: 12px; font-size: 12px;">
-                                                {{ branch_name }}
-                                            </span>
-                                        {% endfor %}
-                                        {% if not cloth_item.available_branches %}
-                                            <span style="color: #999; font-style: italic;">No branches assigned</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p style="color: #999; font-style: italic;">No cloth types added yet.</p>
-                {% endif %}
-            </div>
-        </div>
+        // Card-based service selector
+        const serviceCards = document.querySelectorAll('.service-card');
+        const serviceSections = document.querySelectorAll('.service-price-section');
 
-        <div class="section">
-            <h2><i class="fas fa-tags"></i> Service Cloth Prices</h2>
-            <p>Set specific prices for different cloth types in your services. Leave fields empty to use default service pricing.</p>
+        serviceCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Reset state
+                serviceCards.forEach(c => c.classList.remove('active'));
+                serviceSections.forEach(section => section.style.display = 'none');
 
-            {% if services_data %}
-                <div style="margin-bottom: 30px;">
-                    <label for="service-select" style="font-weight: 600; color: var(--primary-color); margin-right: 10px;">Select Service:</label>
-                    <select id="service-select" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; min-width: 300px;">
-                        <option value="">-- Choose a Service --</option>
-                        {% for service_data in services_data %}
-                        <option value="service-{{ service_data.service.id }}">{{ service_data.service.name }} - {{ service_data.service.branch.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                // Activate selected card
+                card.classList.add('active');
+                const targetId = card.dataset.target;
+                const targetSection = document.getElementById(targetId);
 
-                <form method="post" id="price-form">
-                    {% csrf_token %}
-
-                    {% for service_data in services_data %}
-                        <div id="service-{{ service_data.service.id }}" class="service-price-section" style="display: none;">
-                            <div class="service-header">
-                                <h3>{{ service_data.service.name }}</h3>
-                                <p><i class="fas fa-map-marker-alt"></i> {{ service_data.service.branch.name }}</p>
-                            </div>
-
-                            <table class="price-table">
-                                <thead>
-                                    <tr>
-                                        <th>Cloth Type</th>
-                                        <th>Current Price (₹)</th>
-                                        <th>New Price (₹)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for cloth_item in service_data.cloth_data %}
-                                        <tr>
-                                            <td><strong>{{ cloth_item.cloth.name }}</strong></td>
-                                            <td>
-                                                {% if cloth_item.price %}
-                                                    ₹{{ cloth_item.price }}
-                                                {% else %}
-                                                    <span style="color: #999;">Not set</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <input type="number"
-                                                       name="price_{{ service_data.service.id }}_{{ cloth_item.cloth.id }}"
-                                                       value="{{ cloth_item.price|default:'' }}"
-                                                       class="price-input"
-                                                       min="0"
-                                                       step="0.01"
-                                                       placeholder="Enter price">
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-
-                            <div class="form-actions" style="margin-top: 20px;">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Update Prices for {{ service_data.service.name }}
-                                </button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </form>
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-concierge-bell"></i>
-                    <p>No services found. Add services to your branches first.</p>
-                    <a href="{% url 'add_branch' %}" class="btn btn-primary" style="margin-top: 15px;">
-                        <i class="fas fa-plus"></i> Add Branch
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-
-        <script>
-            document.getElementById('service-select').addEventListener('change', function() {
-                const selectedValue = this.value;
-                const sections = document.querySelectorAll('.service-price-section');
-
-                // Hide all sections
-                sections.forEach(section => {
-                    section.style.display = 'none';
-                });
-
-                // Show selected section
-                if (selectedValue) {
-                    const selectedSection = document.getElementById(selectedValue);
-                    if (selectedSection) {
-                        selectedSection.style.display = 'block';
-                    }
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
-        </script>
-    </div>
+        });
+        const searchInput = document.getElementById('service-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase().trim();
+
+                serviceCards.forEach(card => {
+                    const text = card.innerText.toLowerCase();
+                    card.style.display = text.includes(query) ? 'block' : 'none';
+                });
+            });
+        }
+    </script>
 </body>
 </html>
