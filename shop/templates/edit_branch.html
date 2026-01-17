@@ -15,210 +15,163 @@
             --primary-color: #0f334b;
             --primary-dark: #0a2538;
             --accent-color: #2ecc71;
-            --accent-dark: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --info-color: #3498db;
-            --secondary-color: #6c757d;
-            --light-bg: #f8fafc;
-            --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0,0,0,0.08);
-            --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
-            --border-radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --brand-primary: var(--primary-color);
-            --brand-hover: var(--primary-dark);
             --bg-main: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             --text-heading: #0f172a;
             --text-body: #475569;
             --border-color: #e2e8f0;
             --input-focus: rgba(15, 51, 75, 0.1);
             --danger: #ef4444;
-            --success: #10b981;
+            --white: #ffffff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body {
-            background-color: var(--bg-main);
+            background: var(--bg-main);
             color: var(--text-body);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 24px;
+            /* Changed from center to flex-start for better mobile scrolling */
+            align-items: flex-start; 
+            padding: 16px;
+        }
+
+        @media (min-width: 768px) {
+            body { padding: 40px 24px; align-items: center; }
         }
 
         .settings-card {
             width: 100%;
             max-width: 540px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            border-radius: 16px; /* Slightly rounder for modern feel */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border-color);
             overflow: hidden;
+            margin-bottom: 20px;
         }
 
         .card-header {
-            padding: 32px 32px 24px 32px;
+            padding: 24px;
             border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        @media (min-width: 480px) {
+            .card-header { padding: 32px; text-align: left; }
         }
 
         .card-header h1 {
             color: var(--text-heading);
-            font-size: 20px;
+            font-size: 1.25rem;
             font-weight: 700;
             letter-spacing: -0.025em;
         }
 
         .card-header p {
-            font-size: 14px;
-            color: var(--text-body);
-            margin-top: 4px;
+            font-size: 0.875rem;
+            margin-top: 6px;
         }
 
-        .card-body {
-            padding: 32px;
-        }
+        .card-body { padding: 20px; }
+        @media (min-width: 480px) { .card-body { padding: 32px; } }
 
-        /* Message Styling */
+        /* Alert Styling */
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 24px;
+            font-size: 0.875rem;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 500;
+            gap: 10px;
         }
+        .alert-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+        .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
 
-        .alert-error {
-            background-color: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fee2e2;
-        }
-
-        .alert-success {
-            background-color: #f0fdf4;
-            color: #15803d;
-            border: 1px solid #dcfce7;
-        }
-
-        /* Form Styling */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        /* Form Controls */
+        .form-group { margin-bottom: 1.5rem; }
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 0.813rem;
             font-weight: 600;
             color: var(--text-heading);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
-        /* Targetting Django's automatically rendered inputs */
-        input[type="text"], 
-        input[type="tel"], 
-        input[type="email"], 
-        textarea {
+        input[type="text"], input[type="tel"], input[type="email"], textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 16px; /* Larger tap targets for mobile */
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 15px;
-            color: var(--text-heading);
-            transition: all 0.2s ease;
+            border-radius: 10px;
+            font-size: 1rem; /* Prevents iOS auto-zoom on focus */
+            transition: all 0.2s;
             outline: none;
-            background-color: #ffffff;
         }
 
         input:focus, textarea:focus {
-            border-color: var(--brand-primary);
+            border-color: var(--primary-color);
             box-shadow: 0 0 0 4px var(--input-focus);
-        }
-
-        textarea {
-            min-height: 100px;
-            line-height: 1.5;
         }
 
         .field-error {
             color: var(--danger);
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 0.75rem;
             margin-top: 6px;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
-        /* Button Styling */
+        /* Footer Buttons */
         .card-footer {
-            padding: 24px 32px;
+            padding: 20px;
             background-color: #f8fafc;
             border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: flex-end;
+            flex-direction: column-reverse; /* Save button on top for mobile */
             gap: 12px;
         }
 
+        @media (min-width: 480px) {
+            .card-footer { 
+                padding: 24px 32px; 
+                flex-direction: row; 
+                justify-content: flex-end; 
+            }
+        }
+
         .btn {
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.938rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
+            text-align: center;
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            border: 1px solid transparent;
             text-decoration: none;
+            transition: transform 0.1s, background 0.2s;
         }
 
-        .btn-save {
-            background-color: var(--brand-primary);
-            color: #ffffff;
-        }
+        .btn:active { transform: scale(0.98); }
 
-        .btn-save:hover {
-            background-color: var(--brand-hover);
-        }
+        .btn-save { background: var(--primary-color); color: var(--white); border: none; }
+        .btn-save:hover { background: var(--primary-dark); }
 
-        .btn-cancel {
-            background-color: #ffffff;
-            color: var(--text-heading);
-            border-color: var(--border-color);
-        }
+        .btn-cancel { background: var(--white); color: var(--text-heading); border: 1px solid var(--border-color); }
+        .btn-cancel:hover { background: #f1f5f9; }
 
-        .btn-cancel:hover {
-            background-color: #f1f5f9;
-        }
-
-        @media (max-width: 480px) {
-            .card-footer {
-                flex-direction: column;
-            }
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
     </style>
 </head>
 <body>
 
     <div class="settings-card">
         <div class="card-header">
-            <h1>Update Branch Configuration</h1>
-            <p>Modifying details for the <strong>{{ branch.name }}</strong> location.</p>
+            <h1>Update Branch</h1>
+            <p>Details for <strong>{{ branch.name }}</strong></p>
         </div>
 
         <form method="post" novalidate>
@@ -271,11 +224,11 @@
     </div>
 
     <script>
-        // Professional UX: Ensure Django inputs have the correct CSS class
+        // Ensure inputs are styled correctly even if Django doesn't add classes
         document.addEventListener('DOMContentLoaded', function() {
             const inputs = document.querySelectorAll('input, textarea, select');
             inputs.forEach(el => {
-                if (!el.classList.contains('btn')) {
+                if (!el.classList.contains('btn') && el.type !== 'hidden') {
                     el.classList.add('form-control');
                 }
             });

@@ -5,200 +5,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ branch.name }} Console | {{ shop.name }}</title>
-    <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
-
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --brand-primary: #0f172a;
             --brand-accent: #2563eb;
+            --brand-accent-soft: rgba(37, 99, 235, 0.1);
             --bg-page: #f8fafc;
             --card-border: #e2e8f0;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --success: #10b981;
             --warning: #f59e0b;
+            --white: #ffffff;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg-page); color: var(--text-main); line-height: 1.5; }
+        
+        body { 
+            background: var(--bg-page); 
+            color: var(--text-main); 
+            line-height: 1.6; 
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* --- PROFESSIONAL TOP HEADER --- */
+        /* --- HEADER --- */
         .top-navbar {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--card-border);
-            padding: 16px 40px;
+            padding: 12px 40px;
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 1000;
         }
 
-        .brand-area h1 { font-size: 1.1rem; font-weight: 800; color: var(--brand-primary); }
-        .breadcrumb { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-        .breadcrumb a { color: var(--brand-accent); text-decoration: none; font-weight: 600; }
+        .brand-area h1 { font-size: 1rem; font-weight: 800; color: var(--brand-primary); letter-spacing: -0.02em; }
+        .breadcrumb { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        .breadcrumb a { color: var(--text-muted); text-decoration: none; transition: 0.2s; }
+        .breadcrumb a:hover { color: var(--brand-accent); }
 
-        /* --- CONTAINER --- */
-        .content-wrap { max-width: 1300px; margin: 32px auto; padding: 0 24px; }
+        /* --- LAYOUT --- */
+        .content-wrap { max-width: 1200px; margin: 24px auto; padding: 0 24px; }
 
-        /* --- BRANCH OVERVIEW CARD --- */
+        /* --- HERO SECTION --- */
         .branch-hero {
-            background: white; border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 24px;
+            background: var(--white);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
         }
-        .hero-title h2 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .hero-meta { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+        .hero-title h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; color: var(--brand-primary); }
+        .hero-meta { color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 12px; margin-top: 6px; }
 
-        /* --- ACTION BUTTONS --- */
+        /* --- BUTTONS --- */
         .btn {
-            padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;
-            cursor: pointer; transition: 0.2s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.2s ease; border: none; text-decoration: none; 
+            display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn-primary { background: var(--brand-accent); color: white; }
-        .btn-outline { background: white; border: 1px solid var(--card-border); color: var(--text-main); }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-primary { background: var(--brand-primary); color: white; }
+        .btn-primary:hover { background: #000; transform: translateY(-1px); }
+        
+        .btn-outline { background: var(--white); border: 1px solid var(--card-border); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-page); border-color: var(--text-muted); }
 
-        /* --- STATS GRID --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        /* --- STATS --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
         .stat-card {
-            background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);
+            background: var(--white); padding: 24px; border-radius: var(--radius-md); 
+            border: 1px solid var(--card-border); transition: transform 0.2s;
         }
-        .stat-card-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        .stat-card-val { font-size: 1.5rem; font-weight: 800; color: var(--brand-primary); margin-top: 4px; }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-card-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-card-val { font-size: 1.75rem; font-weight: 800; color: var(--brand-primary); margin-top: 8px; }
 
-        /* --- SECTION BOXES --- */
-        .dashboard-card { background: white; border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 32px; overflow: hidden; }
+        /* --- CARDS & TABLES --- */
+        .dashboard-card { 
+            background: var(--white); border: 1px solid var(--card-border); 
+            border-radius: var(--radius-lg); margin-bottom: 32px; overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
         .card-header { padding: 20px 24px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
-        .card-header h3 { font-size: 1rem; font-weight: 700; }
+        .card-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--brand-primary); }
 
-        /* --- SERVICE LIST --- */
         .service-group { padding: 24px; border-bottom: 1px solid var(--bg-page); }
-        .service-title { font-weight: 700; color: var(--brand-accent); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .cloth-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        .service-title { font-weight: 700; font-size: 0.95rem; color: var(--brand-primary); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+        
+        .cloth-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
         .price-tag {
-            background: var(--bg-page); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid transparent; transition: 0.2s;
+            background: var(--bg-page); padding: 16px; border-radius: var(--radius-md); 
+            border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 4px;
         }
-        .price-tag:hover { border-color: var(--brand-accent); background: white; }
-        .price-tag .name { font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px; }
-        .price-tag .price { font-size: 1rem; font-weight: 800; color: var(--success); }
+        .price-tag .name { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+        .price-tag .price { font-size: 1.1rem; font-weight: 800; color: var(--brand-accent); }
 
-        /* --- DATA TABLE --- */
-        .table-wrap { width: 100%; overflow-x: auto; }
         .pro-table { width: 100%; border-collapse: collapse; }
-        .pro-table th { background: #fcfdfe; padding: 12px 24px; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
-        .pro-table td { padding: 16px 24px; border-bottom: 1px solid var(--bg-page); font-size: 0.85rem; vertical-align: middle; }
+        .pro-table th { background: #fcfdfe; padding: 16px 24px; text-align: left; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .pro-table td { padding: 20px 24px; border-bottom: 1px solid var(--bg-page); font-size: 0.9rem; }
 
-        .status-pill { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-completed { background: #dcfce7; color: #166534; }
-        .status-washing { background: #e0f2fe; color: #075985; }
+        .status-select { 
+            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--card-border); 
+            font-size: 0.85rem; font-weight: 600; background: var(--bg-page); outline: none;
+        }
 
-        .status-select { padding: 8px; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.8rem; outline: none; }
-        /* --- RESPONSIVE REFINEMENTS --- */
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
 
-        /* 1. Navbar & Header Adjustments */
         @media (max-width: 768px) {
-            .top-navbar {
-                padding: 12px 20px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
+            .top-navbar { padding: 12px 20px; }
+            .content-wrap { padding: 0 16px; margin: 16px auto; }
+            .branch-hero { flex-direction: column; align-items: flex-start; gap: 24px; padding: 24px; }
+            .hero-btns, .hero-btns .btn { width: 100%; justify-content: center; }
             
-            .nav-actions {
-                width: 100%;
+            /* Table to Card Transformation */
+            .pro-table thead { display: none; }
+            .pro-table tr { display: block; padding: 16px; border-bottom: 8px solid var(--bg-page); }
+            .pro-table td { 
+                display: flex; justify-content: space-between; align-items: center; 
+                padding: 8px 0; border: none; text-align: right;
             }
-            
-            .nav-actions .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .branch-hero {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 20px;
-            }
-
-            .hero-btns {
-                width: 100%;
-            }
-
-            .hero-btns .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* 2. Stats Grid Scaling */
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr 1fr; /* 2x2 grid on small phones */
-            }
-            
-            .stat-card-val {
-                font-size: 1.25rem;
-            }
-        }
-
-        /* 3. Service Catalog Grid */
-        @media (max-width: 600px) {
-            .cloth-grid {
-                grid-template-columns: 1fr 1fr; /* Ensure items don't get too skinny */
-            }
-        }
-
-        /* 4. The Table "Card" Pattern */
-        /* This is a crucial UX fix: Instead of a horizontal scroll, 
-        we turn table rows into "cards" on mobile. */
-        @media (max-width: 992px) {
-            .pro-table thead {
-                display: none; /* Hide headers on mobile */
-            }
-
-            .pro-table, .pro-table tbody, .pro-table tr, .pro-table td {
-                display: block;
-                width: 100%;
-            }
-
-            .pro-table tr {
-                margin-bottom: 20px;
-                border: 1px solid var(--card-border);
-                border-radius: 12px;
-                padding: 12px;
-                background: #fff;
-            }
-
-            .pro-table td {
-                border: none;
-                padding: 8px 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                text-align: right;
-            }
-
-            /* Add labels before the data using data-attributes or CSS */
             .pro-table td::before {
-                content: attr(data-label);
-                font-weight: 700;
-                text-transform: uppercase;
-                font-size: 0.7rem;
-                color: var(--text-muted);
-                text-align: left;
+                content: attr(data-label); font-weight: 700; font-size: 0.75rem; 
+                color: var(--text-muted); text-transform: uppercase;
             }
-            
-            .status-select {
-                width: 120px;
-            }
-        }
-
-        .content-wrap {
-            padding: 0 16px; /* Slightly tighter margins for mobile */
         }
     </style>
 </head>
@@ -206,15 +148,13 @@
 
     <header class="top-navbar">
         <div class="brand-area">
-            <h1><i class="fas fa-layer-group"></i> {{ shop.name }} Console</h1>
+            <h1><i class="fas fa-rocket" style="color: var(--brand-accent); margin-right: 8px;"></i>{{ shop.name }}</h1>
             <div class="breadcrumb">
-                <a href="{% url 'shop_dashboard' %}">System</a> / 
-                <a href="{% url 'select_branch' %}">Branches</a> / 
-                <span>{{ branch.name }}</span>
+                <a href="#">Admin</a> / <span>{{ branch.name }}</span>
             </div>
         </div>
         <div class="nav-actions">
-            <a href="{% url 'select_branch' %}" class="btn btn-outline"><i class="fas fa-chevron-left"></i> Change Branch</a>
+            <a href="{% url 'select_branch' %}" class="btn btn-outline"><i class="fas fa-exchange-alt"></i> <span class="hide-mobile">Switch Branch</span></a>
         </div>
     </header>
 
@@ -222,44 +162,47 @@
         
         <section class="branch-hero">
             <div class="hero-title">
-                <h2><i class="fas fa-map-marker-alt" style="color: var(--brand-accent);"></i> {{ branch.name }}</h2>
-                <p class="hero-meta">{{ branch.address }} • {% if average_rating %}{{ average_rating|floatformat:1 }} Rating{% else %}New Branch{% endif %}</p>
+                <h2>{{ branch.name }}</h2>
+                <div class="hero-meta">
+                    <span><i class="fas fa-map-pin"></i> {{ branch.address }}</span>
+                    <span><i class="fas fa-star" style="color: var(--warning);"></i> {% if average_rating %}{{ average_rating|floatformat:1 }}{% else %}New{% endif %}</span>
+                </div>
             </div>
             <div class="hero-btns">
-                <a href="{% url 'edit_branch' branch.id %}" class="btn btn-outline"><i class="fas fa-cog"></i> Settings</a>
+                <a href="{% url 'edit_branch' branch.id %}" class="btn btn-outline"><i class="fas fa-sliders-h"></i> Manage Branch</a>
             </div>
         </section>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-card-label">Volume</div>
+                <div class="stat-card-label">Total Volume</div>
                 <div class="stat-card-val">{{ total_orders }}</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-card-label">In Progress</div>
-                <div class="stat-card-val" style="color: var(--warning);">{{ pending_orders }}</div>
+            <div class="stat-card" style="border-left: 4px solid var(--warning);">
+                <div class="stat-card-label">Active Queue</div>
+                <div class="stat-card-val">{{ pending_orders }}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="border-left: 4px solid var(--success);">
                 <div class="stat-card-label">Completed</div>
-                <div class="stat-card-val" style="color: var(--success);">{{ completed_orders }}</div>
+                <div class="stat-card-val">{{ completed_orders }}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-label">Rev (MTD)</div>
+                <div class="stat-card-label">Revenue (MTD)</div>
                 <div class="stat-card-val">₹{{ total_revenue|floatformat:0 }}</div>
             </div>
         </div>
 
         <div class="dashboard-card">
             <div class="card-header">
-                <h3><i class="fas fa-tags"></i> Service Catalog</h3>
-                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Service</a>
+                <h3>Service Catalog</h3>
+                <a href="{% url 'add_service_branch' branch.id %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Service</a>
             </div>
             
             {% for service in branch.services.all %}
             <div class="service-group">
                 <div class="service-title">
-                    <i class="fas fa-check-circle"></i> {{ service.name }}
-                    <a href="{% url 'edit_service' service.id %}" style="font-size: 0.7rem; color: var(--text-muted);">[Edit Service]</a>
+                    <span><i class="fas fa-concierge-bell" style="margin-right: 8px; color: var(--brand-accent);"></i> {{ service.name }}</span>
+                    <a href="{% url 'edit_service' service.id %}" class="btn-outline" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; text-decoration: none;">Edit</a>
                 </div>
                 <div class="cloth-grid">
                     {% for cloth in service.cloths.all %}
@@ -275,53 +218,48 @@
 
         <div class="dashboard-card">
             <div class="card-header">
-                <h3><i class="fas fa-list-ul"></i> Active Order Pipeline</h3>
+                <h3>Live Order Pipeline</h3>
             </div>
             
             <div class="table-wrap">
                 <table class="pro-table">
                     <thead>
                         <tr>
-                            <th>Ref</th>
-                            <th>Customer</th>
-                            <th>Items & Pricing</th>
-                            <th>Timeline</th>
-                            <th>Status Control</th>
+                            <th>Order ID</th>
+                            <th>Customer Details</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
-                        <tbody>
-                            {% for order in active_orders %}
-                            <tr>
-                                <td data-label="Ref" style="font-weight: 700; color: var(--brand-accent);">#{{ order.id }}</td>
-                                <td data-label="Customer">
-                                    <div style="font-weight: 700;">{{ order.delivery_name|default:order.user.username }}</div>
-                                </td>
-                                <td data-label="Items">
-                                    <div style="max-width: 200px;">
-                                        <div style="font-weight: 700; color: var(--success);">₹{{ order.amount|floatformat:2 }}</div>
-                                    </div>
-                                </td>
-                                <td data-label="Timeline">
-                                    <div style="font-size: 0.7rem;">Del: {{ order.delivery_date|date:"d M" }}</div>
-                                </td>
-                                <td data-label="Action">
-                                    <div style="display: flex; gap: 8px;">
-                                        <select class="status-select" id="status-{{ order.id }}">
-                                            {% for val, label in order.STATUS_CHOICES %}
-                                                <option value="{{ val }}" {% if order.cloth_status == val %}selected{% endif %}>{{ label }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <button class="btn btn-primary" onclick="updateOrderStatus({{ order.id }})">OK</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                    <tbody>
+                        {% for order in active_orders %}
+                        <tr>
+                            <td data-label="Order ID" style="font-weight: 700; color: var(--brand-accent);">#{{ order.id }}</td>
+                            <td data-label="Customer">
+                                <div style="font-weight: 600;">{{ order.delivery_name|default:order.user.username }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">Due: {{ order.delivery_date|date:"M d, Y" }}</div>
+                            </td>
+                            <td data-label="Amount">
+                                <span style="font-weight: 700; color: var(--brand-primary);">₹{{ order.amount|floatformat:2 }}</span>
+                            </td>
+                            <td data-label="Status">
+                                <select class="status-select" id="status-{{ order.id }}">
+                                    {% for val, label in order.STATUS_CHOICES %}
+                                        <option value="{{ val }}" {% if order.cloth_status == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td data-label="Action" style="text-align: right;">
+                                <button class="btn btn-primary" style="padding: 6px 14px;" onclick="updateOrderStatus({{ order.id }})">Update</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
-
     <script>
         function updateOrderStatus(orderId) {
             const statusSelect = document.getElementById(`status-${orderId}`);
@@ -368,5 +306,5 @@
             return cookieValue;
         }
     </script>
-</body>
+    </body>
 </html>
