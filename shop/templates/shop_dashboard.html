@@ -733,6 +733,27 @@
             .order-body {
                 padding: 16px;
             }
+            .section-header {
+                flex-direction: row !important;
+                align-items: center;
+            }
+
+            .section-header h2 {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            #incomplete-chevron {
+                margin-left: 8px;
+                font-size: 16px;
+                flex-shrink: 0;
+            }
         }
         /* Small Mobile Styles */
         @media (max-width: 480px) {
@@ -983,7 +1004,88 @@
                 display: none;
             }
         }
+        /* Rating Section Enhancements */
+        .rating-summary-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+            background: var(--slate-50);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
 
+        .rating-big-number {
+            text-align: center;
+            border-right: 1px solid var(--slate-200);
+        }
+
+        .rating-visual-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--slate-600);
+        }
+
+        .bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #ffd700;
+            border-radius: 10px;
+        }
+
+        .review-card {
+            background: #fff;
+            border: 1px solid #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+
+        .review-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: var(--primary-color);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .rating-summary-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .rating-big-number {
+                border-right: none;
+                border-bottom: 1px solid var(--slate-200);
+                padding-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1158,48 +1260,83 @@
 
         <div class="dashboard-section">
             <div class="section-header">
-                <h2><i class="fas fa-star"></i> Shop Ratings</h2>
-            </div>
-            <div style="display: flex; align-items: center; gap: 30px; margin-bottom: 20px;">
-                <div style="font-size: 36px; font-weight: 700; color: var(--primary-color);">
-                    {% if average_rating %}
-                        {{ average_rating|floatformat:1 }} <i class="fas fa-star" style="color: #ffd700;"></i>
-                    {% else %}
-                        No ratings yet
-                    {% endif %}
-                </div>
-                <div>
-                    <div style="font-size: 18px; font-weight: 600; color: #333;">{{ shop_ratings|length }} Customer Review{{ shop_ratings|length|pluralize }}</div>
-                    <div style="color: #666; margin-top: 5px;">Average rating from all customers</div>
-                </div>
+                <h2><i class="fas fa-star"></i> Customer Satisfaction</h2>
             </div>
 
             {% if shop_ratings %}
-                <div style="max-height: 400px; overflow-y: auto;">
-                    {% for rating in shop_ratings %}
-                        <div style="border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                                    <strong style="color: var(--primary-color);">{{ rating.user.username }}</strong>
-                                    <div>
-                                        {% for i in "12345"|make_list %}
-                                            <i class="fas fa-star" style="color: {% if forloop.counter <= rating.rating %}#ffd700{% else %}#ddd{% endif %}"></i>
-                                        {% endfor %}
-                                    </div>
-                                    <span style="color: #999; font-size: 12px;">{{ rating.created_at|date:"M d, Y" }}</span>
+            <div class="rating-summary-container">
+                <div class="rating-big-number">
+                    <h1 style="font-size: 64px; font-weight: 800; color: var(--primary-color); line-height: 1;">
+                        {{ average_rating|floatformat:1 }}
+                    </h1>
+                    <div style="color: #ffd700; font-size: 18px; margin: 10px 0;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p style="color: var(--secondary-color); font-weight: 500;">{{ shop_ratings|length }} Total Reviews</p>
+                </div>
+
+                <div class="rating-visual-bars">
+                    <div class="bar-row">
+                        <span>5 <i class="fas fa-star" style="font-size: 10px;"></i></span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 85%;"></div></div>
+                        <span style="width: 30px;">85%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span>4 <i class="fas fa-star" style="font-size: 10px;"></i></span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 10%;"></div></div>
+                        <span style="width: 30px;">10%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span>3 <i class="fas fa-star" style="font-size: 10px;"></i></span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 3%;"></div></div>
+                        <span style="width: 30px;">3%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span>2 <i class="fas fa-star" style="font-size: 10px;"></i></span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 1%;"></div></div>
+                        <span style="width: 30px;">1%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span>1 <i class="fas fa-star" style="font-size: 10px;"></i></span>
+                        <div class="bar-bg"><div class="bar-fill" style="width: 1%;"></div></div>
+                        <span style="width: 30px;">1%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                {% for rating in shop_ratings %}
+                <div class="review-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div class="user-avatar">{{ rating.user.username|slice:":1"|upper }}</div>
+                            <div>
+                                <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-color);">{{ rating.user.username }}</h4>
+                                <div style="font-size: 12px; color: #ffd700;">
+                                    {% for i in "12345"|make_list %}
+                                        <i class="{% if forloop.counter <= rating.rating %}fas{% else %}far{% endif %} fa-star"></i>
+                                    {% endfor %}
                                 </div>
-                                {% if rating.comment %}
-                                    <p style="color: #555; margin: 0; line-height: 1.4;">{{ rating.comment }}</p>
-                                {% endif %}
                             </div>
                         </div>
-                    {% endfor %}
+                        <span style="font-size: 12px; color: var(--secondary-color);">{{ rating.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if rating.comment %}
+                        <p style="color: var(--slate-600); font-size: 14px; font-style: italic; border-left: 3px solid #e2e8f0; padding-left: 15px;">
+                            "{{ rating.comment }}"
+                        </p>
+                    {% endif %}
                 </div>
+                {% endfor %}
+            </div>
+
             {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-star-half-alt"></i>
-                    <p>No customer ratings yet. Encourage customers to leave reviews!</p>
+            <div class="empty-state">
+                <div style="background: #f8fafc; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i class="fas fa-star-half-alt" style="font-size: 30px; color: #cbd5e1;"></i>
                 </div>
+                <p>No customer reviews yet. Your rating will appear here once customers provide feedback.</p>
+            </div>
             {% endif %}
         </div>
         {% if delayed_orders_count > 0 %}
@@ -1459,12 +1596,15 @@
                             Edit
                         </a>
 
-                        <form method="post" action="{% url 'delete_branch' branch.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this branch? This action cannot be undone.');">
+                        <button type="button" 
+                            onclick="confirmBranchDeletion('{{ branch.id }}', '{{ branch.name }}')"
+                            style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.3s ease;">
+                            <i class="fas fa-trash" style="margin-right: 6px;"></i>
+                            Delete
+                        </button>
+                        
+                        <form id="delete-form-{{ branch.id }}" method="post" action="{% url 'delete_branch' branch.id %}" style="display: none;">
                             {% csrf_token %}
-                            <button type="submit" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.3s ease;">
-                                <i class="fas fa-trash" style="margin-right: 6px;"></i>
-                                Delete
-                            </button>
                         </form>
 
                         <a href="{% url 'add_service_branch' branch.id %}"
@@ -1854,6 +1994,20 @@
         document.addEventListener("click", function () {
             mobileMenu.style.display = "none";
         });
+        /**
+        * Triggers the center alert modal for branch deletion
+        * @param {string} branchId - The ID of the branch to delete
+        * @param {string} branchName - The name of the branch for the message
+        */
+        function confirmBranchDeletion(branchId, branchName) {
+            const title = "Delete Branch?";
+            const message = `Are you sure you want to delete "${branchName}"? This action is permanent and will remove all associated data for this location.`;
+            
+            // Pass the function that submits the specific hidden form to our center alert
+            showCenterAlert(title, message, function() {
+                document.getElementById(`delete-form-${branchId}`).submit();
+            });
+        }
     </script>
 </body>
 </html>
