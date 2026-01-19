@@ -696,11 +696,16 @@
             }
 
             .shop-header {
-                padding: 16px 12px;
-                flex-direction: column;
-                gap: 16px;
+                flex-direction: row;          
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 12px;
             }
-
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
             .shop-header h1 {
                 font-size: 22px;
             }
@@ -840,6 +845,39 @@
                 grid-template-columns: 1fr !important;
             }
         }
+        @media (max-width: 768px) {
+            .shop-status-toggle {
+                position: static;           /* ❌ remove absolute */
+                margin-top: 16px;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
+            .status-indicator {
+                font-size: 13px;
+            }
+
+            .status-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .toggle-switch {
+                width: 48px;
+                height: 24px;
+            }
+
+            .toggle-slider {
+                width: 18px;
+                height: 18px;
+                top: 3px;
+                left: 3px;
+            }
+
+            .toggle-switch.active .toggle-slider {
+                transform: translateX(24px);
+            }
+        }
 
         /* Extra Small Devices */
         @media (max-width: 360px) {
@@ -890,7 +928,62 @@
                 grid-template-columns: 1fr !important;
             }
         }
-        
+        /* Hamburger Button */
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 16px;
+            background: #ffffff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 2000;
+            min-width: 160px;
+        }
+
+        .mobile-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            text-decoration: none;
+            color: #334155;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+            background: #f1f5f9;
+        }
+
+        /* 📱 Mobile View */
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                display: inline-flex;
+                align-items: center;
+            }
+
+            /* Hide normal buttons */
+            .header-actions a.btn {
+                display: none;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -925,6 +1018,20 @@
     <div class="shop-header">
         <h1><i class="fas fa-store"></i> {{ shop.name }} - Dashboard</h1>
         <div class="header-actions">
+            <!-- Hamburger Button (Mobile Only) -->
+            <button class="hamburger-btn" id="hamburger-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Mobile Menu -->
+            <div class="mobile-menu" id="mobile-menu">
+                <a href="{% url 'home' %}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{% url 'shop_logout' %}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
             <div class="notification-container">
                 <button class="notification-btn" id="notification-trigger">
                     <i class="fas fa-bell"></i>
@@ -1734,7 +1841,19 @@
             }
             closeCenterAlert();
         });
+        const hamburgerBtn = document.getElementById("hamburger-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
 
+        hamburgerBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            mobileMenu.style.display =
+                mobileMenu.style.display === "block" ? "none" : "block";
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener("click", function () {
+            mobileMenu.style.display = "none";
+        });
     </script>
 </body>
 </html>
