@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Location | {{ shop.name }}</title>
+    <title>Add New Location | {{ shop.name }}</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
@@ -12,17 +12,16 @@
 
     <style>
         :root {
-            --brand-primary: #4f46e5;
-            --brand-hover: #4338ca;
-            --brand-soft: #eef2ff;
-            --bg-main: #f8fafc;
-            --text-heading: #0f172a;
-            --text-body: #64748b;
-            --border-color: #e2e8f0;
-            --input-focus: #c7d2fe;
-            --danger: #ef4444;
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-600: #475569;
+            --slate-900: #0f172a;
             --success: #10b981;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         * {
@@ -33,270 +32,210 @@
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-body);
+            background-color: var(--slate-50);
+            color: var(--slate-600);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 24px;
-            /* Subtle background pattern */
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 20px 20px;
+            justify-content: center;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Professional Background Ornament */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 320px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            z-index: -1;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
         }
 
         .form-card {
             width: 100%;
-            max-width: 560px;
+            max-width: 540px;
             background: #ffffff;
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
             overflow: hidden;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .card-header {
-            padding: 40px 40px 30px 40px;
+            padding: 3rem 3rem 2rem;
             text-align: center;
         }
 
-        .icon-circle {
-            width: 60px;
-            height: 60px;
-            background: var(--brand-soft);
-            color: var(--brand-primary);
-            border-radius: 50%;
-            display: flex;
+        .brand-icon {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 20px;
+            width: 56px;
+            height: 56px;
+            background: var(--slate-100);
+            color: var(--primary);
+            border-radius: 14px;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
         .card-header h1 {
-            color: var(--text-heading);
-            font-size: 1.5rem;
+            color: var(--slate-900);
+            font-size: 1.75rem;
             font-weight: 800;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
         }
 
         .card-header p {
+            color: var(--slate-600);
             font-size: 0.95rem;
-            color: var(--text-body);
-            margin-top: 8px;
         }
 
         .card-body {
-            padding: 0 40px 40px 40px;
+            padding: 0 3rem 3rem;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
             font-size: 0.875rem;
-            font-weight: 700;
-            color: var(--text-heading);
-            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--slate-900);
+            margin-bottom: 0.5rem;
         }
 
         input[type="text"], 
         input[type="tel"], 
         textarea {
             width: 100%;
-            padding: 14px 18px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 10px;
             font-size: 1rem;
-            color: var(--text-heading);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            outline: none;
-            background-color: #ffffff;
+            color: var(--slate-900);
+            transition: all 0.2s ease;
         }
 
         input:focus, textarea:focus {
-            border-color: var(--brand-primary);
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
-        textarea { min-height: 100px; resize: none; }
+        textarea { height: 100px; resize: none; }
 
-        /* --- PREVIEW BOX --- */
-        .location-badge {
-            background: var(--brand-soft);
-            border: 1px solid var(--input-focus);
-            border-radius: 14px;
-            padding: 16px;
+        /* Geo Status Box */
+        .geo-box {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-top: 8px;
-            transition: 0.3s;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--slate-50);
+            border: 1px dashed var(--slate-200);
+            border-radius: 12px;
+            margin-top: 0.5rem;
         }
 
-        .location-badge .map-ico {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 10px;
+        .geo-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--brand-primary);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--slate-600);
+            box-shadow: var(--shadow-sm);
         }
 
-        .location-data { flex: 1; }
-        .location-data .city-label {
-            font-weight: 800;
-            color: var(--brand-primary);
-            font-size: 0.9rem;
-        }
-        .location-data .coords {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-body);
-        }
+        .geo-info { line-height: 1.2; }
+        .geo-city { display: block; font-weight: 700; color: var(--slate-900); font-size: 0.9rem; margin-bottom: 2px; }
+        .geo-coords { font-size: 0.75rem; color: var(--slate-600); font-family: 'Monaco', monospace; }
 
-        .btn-submit {
+        /* Buttons */
+        .btn-primary {
             width: 100%;
-            padding: 16px;
-            background-color: var(--brand-primary);
-            color: #ffffff;
+            height: 54px;
+            background: var(--primary);
+            color: white;
             border: none;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 10px;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
 
-        .btn-submit:hover {
-            background-color: var(--brand-hover);
+        .btn-primary:hover {
+            background: var(--primary-dark);
             transform: translateY(-1px);
             box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
         }
 
-        .btn-cancel {
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-back {
             display: block;
             text-align: center;
-            margin-top: 20px;
-            color: var(--text-body);
+            margin-top: 1.5rem;
             text-decoration: none;
+            color: var(--slate-600);
             font-size: 0.875rem;
-            font-weight: 600;
+            font-weight: 500;
         }
 
-        .btn-cancel:hover { color: var(--text-heading); }
+        .btn-back:hover { color: var(--primary); }
 
-        /* Loading Animation for Geolocation */
-        .loading-pulse {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--brand-primary);
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        /* --- RESPONSIVE REFINEMENTS --- */
-
+        /* Responsive Logic */
         @media (max-width: 640px) {
-            body {
-                padding: 12px; /* Less padding around the card on small screens */
-                align-items: flex-start; /* Start from top if screen is short */
-            }
-
-            .form-card {
-                border-radius: 16px; /* Slightly sharper corners for mobile */
-            }
-
-            .card-header {
-                padding: 30px 20px 20px 20px; /* Reduce header padding */
-            }
-
-            .card-body {
-                padding: 0 20px 30px 20px; /* Reduce body padding */
-            }
-
-            .card-header h1 {
-                font-size: 1.25rem;
-            }
-
-            .icon-circle {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-                margin-bottom: 15px;
-            }
-
-            input[type="text"], 
-            input[type="tel"], 
-            textarea {
-                font-size: 16px; /* Prevents iOS auto-zoom on focus */
-                padding: 12px 14px;
-            }
-
-            .location-badge {
-                flex-direction: column; /* Stack icon and text on very small screens */
-                align-items: flex-start;
-                gap: 12px;
-            }
-        }
-
-        /* Landscape mode/Small Height fixes */
-        @media (max-height: 700px) {
-            body {
-                display: block; /* Allow natural scrolling */
-            }
+            body { padding: 1rem; align-items: flex-start; }
+            body::before { height: 200px; }
+            .form-card { border-radius: 20px; box-shadow: none; border: 1px solid var(--slate-200); }
+            .card-header { padding: 2rem 1.5rem 1.5rem; }
+            .card-body { padding: 0 1.5rem 2rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="form-card">
-        <div class="card-header">
-            <div class="icon-circle">
-                <i class="fas fa-map-marked-alt"></i>
+        <header class="card-header">
+            <div class="brand-icon">
+                <i class="fas fa-map-location-dot"></i>
             </div>
-            <h1>Expand Your Network</h1>
-            <p>Establish a new operational branch for {{ shop.name }}.</p>
-        </div>
+            <h1>New Branch</h1>
+            <p>Onboard a new operational location to your network.</p>
+        </header>
 
         <div class="card-body">
             <form method="post" id="branchForm">
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label>Internal Branch Name</label>
-                    <input type="text" name="name" placeholder="e.g. Downtown Hub" required>
+                    <label for="name">Internal Branch Name</label>
+                    <input type="text" id="name" name="name" placeholder="e.g., Central Plaza Hub" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Full Physical Address</label>
-                    <textarea name="address" placeholder="Street number, Building, Landmark..." required></textarea>
+                    <label for="address">Full Physical Address</label>
+                    <textarea id="address" name="address" placeholder="Unit, Building, Street, Area..." required></textarea>
                 </div>
 
-                <div class="form-row" style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-                    <div class="form-group">
-                        <label>Contact Number</label>
-                        <input type="tel" name="phone" placeholder="+91 00000 00000">
-                    </div>
+                <div class="form-group">
+                    <label for="phone">Branch Contact Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 (000) 000-0000">
                 </div>
 
                 <input type="hidden" name="city" id="city">
@@ -305,72 +244,86 @@
 
                 <div class="form-group">
                     <label>Geo-Verification</label>
-                    <div id="location-preview">
-                        <div class="location-badge" style="background: #f1f5f9; border-color: #cbd5e1;">
-                            <div class="map-ico"><i class="fas fa-satellite-dish"></i></div>
-                            <div class="location-data">
-                                <span class="city-label" id="city-text">Detecting your location...</span>
-                                <div class="coords" id="coords-text">Initializing GPS satellite link</div>
-                            </div>
+                    <div class="geo-box" id="geo-box">
+                        <div class="geo-icon" id="geo-icon">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                        </div>
+                        <div class="geo-info">
+                            <span class="geo-city" id="city-text">Syncing with GPS...</span>
+                            <span class="geo-coords" id="coords-text">Fetching coordinates</span>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit">
-                    Confirm & Register Branch
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <span>Create Branch</span>
+                    <i class="fas fa-plus"></i>
                 </button>
                 
-                <a href="javascript:history.back()" class="btn-cancel">Go Back</a>
+                <a href="javascript:history.back()" class="btn-back">Cancel and Go Back</a>
             </form>
         </div>
     </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const geoIcon = document.getElementById('geo-icon');
+        const geoBox = document.getElementById('geo-box');
+        const cityText = document.getElementById('city-text');
+        const coordsText = document.getElementById('coords-text');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Handle Form Submission Loading
+        document.getElementById('branchForm').onsubmit = function() {
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.pointerEvents = 'none';
+        };
+
         if (!navigator.geolocation) {
-            updateStatus("Geolocation not supported", "Error");
+            updateStatus("Incompatible", "Browser lacks GPS support", false);
             return;
         }
 
         navigator.geolocation.getCurrentPosition(
-            async function (position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+            async function (pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
 
                 document.getElementById("latitude").value = lat;
                 document.getElementById("longitude").value = lon;
-                document.getElementById("coords-text").innerText = `LAT: ${lat.toFixed(4)} | LON: ${lon.toFixed(4)}`;
 
                 try {
                     const res = await fetch(
                         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                        { headers: { "User-Agent": "LaundryBusinessPortal/1.0" } }
+                        { headers: { "User-Agent": "Terminal/1.0" } }
                     );
                     const data = await res.json();
-
-                    const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "Area Detected";
+                    const city = data.address?.city || data.address?.town || data.address?.suburb || "Location Verified";
 
                     document.getElementById("city").value = city;
-                    document.getElementById("city-text").innerText = city;
-                    
-                    // Style it as "Success"
-                    const badge = document.querySelector('.location-badge');
-                    badge.style.background = '#f0fdf4';
-                    badge.style.borderColor = '#bbf7d0';
-                    document.querySelector('.map-ico').style.color = '#10b981';
-
+                    updateStatus(city, `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
                 } catch (e) {
-                    updateStatus("Area detection limited", "GPS Active");
+                    updateStatus("Verified", `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
                 }
             },
             function () {
-                updateStatus("Permission Denied", "Manual location entry required");
+                updateStatus("Permission Denied", "Manual entry required", false);
             }
         );
 
-        function updateStatus(title, subtitle) {
-            document.getElementById("city-text").innerText = title;
-            document.getElementById("coords-text").innerText = subtitle;
+        function updateStatus(title, sub, isSuccess) {
+            cityText.innerText = title;
+            coordsText.innerText = sub;
+            if (isSuccess) {
+                geoIcon.innerHTML = '<i class="fas fa-check"></i>';
+                geoIcon.style.color = 'var(--success)';
+                geoBox.style.borderColor = 'var(--success)';
+                geoBox.style.background = '#f0fdf4';
+            } else {
+                geoIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                geoIcon.style.color = '#f59e0b';
+            }
         }
     });
 </script>
