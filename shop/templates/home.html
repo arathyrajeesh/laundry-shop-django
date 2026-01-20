@@ -245,15 +245,19 @@
 
             .badge-floating {
                 position: absolute;
-                bottom: 12px;
-                right: 12px;
-                left: auto;
-                top: auto;
+                top: 10px;        /* Moves it to the top */
+                left: 10px;       /* Aligns to the left side */
+                right: auto;
+                bottom: auto;
                 padding: 8px 12px;
                 border-radius: 12px;
-                animation: none; /* Stabilizes the badge for mobile readability */
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(4px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                z-index: 10;
+                
+                /* Keeps the animation active on mobile */
+                animation: floatUpDown 3.5s ease-in-out infinite; 
             }
             .hero-btn-container {
                 justify-content: center;
