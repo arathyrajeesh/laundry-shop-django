@@ -26,6 +26,8 @@
             --primary-color: #0f334bff; /* Dark Blue */
             --accent-color: #2ecc71;    /* Bright Green for Badges/Icons */
             --accent-hover: #6cafdbff;
+            --white: #ffffff;
+            --secondary: #3b82f6;
         }
 
         /* --- GENERAL SECTIONS --- */
@@ -92,66 +94,170 @@
         .schedule-btn:hover { background: var(--accent-hover); }
 
         /* --- HERO SECTION --- */
+        /* --- UPDATED HERO LAYOUT --- */
         .hero {
-            position: relative;
-            height: 70vh;
-            background: url("{% static 'images/hero.jpg' %}") no-repeat center center/cover;
+            height: 85vh;
             display: flex;
-            justify-content: flex-start; /* move content to left */
-            align-items: center;         /* vertical center */
-            text-align: left;            /* left align text */
-            color: white;
-            overflow: hidden;
-            padding-left: 80px;          /* space from left */
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 80px;
+            background: radial-gradient(circle, #ffffff 0%, #f0f7ff 100%);
+            gap: 40px;
         }
 
-        /* Dark cover overlay */
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                rgba(0, 0, 0, 0.55),
-                rgba(0, 0, 0, 0.55)
-            );
-            z-index: 1;
-        }
-
-        /* Content above the cover */
         .hero-content {
-            position: relative;
+            flex: 1;
             z-index: 2;
             max-width: 600px;
         }
 
-        /* Heading */
-        .hero-content h1 {
-            font-size: 50px;
-            margin-bottom: 15px;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.7);
-        }
-
-        /* Paragraph */
-        .hero-content p {
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: #f1f1f1;
-        }
-
-        /* CTA button */
-        .hero .btn {
-            display: inline-block;
-            background: var(--primary-color);
-            padding: 14px 30px;
-            border-radius: 6px;
-            color: white;
-            text-decoration: none;
+        .section-tag {
+            background: #e9eff5;
+            color: var(--primary-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .hero-content h1 {
+            font-size: 56px;
+            line-height: 1.1;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        /* Matches the bright blue from your reference image */
+        .hero-content h1 span {
+            color: #3b82f6 !important;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .hero-visual {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Organic Oval Shape */
+        .hero-visual img {
+            width: 100%;
+            max-width: 550px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 44% 56% 40% 60% / 54% 43% 57% 46%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Floating Animated Badge */
+        .badge-floating {
+            position: absolute;
+            top: 20%;
+            left: 5%;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            z-index: 3;
+            animation: floatUpDown 3.5s ease-in-out infinite;
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Hero Specific Gradient Button */
+        .hero-content .schedule-btn {
+            background: linear-gradient(135deg, #2d699dff 0%, #09114aff 100%) !important;
+            border: none;
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4);
+            border-radius: 30px;
+            padding: 15px 35px;
+            color: white !important;
             transition: all 0.3s ease;
         }
 
-        .hero .btn:hover {
-            background: var(--accent-hover);
+        .hero-content .schedule-btn:hover {
             transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(79, 172, 254, 0.5);
+        }
+
+        /* --- CONSOLIDATED RESPONSIVE RULES --- */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 50px 16px 30px;
+                height: auto;
+                min-height: 100vh;
+                gap: 18px;
+                justify-content: flex-start;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                order: 1; /* Text first */
+            }
+
+            .hero-content h1 {
+                font-size: clamp(2rem, 8vw, 2.5rem); /* Responsive scaling */
+                font-weight: 800;
+                line-height: 1.2;
+                margin-bottom: 14px;
+            }
+
+            .hero-content p {
+                font-size: 14.5px;
+                line-height: 1.6;
+                margin-bottom: 22px;
+                color: #64748b;
+            }
+
+            .hero-visual {
+                order: 2; /* Image second */
+                margin-top: 26px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                position: relative;
+            }
+
+            .hero-visual img {
+                width: 280px;
+                height: 320px;
+                object-fit: cover;
+                /* Matches your organic oval desktop look */
+                border-radius: 44% 56% 40% 60% / 54% 43% 57% 46%;
+            }
+
+            .badge-floating {
+                position: absolute;
+                bottom: 12px;
+                right: 12px;
+                left: auto;
+                top: auto;
+                padding: 8px 12px;
+                border-radius: 12px;
+                animation: none; /* Stabilizes the badge for mobile readability */
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(4px);
+            }
+            .hero-btn-container {
+                justify-content: center;
+            }
         }
 
         /* --- ABOUT SECTION --- */
@@ -971,6 +1077,19 @@
 
         /* ===== MOBILE FULLSCREEN NAV ===== */
         @media (max-width: 992px) {
+            nav {
+                padding: 14px 16px;
+            }
+
+            .brand-name {
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .logo {
+                height: 36px;
+                width: 36px;
+            }
             nav.nav-open {
                 background-color: #0f334b; /* DARK */
                 box-shadow: none;
@@ -988,6 +1107,8 @@
             nav.nav-open .schedule-btn {
                 color: var(--primary-color) !important;
                 background-color:white;
+                display: flex;
+                justify-content:center;
             }
             .menu-toggle {
                 display: block;
@@ -1032,9 +1153,6 @@
                 margin-top: 15px;
             }
         }
-        body.no-scroll {
-            overflow: hidden;
-        }
 
     </style>
 </head>
@@ -1042,49 +1160,56 @@
 <body>
 
     <nav>
-    <div class="brand">
-        <img src="{% static 'images/Shine.png' %}" alt="Laundry Logo" class="logo">
-        <span class="brand-name">Shine & Bright</span>
-    </div>
+        <div class="brand">
+            <img src="{% static 'images/Shine.png' %}" alt="Logo" class="logo">
+            <span class="brand-name">Shine & Bright</span>
+        </div>
 
-    <div class="menu-toggle" id="mobile-menu">
-        <i class="fas fa-bars"></i>
-    </div>
+        <div class="menu-toggle" id="mobile-menu">
+            <i class="fas fa-bars"></i>
+        </div>
 
-    <ul class="nav-links" id="nav-list">
-        <li><a href="#">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="{% url 'login' %}">Login</a></li>
-        <li><a href="{% url 'signup' %}">Register</a></li>
-        <li class="mobile-only">
-            {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}" class="schedule-btn">Schedule a Pickup</a>
+        <ul class="nav-links" id="nav-list">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            {% if not user.is_authenticated %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li class="mobile-only"><a href="{% url 'signup' %}" class="schedule-btn">Get Started</a></li>
             {% else %}
-                <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="schedule-btn">Schedule a Pickup</a>
+                <li><a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a></li>
             {% endif %}
-        </li>
-    </ul>
-    
-    <div class="nav-actions desktop-only">
-        {% if user.is_authenticated %}
-            <a href="{% url 'dashboard' %}" class="schedule-btn">Schedule a Pickup</a>
-        {% else %}
-            <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="schedule-btn">Schedule a Pickup</a>
-        {% endif %}
-    </div>
-</nav>
+        </ul>
 
+        <div class="nav-actions desktop-only">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'signup' %}" class="schedule-btn">Get Started</a>
+            {% else %}
+                <a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a>
+            {% endif %}
+        </div>
+    </nav>
 
-    <section class="hero">
-        <div class="hero-overlay"></div>
-
+    <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Fast & Professional Laundry Service</h1>
-            <p>We pick, clean, and deliver your clothes with care.</p>
-            <a href="{% url 'login' %}" class="btn">Book Now</a>
+            <span class="section-tag">Premium Laundry Care</span>
+            <h1>Clean Clothes, <br><span style="color: var(--accent-color);">Zero Effort.</span></h1>
+            <p>Experience the most professional laundry and dry cleaning service in Kerala. We pick up, clean, and deliver to your doorstep within 24 hours.</p>
+            <div class="hero-btn-container" style="display: flex; gap: 1rem;">
+                <a href="{% url 'login' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">Book a Pickup Now</a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <img src="{% static 'images/hero.jpg' %}" alt="Laundry Hero">
+            <div class="badge-floating">
+                <i class="fas fa-star" style="color: #f59e0b; font-size: 24px;"></i>
+                <div>
+                    <strong style="display: block; color: var(--primary-color);">25 Years</strong>
+                    <small style="color: #777;">Trusted Expertise</small>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1575,14 +1700,6 @@
         });
     });
 
-
-    // Close menu when a link is clicked
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navList.classList.remove('active');
-            menuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
-        });
-    });
     window.addEventListener('resize', () => {
         if (window.innerWidth > 992) {
             navList.classList.remove('active');
@@ -1595,4 +1712,4 @@
     </script>
 
 </body>
-</html>
+</html> 
