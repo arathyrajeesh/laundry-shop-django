@@ -2396,174 +2396,119 @@ def shop_dashboard(request):
 
     branches = Branch.objects.filter(shop=shop).prefetch_related('services')
 
-    # 🔒 PAID & UNPAID ORDERS (SEPARATED)
+    # 1. Base Orders
     paid_orders = Order.objects.filter(shop=shop, payment_status="Completed")
     one_week_ago = timezone.now() - timedelta(days=7)
-    recent_orders = Order.objects.filter(
-        shop=shop,
-        payment_status="Completed"
-    ).select_related('user', 'branch').order_by('-created_at')[:10]
-    unpaid_orders = Order.objects.filter(
-        shop=shop,
-        payment_status="Pending",
-        created_at__gte=one_week_ago   # ✅ ONLY LAST 7 DAYS
-    )
-        # =====================
-    # 📊 SHOP STATISTICS (PAID ONLY)
-    # =====================
+    
+    # 2. Stats
     total_orders = paid_orders.count()
     pending_orders = paid_orders.filter(cloth_status="Pending").count()
     completed_orders = paid_orders.filter(cloth_status="Completed").count()
+    total_revenue = paid_orders.aggregate(total=Sum('amount'))['total'] or 0
+    today_revenue = paid_orders.filter(created_at__date=timezone.now().date()).aggregate(total=Sum('amount'))['total'] or 0
 
-    total_revenue = paid_orders.aggregate(
-        total=Sum('amount')
-    )['total'] or 0
+    # 3. Tables
+    incomplete_payment_orders = Order.objects.filter(
+        shop=shop, 
+        payment_status="Pending", 
+        created_at__gte=one_week_ago
+    ).select_related('user', 'branch').order_by('-created_at')
 
-    today_revenue = paid_orders.filter(
-        created_at__date=timezone.now().date()
-    ).aggregate(total=Sum('amount'))['total'] or 0
+    recent_orders = paid_orders.select_related('user', 'branch').order_by('-created_at')[:10]
 
-    # =====================
-    # 🧾 INCOMPLETE PAYMENTS
-    # =====================
-    incomplete_payment_orders = unpaid_orders.select_related(
-        'user', 'branch'
-    ).order_by('-created_at')
-
-    # =====================
-    # 📦 RECENT ORDERS (MIXED VIEW)
-    # =====================
-    recent_orders = Order.objects.filter(
-        shop=shop,
-        payment_status="Completed"
-    ).select_related('user', 'branch').order_by('-created_at')[:10]
-
-    # =====================
-    # 🏢 BRANCH STATISTICS (PAID ONLY)
-    # =====================
+    # 4. Branch Stats Loop
     branch_stats = []
     for branch in branches:
-        branch_paid_orders = paid_orders.filter(branch=branch)
+        branch_paid = paid_orders.filter(branch=branch)
         branch_ratings = BranchRating.objects.filter(branch=branch)
-
-        branch_average_rating = branch_ratings.aggregate(
-            avg=Avg('rating')
-        )['avg'] or 0
+        avg_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
         branch_stats.append({
             'branch': branch,
-            'total_orders': branch_paid_orders.count(),
-            'pending_orders': branch_paid_orders.filter(cloth_status="Pending").count(),
-            'completed_orders': branch_paid_orders.filter(cloth_status="Completed").count(),
-            'revenue': branch_paid_orders.aggregate(total=Sum('amount'))['total'] or 0,
-            'average_rating': branch_average_rating,
+            'total_orders': branch_paid.count(),
+            'pending_orders': branch_paid.filter(cloth_status="Pending").count(),
+            'completed_orders': branch_paid.filter(cloth_status="Completed").count(),
+            'revenue': branch_paid.aggregate(total=Sum('amount'))['total'] or 0,
+            'average_rating': avg_rating,
             'total_ratings': branch_ratings.count(),
         })
 
-        # 🔔 SHOP NOTIFICATIONS (DICT ONLY)
-        # =====================
-        shop_notifications = [] 
-        now = timezone.now()
+    # ========================================================
+    # 🔔 NOTIFICATIONS & DELAYED (MOVED OUTSIDE THE LOOP) ✅
+    # ========================================================
+    shop_notifications = [] 
+    now = timezone.now()
 
-        # 1️⃣ Notifications from DB (convert to dict)
-        db_notifications = Notification.objects.filter(
-            shop=shop,
-            notification_type="shop_order_reminder"
-        ).order_by("-created_at")[:5]
-        delayed_orders = paid_orders.select_related( 'user', 'branch' ).filter( delivery_date__isnull=False, delivery_date__lt=now, cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing'] ).order_by('delivery_date')
-        for n in db_notifications:
+    # Delayed Orders
+    delayed_orders = paid_orders.select_related('user', 'branch').filter(
+        delivery_date__isnull=False, 
+        delivery_date__lt=now, 
+        cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
+    ).order_by('delivery_date')
+
+    # DB Notifications (Handle unread_count BEFORE slicing)
+    db_notifs_query = Notification.objects.filter(
+        shop=shop,
+        notification_type="shop_order_reminder"
+    ).order_by("-created_at")
+    
+    unread_count = db_notifs_query.filter(is_read=False).count()
+    db_notifications = db_notifs_query[:5] # Slice now for display
+
+    for n in db_notifications:
+        shop_notifications.append({
+            "title": n.title, "message": n.message, "time": n.created_at,
+            "icon": n.icon, "color": n.color, "is_read": n.is_read,
+        })
+
+    # Auto-generated notifications
+    notif_recent_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:10]
+    for order in notif_recent_orders:
+        if order.payment_status != "Completed":
             shop_notifications.append({
-                "title": n.title,
-                "message": n.message,
-                "time": n.created_at,
-                "icon": n.icon,
-                "color": n.color,
-                "is_read": n.is_read,
+                "title": f"Payment Pending - Order #{order.id}",
+                "message": f"Customer {order.user.username} hasn't paid",
+                "time": order.created_at, "icon": "fas fa-exclamation-circle", "color": "#e74c3c", "is_read": False,
+            })
+        elif order.cloth_status == "Pending":
+            shop_notifications.append({
+                "title": f"New Order #{order.id}",
+                "message": f"Order from {order.user.username} - ₹{order.amount}",
+                "time": order.created_at, "icon": "fas fa-shopping-cart", "color": "#28a745", "is_read": False,
             })
 
-        # 2️⃣ Auto-generated order notifications
-        recent_orders_for_notifications = Order.objects.filter(
-            shop=shop
-        ).order_by('-created_at')[:10]
+    if not shop_notifications:
+        shop_notifications.append({
+            "title": "Welcome", "message": "Dashboard Ready", "time": now,
+            "icon": "fas fa-store", "color": "#3498db", "is_read": True,
+        })
 
-        for order in recent_orders_for_notifications:
-            if order.payment_status != "Completed":
-                shop_notifications.append({
-                    "title": f"Payment Pending - Order #{order.id}",
-                    "message": f"Customer {order.user.username} has not completed payment",
-                    "time": order.created_at,
-                    "icon": "fas fa-exclamation-circle",
-                    "color": "#e74c3c",
-                    "is_read": False,
-                })
-            elif order.cloth_status == "Pending":
-                shop_notifications.append({
-                    "title": f"New Order #{order.id}",
-                    "message": f"Order from {order.user.username} - ₹{order.amount}",
-                    "time": order.created_at,
-                    "icon": "fas fa-shopping-cart",
-                    "color": "#28a745",
-                    "is_read": False,
-                })
+    shop_notifications.sort(key=lambda x: x["time"], reverse=True)
+    final_notifications = shop_notifications[:5]
 
-        # 3️⃣ Default message
-        if not shop_notifications:
-            shop_notifications.append({
-                "title": "Welcome to Shop Dashboard",
-                "message": "Manage your orders and track your business performance",
-                "time": timezone.now(),
-                "icon": "fas fa-store",
-                "color": "#3498db",
-                "is_read": True,
-            })
-
-        # 4️⃣ SORT (NOW SAFE ✅)
-        shop_notifications.sort(key=lambda x: x["time"], reverse=True)
-
-        # 5️⃣ LIMIT
-        shop_notifications = shop_notifications[:5]
-
-
-    # =====================
-    # ⭐ SHOP RATINGS
-    # =====================
+    # Ratings
     shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
-    # =====================
-    # 🎯 CONTEXT
-    # =====================
     context = {
         'shop': shop,
         'branches': branches,
-
-        # Stats
         'total_orders': total_orders,
         'pending_orders': pending_orders,
         'completed_orders': completed_orders,
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
-
-        # Orders
         'recent_orders': recent_orders,
         'incomplete_payment_orders': incomplete_payment_orders,
         'incomplete_payment_count': incomplete_payment_orders.count(),
-
-        # Branch
         'branch_stats': branch_stats,
-
-        # Notifications
-        'shop_notifications': shop_notifications[:5],
-
-        # Ratings
         'shop_ratings': shop_ratings,
         'average_rating': average_rating,
-
-        # Delayed
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
-        "now": timezone.now(),
-        "shop_notifications": shop_notifications,
+        'now': now,
+        'shop_notifications': final_notifications,
+        'unread_count': unread_count,
     }
 
     return render(request, 'shop_dashboard.html', context)
@@ -2940,24 +2885,18 @@ def manage_service_prices(request):
             selected_branches = request.POST.getlist('branches')
 
             if cloth_name and selected_branches:
-                # 1. Check if this cloth already exists globally
-                cloth, created = Cloth.objects.get_or_create(name__iexact=cloth_name, defaults={'name': cloth_name})
+                # 1. Safely find the cloth (case-insensitive)
+                # Using .filter().first() prevents the MultipleObjectsReturned error
+                cloth = Cloth.objects.filter(name__iexact=cloth_name).first()
 
-                # 2. Check if this cloth is already linked to ANY of the selected branches
-                already_linked = BranchCloth.objects.filter(branch_id__in=selected_branches, cloth=cloth)
-                
-                if already_linked.exists():
-                    # If it already exists in the selected branches, show error
-                    messages.error(request, f'Notice: "{cloth_name}" already exists in the selected branches.')
-                else:
-                    # Add cloth to selected branches
-                    for branch_id in selected_branches:
-                        try:
-                            branch = Branch.objects.get(id=branch_id, shop=shop)
-                            BranchCloth.objects.get_or_create(branch=branch, cloth=cloth)
-                        except Branch.DoesNotExist:
-                            continue
-                    messages.success(request, f'Cloth type "{cloth_name}" added successfully!')
+                if not cloth:
+                    cloth = Cloth.objects.create(name=cloth_name)
+
+                # 2. Link to selected branches
+                for branch_id in selected_branches:
+                    BranchCloth.objects.get_or_create(branch_id=branch_id, cloth=cloth)
+                    
+                messages.success(request, f'Cloth type "{cloth.name}" is now available in selected branches.')
             else:
                 messages.error(request, 'Please provide both a name and at least one branch.')
             
@@ -2997,7 +2936,7 @@ def manage_service_prices(request):
                     messages.error(request, 'Cloth type not found.')
             return redirect('manage_service_prices')
         else:
-            # Process price updates
+    # Process price updates
             for service in services:
                 for cloth in clothes:
                     price_key = f'price_{service.id}_{cloth.id}'
@@ -3006,20 +2945,16 @@ def manage_service_prices(request):
                     if price_value:
                         try:
                             price = float(price_value)
-                            if price >= 0:
-                                # Update or create cloth price
-                                ServiceClothPrice.objects.update_or_create(
-                                    service=service,
-                                    cloth=cloth,
-                                    defaults={'price': price}
-                                )
-                            else:
-                                # Remove if price is 0 or negative
-                                ServiceClothPrice.objects.filter(service=service, cloth=cloth).delete()
+                            # Use update_or_create to ensure one price per service/cloth pair
+                            ServiceClothPrice.objects.update_or_create(
+                                service=service,
+                                cloth=cloth,
+                                defaults={'price': price}
+                            )
                         except ValueError:
                             continue
                     else:
-                        # Remove if empty
+                        # If input is empty, remove the price entry
                         ServiceClothPrice.objects.filter(service=service, cloth=cloth).delete()
 
             messages.success(request, 'Service cloth prices updated successfully!')

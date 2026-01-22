@@ -1086,6 +1086,33 @@
                 padding-bottom: 20px;
             }
         }
+        /* Animation for the bell shaking */
+        @keyframes bellShake {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(15deg); }
+            30% { transform: rotate(-15deg); }
+            45% { transform: rotate(10deg); }
+            60% { transform: rotate(-10deg); }
+            75% { transform: rotate(5deg); }
+            85% { transform: rotate(-5deg); }
+            100% { transform: rotate(0); }
+        }
+
+        .shake-now {
+            animation: bellShake 0.6s ease-in-out;
+            color: #e74c3c !important; /* Change bell color to red momentarily */
+        }
+
+        /* Animation for the red badge pulsing */
+        @keyframes badgePulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .notification-badge {
+            animation: badgePulse 2s infinite; /* Make the red number pulse constantly */
+        }
     </style>
 </head>
 <body>
@@ -1136,8 +1163,7 @@
             </div>
             <div class="notification-container">
                 <button class="notification-btn" id="notification-trigger">
-                    <i class="fas fa-bell"></i>
-                    {% if unread_count > 0 %}
+                    <i class="fas fa-bell" id="bell-icon"></i> {% if unread_count > 0 %}
                     <span id="notification-count" class="notification-badge">
                         {{ unread_count }}
                     </span>
@@ -2008,6 +2034,34 @@
                 document.getElementById(`delete-form-${branchId}`).submit();
             });
         }
+        document.addEventListener("DOMContentLoaded", function () {
+            const bell = document.getElementById("bell-icon");
+            const badge = document.getElementById("notification-count");
+            const dropdown = document.getElementById("notification-dropdown-menu");
+
+            // Check if Django sent an unread count
+            const unreadCount = parseInt("{{ unread_count|default:0 }}");
+
+            if (unreadCount > 0) {
+                // 1. Make the bell shake
+                bell.classList.add("shake-now");
+
+                // 2. "Pop up" the existing dropdown automatically
+                dropdown.classList.add("show");
+
+                // 3. Remove the shake class after animation ends
+                setTimeout(() => {
+                    bell.classList.remove("shake-now");
+                }, 1000);
+
+                // 4. Automatically close the "pop up" after 4 seconds
+                setTimeout(() => {
+                    if (dropdown.classList.contains("show")) {
+                        dropdown.classList.remove("show");
+                    }
+                }, 4000);
+            }
+        });
     </script>
 </body>
 </html>

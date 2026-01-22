@@ -1245,6 +1245,88 @@
                 padding: 12px 20px;
             }
         }
+        /* ===== MOBILE FULLSCREEN NAV REWRITTEN ===== */
+        @media (max-width: 992px) {
+            /* The Dark Overlay Background */
+            nav::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.6); /* Darkens the screen */
+                opacity: 0;
+                visibility: hidden;
+                transition: 0.3s;
+                z-index: 1999;
+            }
+
+            /* Show overlay when nav is open */
+            nav.nav-open::after {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%; /* Hidden by default */
+                height: 100vh;
+                width: 75%%; /* Width of the drawer like in the video */
+                background: #0f334b; 
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start; /* Start from top */
+                padding-top: 80px; 
+                gap: 15px;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 2000;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+            }
+
+            .nav-links.active {
+                right: 0; /* Slides into view */
+            }
+
+            .nav-links li {
+                width: 100%;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+            }
+
+            .nav-links li a {
+                display: block;
+                padding: 15px 30px;
+                font-size: 18px;
+                color: #ffffff;
+                text-align: left;
+                text-decoration:line;
+            }
+            .nav-links li a::after {
+                background-color: var(--white); /* Bright green line for the dark mobile menu */
+                bottom: 5px; /* Adjust position for mobile layout */
+                left: 30px;  /* Align with the text padding */
+            }
+            
+            .nav-links li a:hover::after {
+                width: 40px; /* Keep it shorter on mobile for a cleaner look */
+                text-decoration:line;
+            }
+
+            /* The "X" or Hamburger Icon */
+            .menu-toggle {
+                display: block;
+                z-index: 2001;
+                position: relative;
+                padding: 10px;
+                font-size: 28px;
+            }
+
+            /* Force the Close Icon (X) to stay white when menu is open */
+            nav.nav-open .menu-toggle i {
+                color: #ffffff;
+            }
+        }
     </style>
 </head>
 
@@ -1694,12 +1776,14 @@
 
         const menuToggle = document.getElementById('mobile-menu');
         const navList = document.getElementById('nav-list');
-
         const navbar = document.querySelector('nav');
 
         menuToggle.addEventListener('click', () => {
             navList.classList.toggle('active');
-            navbar.classList.toggle('nav-open'); // 🔥 ADD THIS
+            navbar.classList.toggle('nav-open');
+            
+            // Prevent body scrolling when menu is open
+            document.body.style.overflow = navList.classList.contains('active') ? 'hidden' : 'auto';
 
             const icon = menuToggle.querySelector('i');
             if (navList.classList.contains('active')) {
@@ -1709,11 +1793,12 @@
             }
         });
 
-        // Close menu on link click
+        // Close menu when a link is clicked
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', () => {
                 navList.classList.remove('active');
-                navbar.classList.remove('nav-open'); // 🔥 ADD THIS
+                navbar.classList.remove('nav-open');
+                document.body.style.overflow = 'auto';
                 menuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
             });
         });
