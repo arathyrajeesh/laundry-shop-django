@@ -1113,6 +1113,11 @@
         .notification-badge {
             animation: badgePulse 2s infinite; /* Make the red number pulse constantly */
         }
+        .btn.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
     </style>
 </head>
 <body>
@@ -1734,7 +1739,7 @@
             const trigger = document.getElementById("notification-trigger");
             const dropdown = document.getElementById("notification-dropdown-menu");
             const badge = document.getElementById("notification-count");
-
+            if (badge) badge.style.display = "none";
             if (!trigger || !dropdown) return;
 
             trigger.addEventListener("click", function (e) {
@@ -1756,14 +1761,6 @@
             });
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("{% url 'mark_notifications_read' %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}"
-                }
-            });
-        });
 
 
         // Shop status toggle functionality
@@ -2042,25 +2039,14 @@
             // Check if Django sent an unread count
             const unreadCount = parseInt("{{ unread_count|default:0 }}");
 
-            if (unreadCount > 0) {
-                // 1. Make the bell shake
+            const lastUnread = localStorage.getItem("shop_unread") || 0;
+
+            if (unreadCount > lastUnread) {
                 bell.classList.add("shake-now");
-
-                // 2. "Pop up" the existing dropdown automatically
-                dropdown.classList.add("show");
-
-                // 3. Remove the shake class after animation ends
-                setTimeout(() => {
-                    bell.classList.remove("shake-now");
-                }, 1000);
-
-                // 4. Automatically close the "pop up" after 4 seconds
-                setTimeout(() => {
-                    if (dropdown.classList.contains("show")) {
-                        dropdown.classList.remove("show");
-                    }
-                }, 4000);
             }
+
+            localStorage.setItem("shop_unread", unreadCount);
+
         });
     </script>
 </body>

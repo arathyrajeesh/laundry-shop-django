@@ -2468,13 +2468,14 @@ def shop_dashboard(request):
             shop_notifications.append({
                 "title": f"Payment Pending - Order #{order.id}",
                 "message": f"Customer {order.user.username} hasn't paid",
-                "time": order.created_at, "icon": "fas fa-exclamation-circle", "color": "#e74c3c", "is_read": False,
+                "time": order.created_at, "icon": "fas fa-exclamation-circle", "color": "#e74c3c", "is_read": True,
             })
         elif order.cloth_status == "Pending":
             shop_notifications.append({
                 "title": f"New Order #{order.id}",
                 "message": f"Order from {order.user.username} - ₹{order.amount}",
-                "time": order.created_at, "icon": "fas fa-shopping-cart", "color": "#28a745", "is_read": False,
+                "time": order.created_at, "icon": "fas fa-shopping-cart", "color": "#28a745",
+                "is_read": True,  # ✅ CHANGE THIS
             })
 
     if not shop_notifications:
