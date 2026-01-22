@@ -1273,7 +1273,7 @@
                 top: 0;
                 right: -100%; /* Hidden by default */
                 height: 100vh;
-                width: 75%%; /* Width of the drawer like in the video */
+                width: 75%; /* Width of the drawer like in the video */
                 background: #0f334b; 
                 display: flex;
                 flex-direction: column;
@@ -1326,6 +1326,118 @@
             nav.nav-open .menu-toggle i {
                 color: #ffffff;
             }
+        }
+        /* --- CHATBOT WIDGET --- */
+        .chat-widget-container {
+            position: fixed;
+            bottom: 85px; /* Positioned above the Up Arrow */
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .chat-button {
+            width: 55px;
+            height: 55px;
+            background: var(--accent-color); /* Bright Green */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+            background: var(--accent-hover);
+        }
+
+        .chat-window {
+            width: 320px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-footer {
+            padding: 10px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 5px;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .chat-footer button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .bot-msg, .user-msg {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .bot-msg {
+            background: #e9eff5;
+            color: #333;
+            align-self: flex-start;
+        }
+
+        .user-msg {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
         }
     </style>
 </head>
@@ -1696,8 +1808,26 @@
         </div>
     </footer>
 
-    <div class="combined-widget">
-        <div class="up-arrow-btn" id="up-arrow-btn">
+    <div class="chat-widget-container">
+        <div class="chat-window" id="chat-window">
+            <div class="chat-header">
+                <span><i class="fas fa-robot"></i> ShineBot</span>
+                <i class="fas fa-times" style="cursor:pointer" id="close-chat"></i>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="bot-msg">Hi there! 👋 How can I help you with your laundry today?</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="chat-input" placeholder="Type a message...">
+                <button id="send-chat"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <div class="chat-button" id="chat-toggle">
+            <i class="fas fa-comment-dots"></i>
+        </div>
+
+        <div class="up-arrow-btn" id="up-arrow-btn" style="margin-top: 10px;">
             <i class="fas fa-arrow-up"></i>
         </div>
     </div>
@@ -1811,7 +1941,71 @@
                 document.body.classList.remove('no-scroll');
             }
         });
+        // Chatbot Logic
+        const chatToggle = document.getElementById('chat-toggle');
+        const chatWindow = document.getElementById('chat-window');
+        const closeChat = document.getElementById('close-chat');
+        const sendBtn = document.getElementById('send-chat');
+        const chatInput = document.getElementById('chat-input');
+        const chatBody = document.getElementById('chat-body');
 
+        // Toggle Open/Close
+        chatToggle.addEventListener('click', () => {
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+        });
+
+        // Simple Send Function
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text === "") return;
+
+            // Add User Message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-msg';
+            userDiv.textContent = text;
+            chatBody.appendChild(userDiv);
+
+            chatInput.value = "";
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Convert text to lowercase for comparison
+            const userText = text.toLowerCase();
+
+            setTimeout(() => {
+                const botDiv = document.createElement('div');
+                botDiv.className = 'bot-msg';
+
+                // 👇 SMART REPLIES
+                if (userText === "hello" || userText === "hi" || userText === "hey" || userText === "haii") {
+                    botDiv.textContent = "Hi 👋 How can I help you today?";
+                } 
+                else if (userText.includes("price") || userText.includes("cost")) {
+                    botDiv.textContent = "💰 Our prices start from ₹60/kg for Wash & Fold. Would you like to see full pricing?";
+                }
+                else if (userText.includes("pickup")) {
+                    botDiv.textContent = "🚚 We offer FREE pickup & delivery. You can book a pickup from your dashboard.";
+                }
+                else if (userText.includes("time") || userText.includes("delivery")) {
+                    botDiv.textContent = "⏱️ We usually deliver within 24–48 hours.";
+                }
+                else {
+                    botDiv.textContent = "Thanks for your message 😊 Our team will contact you shortly. You can also call +(91) 9876543210.";
+                }
+
+                chatBody.appendChild(botDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 600);
+        }
+
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 
 </body>
