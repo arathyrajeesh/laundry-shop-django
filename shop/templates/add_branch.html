@@ -299,7 +299,18 @@
                         { headers: { "User-Agent": "Terminal/1.0" } }
                     );
                     const data = await res.json();
-                    const city = data.address?.city || data.address?.town || data.address?.suburb || "Location Verified";
+                    const addr = data.address || {};
+                    const city =
+                        addr.city ||
+                        addr.city_district ||
+                        addr.town ||
+                        addr.village ||
+                        addr.county ||
+                        addr.state_district ||
+                        addr.municipality ||
+                        addr.suburb ||
+                        addr.state ||
+                        "Location Verified";
 
                     document.getElementById("city").value = city;
                     updateStatus(city, `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
