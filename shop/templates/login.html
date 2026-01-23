@@ -7,6 +7,7 @@
     <title>Login - Shine & Bright Laundry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -19,7 +20,25 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+        h1, h2 {
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-weight: 250;
+        }
+
+        input,
+        button,
+        a {
+            font-weight: 250;
+        }
 
         body { background: var(--bg-soft); color: var(--text-main); }
 
@@ -53,12 +72,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        .logo-box img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            /* REMOVED: filter: brightness(100) invert(1); */
-        }
         h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px; color: var(--primary); }
         .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 32px; }
 
@@ -256,6 +269,121 @@
                 font-size: 14px;
             }
         }
+        /* =========================
+        GLOBAL MOBILE FIXES
+        ========================= */
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* =========================
+        TABLET (≤ 1024px)
+        ========================= */
+        @media (max-width: 1024px) {
+            .page-wrapper {
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .left-panel {
+                min-height: 100vh;
+            }
+        }
+
+        /* =========================
+        MOBILE (≤ 768px)
+        ========================= */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 28px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+                margin-bottom: 24px;
+            }
+
+            input {
+                padding: 13px 14px;
+                font-size: 13px;
+            }
+
+            .login-btn {
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            .google-btn {
+                font-size: 13px;
+                padding: 11px;
+            }
+
+            .or {
+                margin: 20px 0;
+            }
+        }
+
+        /* =========================
+        SMALL PHONES (≤ 480px)
+        ========================= */
+        @media (max-width: 480px) {
+            .page-wrapper {
+                min-height: 100svh; /* iOS safe height */
+            }
+
+            .login-box {
+                padding: 24px 20px;
+                border-radius: 14px;
+            }
+
+            .logo-box {
+                width: 52px;
+                height: 52px;
+                margin-bottom: 18px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .forgot-password {
+                margin-bottom: 18px;
+            }
+
+            .combined-links {
+                gap: 8px;
+                margin-top: 22px;
+            }
+
+            .combined-links span {
+                font-size: 12px;
+            }
+
+            .combined-links a {
+                font-size: 13px;
+            }
+        }
+
+        /* =========================
+        VERY SMALL DEVICES (≤ 360px)
+        ========================= */
+        @media (max-width: 360px) {
+            h2 {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            .login-btn {
+                font-size: 13px;
+            }
+        }
 
     </style>
 </head>
@@ -265,9 +393,6 @@
 <div class="page-wrapper">
     <div class="left-panel">
         <div class="login-box">
-            <div class="logo-box">
-                <img src="{% static 'images/Shine.png' %}" alt="Logo">
-            </div>
             {% if messages %}
                 {% for message in messages %}
                     <div class="error-box">
