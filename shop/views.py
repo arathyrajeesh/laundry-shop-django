@@ -326,73 +326,61 @@ def hero(request):
     shops = LaundryShop.objects.filter(is_approved=True)
     return render(request, 'home.html', {'shops': shops})
 
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.utils import timezone
+
 def login_page(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
 
-            # Send login success email only once per user
+            # Send login success email only once
             try:
                 profile = user.profile
                 if not profile.login_email_sent:
-                    login_message = f"""
+                    send_mail(
+                        subject="Login Successful - Shine & Bright",
+                        message=f"""
 Hi {user.username},
 
 You have successfully logged in to your Shine & Bright Laundry account.
 
-Login Details:
-- Username: {user.username}
-- Email: {user.email}
-- Login Time: {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+Login Time: {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
 
-If this login was not initiated by you, please contact our support team immediately and consider changing your password.
+If this wasn’t you, please contact support immediately.
 
-For your security, we recommend:
-- Using a strong, unique password
-- Enabling two-factor authentication if available
-- Regularly monitoring your account activity
-
-Thank you for using Shine & Bright!
-
-Best regards,
-Shine & Bright Team
-🧺✨
-"""
-
-                    send_mail(
-                        subject="Login Successful - Shine & Bright",
-                        message=login_message,
+– Shine & Bright Team
+""",
                         from_email=settings.EMAIL_HOST_USER,
                         recipient_list=[user.email],
                         fail_silently=True,
                     )
 
-                    # Mark that login email has been sent
                     profile.login_email_sent = True
                     profile.save()
-            except Exception as e:
-                # If profile doesn't exist or other error, continue without sending email
+            except Exception:
                 pass
 
-            messages.success(request, "Login successful!")
-            # Redirect to 'next' parameter if present, otherwise check user type
-            next_url = request.GET.get('next') or request.POST.get('next')
+            # Redirect logic
+            next_url = request.GET.get("next") or request.POST.get("next")
             if next_url:
                 return redirect(next_url)
-            # Redirect staff/superusers to admin dashboard, regular users to user dashboard
             elif user.is_staff or user.is_superuser:
-                return redirect('admin_dashboard')
-            else:
-                return redirect('dashboard')
+                return redirect("admin_dashboard")
+            return redirect("dashboard")
+
         else:
             messages.error(request, "Invalid username or password")
-            # Preserve the 'next' parameter in the redirect
-            next_param = request.GET.get('next', '')
+
+            next_param = request.GET.get("next", "")
             if next_param:
                 return redirect(f"{reverse('login')}?next={next_param}")
             return redirect("login")
