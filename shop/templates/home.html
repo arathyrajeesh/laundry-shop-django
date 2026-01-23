@@ -1460,6 +1460,79 @@
             color: white;
             align-self: flex-end;
         }
+        /* ===== CHATBOT RESPONSIVENESS ===== */
+        @media (max-width: 768px) {
+            .chat-widget-container {
+                right: 15px;
+                bottom: 15px;
+                gap: 12px;
+            }
+
+            .chat-window {
+                width: 92vw;
+                height: 70vh;
+                right: 0;
+                bottom: 70px;
+                border-radius: 14px;
+            }
+
+            .chat-body {
+                font-size: 14px;
+            }
+
+            .chat-footer input {
+                font-size: 14px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 420px) {
+            .chat-window {
+                height: 65vh;
+            }
+        }
+        @media (max-width: 576px) {
+            .hero-content h1 {
+                font-size: 28px;
+                line-height: 1.25;
+            }
+
+            .hero-content p {
+                font-size: 14px;
+            }
+
+            .hero-visual img {
+                width: 240px;
+                height: 280px;
+            }
+        }
+        @media (max-width: 600px) {
+            .swiper {
+                width: 100%;
+            }
+
+            .service-card,
+            .pricing-card {
+                width: 90%;
+            }
+        }
+        @media (max-width: 600px) {
+            .footer-col h3 {
+                font-size: 18px;
+            }
+
+            .footer-about p {
+                font-size: 14px;
+            }
+
+            .footer-bottom {
+                font-size: 13px;
+            }
+        }
+        .chat-widget-container {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
     </style>
 </head>
 
