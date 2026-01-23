@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Shine & Bright</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
 
@@ -26,7 +26,18 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+        }
+        h1, h2, h3 {
+            letter-spacing: -0.02em;
+        }
+
+        .section-header h2 {
+            font-weight: 800;
+        }
+
+        .shop-card h3 {
+            font-weight: 600;
         }
 
         body {
@@ -425,6 +436,41 @@
                 display: none; 
             }
         }
+        .show-more-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: -2rem;
+            margin-bottom: 3rem;
+        }
+
+        #toggleServicesBtn {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #toggleServicesBtn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        #toggleServicesBtn i {
+            transition: transform 0.3s ease;
+        }
+
+        #toggleServicesBtn.active i {
+            transform: rotate(180deg);
+        }
+
     </style>
 </head>
 <body>
@@ -533,7 +579,7 @@
         </div>
 
         {% if services_nearby %}
-            <div class="modern-grid">
+            <div class="modern-grid" id="servicesGrid">
                 {% for service in services_nearby %}
                     <div class="shop-card">
                         <div class="card-body">
@@ -556,6 +602,14 @@
                     </div>
                 {% endfor %}
             </div>
+            {% if services_nearby|length > 5 %}
+            <div class="show-more-wrapper">
+                <button id="toggleServicesBtn" onclick="toggleServices()">
+                    <i class="fas fa-chevron-down"></i>
+                    Show more services
+                </button>
+            </div>
+            {% endif %}
 
         {% else %}
             <!-- NO SERVICES MESSAGE -->
@@ -871,19 +925,44 @@
                 if (data.success) {
                     btn.innerHTML = "Reminder Sent";
                 } else {
-                    btn.innerHTML = "🔔 Send Reminder";
+                    btn.innerHTML = " Send Reminder";
                     btn.disabled = false;
                     alert(data.message || "Failed to send reminder");
                 }
             })
             .catch(err => {
                 console.error(err);
-                btn.innerHTML = "🔔 Send Reminder";
+                btn.innerHTML = " Send Reminder";
                 btn.disabled = false;
                 alert("Something went wrong");
             });
         }
+        const services = document.querySelectorAll("#servicesGrid .shop-card");
+        const toggleBtn = document.getElementById("toggleServicesBtn");
+        let expanded = false;
 
+        // Hide services beyond 5 initially
+        if (services.length > 5) {
+            services.forEach((card, index) => {
+                if (index >= 5) card.style.display = "none";
+            });
+        }
+
+        function toggleServices() {
+            expanded = !expanded;
+
+            services.forEach((card, index) => {
+                if (index >= 5) {
+                    card.style.display = expanded ? "block" : "none";
+                }
+            });
+
+            toggleBtn.classList.toggle("active");
+
+            toggleBtn.innerHTML = expanded
+                ? '<i class="fas fa-chevron-up"></i> Show less'
+                : '<i class="fas fa-chevron-down"></i> Show more services';
+        }
 
     </script>
 </body>
