@@ -1330,12 +1330,46 @@
         /* --- CHATBOT WIDGET --- */
         .chat-widget-container {
             position: fixed;
-            bottom: 85px; /* Positioned above the Up Arrow */
+            bottom: 20px; /* Aligned to the bottom */
             right: 20px;
             z-index: 1000;
             display: flex;
-            flex-direction: column;
+            flex-direction: row-reverse; /* Places items side-by-side, starting from the right */
             align-items: flex-end;
+            gap: 15px; /* Space between the two buttons */
+        }
+
+        /* Up Arrow Specific Adjustments */
+        .up-arrow-btn {
+            width: 55px; /* Matched size with chat button */
+            height: 55px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: none; /* Controlled by JS scroll */
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            margin-top: 0 !important; /* Remove the top margin you had */
+        }
+
+        /* Ensure Chat Window stays anchored above the Chat Button */
+        .chat-window {
+            position: absolute;
+            bottom: 70px; /* Sits above the chat button */
+            right: 0;
+            width: 320px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
         }
 
         .chat-button {
@@ -1356,19 +1390,6 @@
         .chat-button:hover {
             transform: scale(1.1);
             background: var(--accent-hover);
-        }
-
-        .chat-window {
-            width: 320px;
-            height: 450px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            overflow: hidden;
-            margin-bottom: 15px;
-            animation: slideIn 0.3s ease-out;
         }
 
         @keyframes slideIn {
@@ -1809,25 +1830,27 @@
     </footer>
 
     <div class="chat-widget-container">
-        <div class="chat-window" id="chat-window">
-            <div class="chat-header">
-                <span><i class="fas fa-robot"></i> ShineBot</span>
-                <i class="fas fa-times" style="cursor:pointer" id="close-chat"></i>
+        <div class="chat-control-group">
+            <div class="chat-window" id="chat-window">
+                <div class="chat-header">
+                    <span><i class="fas fa-robot"></i> ShineBot</span>
+                    <i class="fas fa-times" style="cursor:pointer" id="close-chat"></i>
+                </div>
+                <div class="chat-body" id="chat-body">
+                    <div class="bot-msg">Hi there! 👋 How can I help you with your laundry today?</div>
+                </div>
+                <div class="chat-footer">
+                    <input type="text" id="chat-input" placeholder="Type a message...">
+                    <button id="send-chat"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
-            <div class="chat-body" id="chat-body">
-                <div class="bot-msg">Hi there! 👋 How can I help you with your laundry today?</div>
-            </div>
-            <div class="chat-footer">
-                <input type="text" id="chat-input" placeholder="Type a message...">
-                <button id="send-chat"><i class="fas fa-paper-plane"></i></button>
+
+            <div class="chat-button" id="chat-toggle">
+                <i class="fas fa-comment-dots"></i>
             </div>
         </div>
 
-        <div class="chat-button" id="chat-toggle">
-            <i class="fas fa-comment-dots"></i>
-        </div>
-
-        <div class="up-arrow-btn" id="up-arrow-btn" style="margin-top: 10px;">
+        <div class="up-arrow-btn" id="up-arrow-btn">
             <i class="fas fa-arrow-up"></i>
         </div>
     </div>
