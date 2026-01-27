@@ -619,6 +619,29 @@
                 </div>
             {% endif %}
         </div>
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+            <label style="font-size:0.85rem; color:#64748b;">
+                Filter by rating:
+            </label>
+
+            <form method="GET" class="modern-search-bar">
+                <input type="text" name="search" value="{{ search_query }}"
+                    placeholder="Search wash & fold, dry cleaning, premium care...">
+
+                <select name="rating"
+                    style="padding:6px 10px;border-radius:8px;border:1px solid #e2e8f0;">
+                    <option value="">All</option>
+                    <option value="4" {% if rating_filter == "4" %}selected{% endif %}>
+                        ⭐ 4 & above
+                    </option>
+                    <option value="3" {% if rating_filter == "3" %}selected{% endif %}>
+                        ⭐ 3 & above
+                    </option>
+                </select>
+
+                <button type="submit" class="search-btn-alt">Search</button>
+            </form>
+        </div>
 
         <div class="section-header">
             <div>

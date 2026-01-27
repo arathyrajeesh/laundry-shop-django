@@ -13,7 +13,6 @@ from django.db.models import Sum, Count
 from shop.utils.wash_ai import get_wash_recommendation
 from .models import WashRecommendation
 from datetime import timedelta
-from django.utils import timezone
 from shop.utils.delivery_ai import predict_delivery_hours
 from .models import Order, OrderItem
 from django.core.exceptions import ValidationError
@@ -55,7 +54,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import LaundryShop, ShopPasswordResetToken,NewsletterSubscriber
 from django.template.loader import render_to_string
-from django.utils import timezone
 from .models import Order, Profile
 from django.db.models import Count
 from datetime import timedelta
@@ -338,7 +336,6 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.utils import timezone
 
 def login_page(request):
     if request.method == "POST":
@@ -549,7 +546,7 @@ def edit_profile(request):
         "profile": profile
     })
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Avg
 from django.shortcuts import render
 
 @login_required
@@ -573,26 +570,20 @@ def user_dashboard(request):
     spent = (
         Order.objects
         .filter(user=request.user, payment_status="Completed")
-        .aggregate(total=Sum("amount"))["total"]
-        or 0
+        .aggregate(total=Sum("amount"))["total"] or 0
     )
 
     cloth_status = get_cloth_status(request.user)
 
-    # ===============================
-    # USER LOCATION (FROM PROFILE)
-    # ===============================
     search_query = request.GET.get("search", "").strip()
+    rating_filter = request.GET.get("rating")
+
     profile = getattr(request.user, "profile", None)
     user_city = profile.city.strip() if profile and profile.city else None
 
     services_nearby = []
     shops_nearby = []
     nearby_shop_count = 0
-
-    # ===============================
-    # SEARCH MODE
-    # ===============================
 
     if search_query:
         services = (
@@ -601,39 +592,46 @@ def user_dashboard(request):
                 name__icontains=search_query,
                 branch__shop__is_approved=True
             )
-            .select_related("branch__shop")
+            .select_related("branch", "branch__shop")
+            .annotate(
+                avg_rating=Avg("branch__shop__shoprating__rating")
+            )
         )
 
         if user_city:
-            services_nearby = services.filter(
-                branch__city__iexact=user_city
-            )[:10]
-        else:
-            services_nearby = services[:10]
+            services = services.filter(branch__city__iexact=user_city)
 
+        if rating_filter:
+            services = services.filter(avg_rating__gte=float(rating_filter))
 
-    # ===============================
-    # LOCATION-BASED MODE
-    # ===============================
+        services_nearby = services[:10]
+
     elif user_city:
         services_nearby = (
             Service.objects
             .filter(
-                branch__city__iexact=user_city,   
+                branch__city__iexact=user_city,
                 branch__shop__is_approved=True
             )
-            .select_related("branch", "branch__shop")[:10]
+            .select_related("branch", "branch__shop")
+            .annotate(
+                avg_rating=Avg("branch__shop__shoprating__rating")
+            )
         )
 
+        if rating_filter:
+            services_nearby = services_nearby.filter(
+                avg_rating__gte=float(rating_filter)
+            )
 
+        services_nearby = services_nearby[:10]
 
         nearby_shops_qs = (
             LaundryShop.objects
             .filter(
                 is_approved=True,
-                branches__city__iexact=user_city   
+                branches__city__iexact=user_city
             )
-            .order_by("id")
             .distinct()
         )
 
@@ -697,6 +695,7 @@ def user_dashboard(request):
             "recent_notifications": recent_notifications,
             "unread_count": unread_count,
             "previous_shops": previous_shops,
+            "rating_filter": rating_filter,
         },
     )
 
@@ -3382,7 +3381,6 @@ def update_live_location(request):
         profile.save()
 
         return JsonResponse({"success": True})
-from django.utils import timezone
 from django.db.models import Q
 
 def admin_orders_filter(request):
@@ -3454,7 +3452,6 @@ def mark_notifications_read(request):
 
 from django.core.mail import send_mail
 from django.conf import settings
-from django.utils import timezone
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
