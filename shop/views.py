@@ -234,18 +234,26 @@ def get_cloth_status(user):
     orders = Order.objects.filter(
         user=user,
         payment_status="Completed"
-    ).select_related('shop').order_by('-created_at')
+    ).select_related('shop', 'branch').order_by('-created_at')
 
-    return [
-        {
-            'order_id': order.id,   # ✅ ADD THIS LINE
+    result = []
+    for order in orders:
+        already_rated = ShopRating.objects.filter(
+            user=user,
+            shop=order.shop
+        ).exists()
+
+        result.append({
+            'order_id': order.id,
             'cloth_name': f"Order #{order.id}",
             'status': order.cloth_status,
             'delivery_date': order.delivery_date or order.predicted_delivery,
-            'shop_name': order.shop.name
-        }
-        for order in orders
-    ]
+            'shop_name': order.shop.name,
+            'shop_id': order.shop.id,
+            'already_rated': already_rated,   # ✅ important
+        })
+
+    return result
 
 
 
@@ -2403,7 +2411,20 @@ def shop_dashboard(request):
     ).select_related('user', 'branch').order_by('-created_at')
 
     recent_orders = paid_orders.select_related('user', 'branch').order_by('-created_at')[:10]
+    rating_counts = (
+        ShopRating.objects
+        .filter(shop=shop)
+        .values("rating")
+        .annotate(count=Count("id"))
+    )
 
+    rating_map = {r["rating"]: r["count"] for r in rating_counts}
+    total_reviews = sum(rating_map.values()) or 1
+
+    rating_percentages = {
+        star: (rating_map.get(star, 0) / total_reviews) * 100
+        for star in range(1, 6)
+    }
     # 4. Branch Stats Loop
     branch_stats = []
     for branch in branches:
@@ -2498,6 +2519,7 @@ def shop_dashboard(request):
         'now': now,
         'shop_notifications': final_notifications,
         'unread_count': unread_count,
+        "rating_percentages": rating_percentages,
     }
 
     return render(request, 'shop_dashboard.html', context)
@@ -3012,37 +3034,49 @@ def toggle_shop_status(request):
     })
 
 
-@login_required
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+
 @require_POST
+@login_required
 def rate_shop(request, shop_id):
-    """Handle shop rating submission."""
-    shop = get_object_or_404(LaundryShop, id=shop_id, is_approved=True)
-    rating = request.POST.get('rating')
-    comment = request.POST.get('comment', '').strip()
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        rating = int(data.get("rating"))
+        comment = data.get("comment", "").strip()
 
-    if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
-        return JsonResponse({'success': False, 'message': 'Invalid rating. Please select a rating between 1 and 5.'}, status=400)
+        if rating < 1 or rating > 5:
+            return JsonResponse({"success": False, "message": "Invalid rating"}, status=400)
 
-    rating = int(rating)
+        shop = get_object_or_404(LaundryShop, id=shop_id)
 
-    # Check if user already rated this shop
-    existing_rating = ShopRating.objects.filter(user=request.user, shop=shop).first()
-    if existing_rating:
-        existing_rating.rating = rating
-        existing_rating.comment = comment
-        existing_rating.save()
-        message = 'Your rating has been updated successfully!'
-    else:
-        ShopRating.objects.create(
+        # ✅ SAVE RATING (example)
+        ShopRating.objects.update_or_create(
             user=request.user,
             shop=shop,
-            rating=rating,
-            comment=comment
+            defaults={
+                "rating": rating,
+                "comment": comment
+            }
         )
-        message = 'Thank you for rating this shop!'
 
-    return JsonResponse({'success': True, 'message': message})
+        return JsonResponse({"success": True})
 
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"success": False, "message": "Invalid JSON data"},
+            status=400
+        )
+
+    except Exception as e:
+        print("Rating error:", e)  # 👈 YOU WILL SEE THIS IN TERMINAL
+        return JsonResponse(
+            {"success": False, "message": "Server error"},
+            status=500
+        )
 
 @login_required
 @require_POST

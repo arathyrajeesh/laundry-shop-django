@@ -1,4 +1,4 @@
-{% load static %}
+{% load static custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1307,31 +1307,15 @@
                 </div>
 
                 <div class="rating-visual-bars">
+                    {% for star in "54321"|make_list %}
                     <div class="bar-row">
-                        <span>5 <i class="fas fa-star" style="font-size: 10px;"></i></span>
-                        <div class="bar-bg"><div class="bar-fill" style="width: 85%;"></div></div>
-                        <span style="width: 30px;">85%</span>
+                        <span>{{ star }} <i class="fas fa-star" style="font-size:10px;"></i></span>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: {{ rating_percentages|get_item:star|default:0 }}%;"></div>
+                        </div>
+                        <span>{{ rating_percentages|get_item:star|default:0|floatformat:0 }}%</span>
                     </div>
-                    <div class="bar-row">
-                        <span>4 <i class="fas fa-star" style="font-size: 10px;"></i></span>
-                        <div class="bar-bg"><div class="bar-fill" style="width: 10%;"></div></div>
-                        <span style="width: 30px;">10%</span>
-                    </div>
-                    <div class="bar-row">
-                        <span>3 <i class="fas fa-star" style="font-size: 10px;"></i></span>
-                        <div class="bar-bg"><div class="bar-fill" style="width: 3%;"></div></div>
-                        <span style="width: 30px;">3%</span>
-                    </div>
-                    <div class="bar-row">
-                        <span>2 <i class="fas fa-star" style="font-size: 10px;"></i></span>
-                        <div class="bar-bg"><div class="bar-fill" style="width: 1%;"></div></div>
-                        <span style="width: 30px;">1%</span>
-                    </div>
-                    <div class="bar-row">
-                        <span>1 <i class="fas fa-star" style="font-size: 10px;"></i></span>
-                        <div class="bar-bg"><div class="bar-fill" style="width: 1%;"></div></div>
-                        <span style="width: 30px;">1%</span>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
 

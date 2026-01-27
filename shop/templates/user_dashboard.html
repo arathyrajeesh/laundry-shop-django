@@ -470,6 +470,66 @@
         #toggleServicesBtn.active i {
             transform: rotate(180deg);
         }
+        /* Center Alert Modal */
+        .center-alert-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.center-alert-box {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 360px;
+    text-align: center;
+    animation: scaleIn 0.2s ease;
+}
+
+.center-alert-box h3 {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.center-alert-box p {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.alert-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.alert-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.alert-btn.cancel {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.alert-btn.confirm {
+    background: #ef4444;
+    color: white;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
 
     </style>
 </head>
@@ -656,36 +716,66 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for cloth in cloth_status %}
-                    <tr>
-                        <td style="font-weight: 600;">{{ cloth.cloth_name }}</td>
-                        <td style="color: var(--text-muted); font-size: 0.9rem;">{{ cloth.shop_name }}</td>
-                        <td>
-                            {% if cloth.delivery_date and cloth.delivery_date|date:"Y-m-d" < today_str and cloth.status != "Completed" %}
-                                <span class="status-pill status-delayed">
-                                    DELAYED – {{ cloth.status }}
-                                </span>
+                {% for cloth in cloth_status %}
+                <tr>
+                    <td style="font-weight: 600;">{{ cloth.cloth_name }}</td>
 
-                                <button class="reminder-btn"
-                                        onclick="sendReminder(this, {{ cloth.order_id }})">
-                                    <i class="fas fa-bell"></i> Send Reminder
-                                </button>
+                    <td style="color: var(--text-muted); font-size: 0.9rem;">
+                        {{ cloth.shop_name }}
+                    </td>
+
+                    <td>
+                        {% if cloth.delivery_date and cloth.delivery_date|date:"Y-m-d" < today_str and cloth.status != "Completed" %}
+                            <span class="status-pill status-delayed">
+                                DELAYED – {{ cloth.status }}
+                            </span>
+
+                            <button class="reminder-btn"
+                                    onclick="sendReminder(this, {{ cloth.order_id }})">
+                                <i class="fas fa-bell"></i> Send Reminder
+                            </button>
+
+                        {% else %}
+
+                            {% if cloth.status == "Completed" %}
+                                <span class="status-pill status-completed">Completed</span>
+
+                                {% if not cloth.already_rated %}
+                                    <button class="reminder-btn"
+                                            onclick="openRatingModal({{ cloth.shop_id }})">
+                                        ⭐ Rate Order
+                                    </button>
+                                {% else %}
+                                    <span style="font-size:12px;color:#22c55e;">✔ Rated</span>
+                                {% endif %}
+
+                            {% elif cloth.status == "Pending" %}
+                                <span class="status-pill status-pending">Pending</span>
+
                             {% else %}
-                                <span class="status-pill 
-                                    {% if cloth.status == 'Pending' %}status-pending
-                                    {% elif cloth.status == 'Completed' %}status-completed
-                                    {% else %}status-processing{% endif %}">
+                                <span class="status-pill status-processing">
                                     {{ cloth.status }}
                                 </span>
                             {% endif %}
-                        </td>
-                        <td style="font-size: 0.9rem;">{% if cloth.delivery_date %}{{ cloth.delivery_date|date:"d M" }}{% else %}Calculating...{% endif %}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 3rem;">No active orders to track.</td>
-                    </tr>
-                    {% endfor %}
+
+                        {% endif %}
+                    </td>
+
+                    <td style="font-size: 0.9rem;">
+                        {% if cloth.delivery_date %}
+                            {{ cloth.delivery_date|date:"d M" }}
+                        {% else %}
+                            Calculating...
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align:center;color:var(--text-muted);padding:3rem;">
+                        No active orders to track.
+                    </td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
             {% if pending_count > 0 %}
@@ -703,6 +793,40 @@
                 Please wait while the shop processes your laundry.
             </div>
             {% endif %}
+        </div>
+    </div>
+    <!-- Center Alert Modal -->
+    <div id="centerAlert" class="center-alert-overlay">
+        <div class="center-alert-box">
+            <h3 id="alertTitle">Confirm</h3>
+            <p id="alertMessage">Are you sure?</p>
+
+            <div class="alert-actions">
+                <button id="alertCancel" class="alert-btn cancel">Cancel</button>
+                <button id="alertConfirm" class="alert-btn confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <div id="ratingModal" class="center-alert-overlay">
+        <div class="center-alert-box">
+            <h3>Rate Your Experience</h3>
+
+            <div id="stars" style="margin:15px 0;">
+                {% for i in "12345" %}
+                    <i class="fas fa-star star"
+                    data-value="{{ forloop.counter }}"
+                    style="font-size:22px;color:#cbd5e1;cursor:pointer;"></i>
+                {% endfor %}
+            </div>
+
+            <textarea id="ratingComment"
+                placeholder="Write a short review (optional)"
+                style="width:100%;padding:8px;border-radius:8px;border:1px solid #e5e7eb;"></textarea>
+
+            <div class="alert-actions">
+                <button class="alert-btn cancel" onclick="closeRatingModal()">Cancel</button>
+                <button class="alert-btn confirm" onclick="submitRating()">Submit</button>
+            </div>
         </div>
     </div>
 
@@ -962,6 +1086,122 @@
             toggleBtn.innerHTML = expanded
                 ? '<i class="fas fa-chevron-up"></i> Show less'
                 : '<i class="fas fa-chevron-down"></i> Show more services';
+        }
+        let pendingReminderBtn = null;
+        let pendingOrderId = null;
+
+        function openAlert(title, message, onConfirm) {
+            document.getElementById("alertTitle").innerText = title;
+            document.getElementById("alertMessage").innerText = message;
+
+            const overlay = document.getElementById("centerAlert");
+            overlay.style.display = "flex";
+
+            document.getElementById("alertConfirm").onclick = () => {
+                overlay.style.display = "none";
+                onConfirm();
+            };
+
+            document.getElementById("alertCancel").onclick = () => {
+                overlay.style.display = "none";
+            };
+        }
+
+        function sendReminder(btn, orderId) {
+            pendingReminderBtn = btn;
+            pendingOrderId = orderId;
+
+            openAlert(
+                "Send Reminder?",
+                "Do you want to notify the shop about this delayed order?",
+                () => confirmSendReminder()
+            );
+        }
+
+        function confirmSendReminder() {
+            const btn = pendingReminderBtn;
+            const orderId = pendingOrderId;
+
+            btn.disabled = true;
+            btn.innerHTML = " Sending...";
+
+            fetch(`/send-order-reminder/${orderId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    btn.innerHTML = "Reminder Sent";
+                    openAlert("Success", "Reminder sent to the shop ✔", () => {});
+                } else {
+                    btn.innerHTML = " Send Reminder";
+                    btn.disabled = false;
+                    openAlert("Error", data.message || "Failed to send reminder", () => {});
+                }
+            })
+            .catch(() => {
+                btn.innerHTML = " Send Reminder";
+                btn.disabled = false;
+                openAlert("Error", "Something went wrong", () => {});
+            });
+        }
+        let selectedRating = 0;
+        let selectedShopId = null;
+
+        function openRatingModal(shopId) {
+            selectedShopId = shopId;
+            selectedRating = 0;
+
+            document.querySelectorAll(".star").forEach(s => s.style.color = "#cbd5e1");
+            document.getElementById("ratingModal").style.display = "flex";
+        }
+
+        function closeRatingModal() {
+            document.getElementById("ratingModal").style.display = "none";
+        }
+
+        document.querySelectorAll(".star").forEach(star => {
+            star.addEventListener("click", () => {
+                selectedRating = star.dataset.value;
+                document.querySelectorAll(".star").forEach(s => {
+                    s.style.color = s.dataset.value <= selectedRating ? "#facc15" : "#cbd5e1";
+                });
+            });
+        });
+
+        function submitRating() {
+            if (!selectedRating || !selectedShopId) {
+                alert("Rating or shop missing");
+                return;
+            }
+
+            fetch(`/rate-shop/${selectedShopId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    rating: selectedRating,
+                    comment: document.getElementById("ratingComment").value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    closeRatingModal();
+                    location.reload();
+                } else {
+                    alert(data.message || "Rating failed");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error submitting rating");
+            });
         }
 
     </script>

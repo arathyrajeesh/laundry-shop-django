@@ -18,3 +18,10 @@ def get_cloth_price(service, cloth_id):
         return cloth_price.price if cloth_price else None
     except:
         return None
+    
+@register.filter
+def get_item(dictionary, key):
+    try:
+        return dictionary.get(int(key))
+    except Exception:
+        return None
