@@ -530,7 +530,148 @@
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+/* Styling for the unified search and filter */
+/* Fix for the unified search and filter */
+.filter-group {
+    display: flex;
+    position: relative; /* Needed for absolute positioning of arrow */
+    align-items: center;
+    border-left: 1px solid rgba(255, 255, 255, 0.2); /* Separator line */
+    padding-right: 10px;
+}
 
+.modern-select {
+    background: transparent;
+    border: none;
+    color: white;
+    padding-right: 25px !important;
+    outline: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+    appearance: none; /* Removes default browser arrow */
+    -webkit-appearance: none;
+}
+
+/* Ensure dropdown options are readable */
+.modern-select option {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Responsive fix for mobile */
+@media (max-width: 768px) {
+    .filter-group {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        padding: 10px;
+        justify-content: center;
+    }
+}
+
+.location-chip {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s;
+}
+
+.location-chip:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* Mobile Responsiveness for Search Form */
+@media (max-width: 768px) {
+    .modern-search-bar {
+        flex-direction: column;
+    }
+    .filter-group {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 10px 0;
+    }
+    .modern-select {
+        width: 100%;
+    }
+}
+/* Container for the search and reset buttons */
+.search-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 5px;
+}
+
+/* Custom Select Wrapper for Arrow Positioning */
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.star-icon {
+    color: #facc15; 
+    font-size: 0.8rem; 
+    margin-left: 10px;
+}
+
+.custom-arrow {
+    position: absolute;
+    right: 10px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none; /* Allows clicks to pass through to the select box */
+}
+
+.modern-select {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem; /* Extra right padding for arrow */
+    outline: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Reset Button Style */
+.reset-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.3s;
+}
+
+.reset-btn:hover {
+    background: #ef4444; /* Turns red on hover to indicate 'clear' */
+    border-color: #ef4444;
+}
+
+@media (max-width: 768px) {
+    .search-actions {
+        width: 100%;
+        margin-top: 10px;
+    }
+    .search-btn-alt { flex: 1; }
+}
     </style>
 </head>
 <body>
@@ -582,65 +723,41 @@
 
         <div class="search-wrapper">
             <h2>Find the perfect laundry care</h2>
-            <form method="GET" class="modern-search-bar">
+            
+            <form method="GET" class="modern-search-bar" id="searchForm">
                 {% csrf_token %}
-                <input type="text" name="search" value="{{ search_query }}" placeholder="Search wash & fold, dry cleaning, premium care...">
-                <button type="submit" class="search-btn-alt">Search</button>
-            </form>
-            <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px;">
-                    <button
-                        id="useLiveLocationBtn"
-                        onclick="useCurrentLocation()"
-                        style="
-                            background: rgba(255,255,255,0.15);
-                            color: #fff;
-                            border: 1px solid rgba(255,255,255,0.3);
-                            padding: 8px 14px;
-                            border-radius: 999px;
-                            font-size: 0.85rem;
-                            cursor: pointer;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 6px;
-                        "
-                    >
-                        <i class="fas fa-location-crosshairs"></i>
-                        Use Current Location
-                    </button>
-
-                <span id="liveLocationStatus"
-                    style="font-size: 0.8rem; color: rgba(255,255,255,0.8);">
-                </span>
-            </div>
-            {% if request.user.profile.location_updated_at %}
-                <div class="location-updated">
-                    <i class="fas fa-clock"></i>
-                    Location updated at {{ request.user.profile.location_updated_at|date:"d M Y, h:i A" }}
-                </div>
-            {% endif %}
-        </div>
-        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-            <label style="font-size:0.85rem; color:#64748b;">
-                Filter by rating:
-            </label>
-
-            <form method="GET" class="modern-search-bar">
-                <input type="text" name="search" value="{{ search_query }}"
+                <input type="text" name="search" id="searchInput" value="{{ search_query }}"
                     placeholder="Search wash & fold, dry cleaning, premium care...">
 
-                <select name="rating"
-                    style="padding:6px 10px;border-radius:8px;border:1px solid #e2e8f0;">
-                    <option value="">All</option>
-                    <option value="4" {% if rating_filter == "4" %}selected{% endif %}>
-                        ⭐ 4 & above
-                    </option>
-                    <option value="3" {% if rating_filter == "3" %}selected{% endif %}>
-                        ⭐ 3 & above
-                    </option>
-                </select>
+                <div class="filter-group">
+                    <i class="fas fa-star" style="color: #facc15; font-size: 0.8rem; margin-left: 10px;"></i>
+                    <select name="rating" id="ratingSelect" class="modern-select">
+                        <option value="">All Ratings</option>
+                        <option value="4" {% if rating_filter == "4" %}selected{% endif %}>4 & above</option>
+                        <option value="3" {% if rating_filter == "3" %}selected{% endif %}>3 & above</option>
+                        <option value="2" {% if rating_filter == "2" %}selected{% endif %}>2 & above</option>
+                    </select>
+                    <i class="fas fa-chevron-down custom-arrow"></i>
+                </div>
 
                 <button type="submit" class="search-btn-alt">Search</button>
+                <button type="button" onclick="resetFilters()" class="reset-btn" title="Clear Filters">
+                    <i class="fas fa-undo-alt"></i>
+                </button>
             </form>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <button id="useLiveLocationBtn" onclick="useCurrentLocation()" class="location-chip">
+                    <i class="fas fa-location-crosshairs"></i>
+                    Use Current Location
+                </button>
+
+                {% if request.user.profile.location_updated_at %}
+                    <div class="location-updated">
+                        <i class="fas fa-clock"></i>
+                        Updated {{ request.user.profile.location_updated_at|timesince }} ago
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="section-header">
@@ -764,8 +881,7 @@
                                 <span class="status-pill status-completed">Completed</span>
 
                                 {% if not cloth.already_rated %}
-                                    <button class="reminder-btn"
-                                            onclick="openRatingModal({{ cloth.shop_id }})">
+                                    <button class="reminder-btn" onclick="openRatingModal({{ cloth.shop_id }})">
                                         ⭐ Rate Order
                                     </button>
                                 {% else %}
@@ -1226,7 +1342,14 @@
                 alert("Error submitting rating");
             });
         }
-
+        function resetFilters() {
+            // Clear inputs
+            document.getElementById('searchInput').value = '';
+            document.getElementById('ratingSelect').selectedIndex = 0;
+            
+            // Submit the form to refresh the page with no parameters
+            window.location.href = window.location.pathname;
+        }
     </script>
 </body>
 </html>

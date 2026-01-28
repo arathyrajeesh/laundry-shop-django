@@ -236,10 +236,10 @@ def get_cloth_status(user):
 
     result = []
     for order in orders:
-        already_rated = ShopRating.objects.filter(
-            user=user,
-            shop=order.shop
-        ).exists()
+        # 🚩 CRITICAL: Check if this SPECIFIC order has been rated
+        # If your ShopRating model links to 'shop', it checks if the user has EVER rated the shop.
+        # It is better to check if they rated the specific order if your model supports it.
+        already_rated = ShopRating.objects.filter(user=user, shop=order.shop).exists()
 
         result.append({
             'order_id': order.id,
@@ -248,11 +248,9 @@ def get_cloth_status(user):
             'delivery_date': order.delivery_date or order.predicted_delivery,
             'shop_name': order.shop.name,
             'shop_id': order.shop.id,
-            'already_rated': already_rated,   # ✅ important
+            'already_rated': already_rated,
         })
-
     return result
-
 
 
 # --- Notification Helper Functions ---
@@ -619,24 +617,24 @@ def user_dashboard(request):
             )
         )
 
-        if rating_filter:
-            services_nearby = services_nearby.filter(
-                avg_rating__gte=float(rating_filter)
-            )
-
-        services_nearby = services_nearby[:10]
-
-        nearby_shops_qs = (
-            LaundryShop.objects
-            .filter(
-                is_approved=True,
-                branches__city__iexact=user_city
-            )
-            .distinct()
+    if rating_filter:
+        services_nearby = services_nearby.filter(
+            avg_rating__gte=float(rating_filter)
         )
 
-        shops_nearby = nearby_shops_qs[:10]
-        nearby_shop_count = nearby_shops_qs.count()
+    services_nearby = services_nearby[:10]
+
+    nearby_shops_qs = (
+        LaundryShop.objects
+        .filter(
+            is_approved=True,
+            branches__city__iexact=user_city
+        )
+        .distinct()
+    )
+
+    shops_nearby = nearby_shops_qs[:10]
+    nearby_shop_count = nearby_shops_qs.count()
 
     # ===============================
     # NOTIFICATIONS
@@ -3033,25 +3031,27 @@ from django.shortcuts import get_object_or_404
 def rate_shop(request, shop_id):
     try:
         data = json.loads(request.body.decode("utf-8"))
-        rating = int(data.get("rating"))
-        comment = data.get("comment", "").strip()
+        rating_value = int(data.get("rating"))
+        comment_text = data.get("comment", "").strip()
 
-        if rating < 1 or rating > 5:
+        if not (1 <= rating_value <= 5):
             return JsonResponse({"success": False, "message": "Invalid rating"}, status=400)
 
         shop = get_object_or_404(LaundryShop, id=shop_id)
 
-        # ✅ SAVE RATING (example)
+        # ✅ Use update_or_create to allow users to update their review 
+        # instead of creating multiple entries for the same shop
         ShopRating.objects.update_or_create(
             user=request.user,
             shop=shop,
             defaults={
-                "rating": rating,
-                "comment": comment
+                "rating": rating_value,
+                "comment": comment_text
             }
         )
 
         return JsonResponse({"success": True})
+    # ... rest of your error handling ...
 
     except json.JSONDecodeError:
         return JsonResponse(
