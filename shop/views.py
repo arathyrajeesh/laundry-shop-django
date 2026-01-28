@@ -2279,23 +2279,27 @@ def shop_login_required(view_func):
 def shop_notifications(request):
     shop_id = request.session.get('shop_id')
     shop = get_object_or_404(LaundryShop, id=shop_id)
-    
-    notifications = []
     now = timezone.now()
+    notifications = []
 
-    # 1. CRITICAL ALERT: Pending Orders
-    pending_orders_count = Order.objects.filter(shop=shop, cloth_status="Pending", payment_status="Completed").count()
+    # 1. 🔴 CRITICAL SYSTEM ALERT: Pending Laundry
+    pending_orders_count = Order.objects.filter(
+        shop=shop, 
+        cloth_status="Pending", 
+        payment_status="Completed"
+    ).count()
+
     if pending_orders_count > 0:
         notifications.append({
-            'title': "Action Required!",
-            'message': f"You have {pending_orders_count} pending orders. Start processing them to avoid delivery delays.",
+            'title': "Action Required: Pending Orders",
+            'message': f"You have {pending_orders_count} new order(s) waiting for processing. Start washing to maintain your delivery schedule.",
             'time': now,
             'icon': 'fas fa-exclamation-triangle',
             'color': '#f59e0b',
             'is_alert': True
         })
 
-    # 2. DATABASE ALERTS (Delayed order reminders etc.)
+    # 2. 🗄️ DATABASE NOTIFICATIONS (Delayed Reminders from Customers)
     db_notifs = Notification.objects.filter(shop=shop).order_by("-created_at")
     for n in db_notifs:
         notifications.append({
@@ -2304,28 +2308,40 @@ def shop_notifications(request):
             'time': n.created_at,
             'icon': n.icon or 'fas fa-bell',
             'color': n.color or '#1a365d',
-            'is_alert': True if n.notification_type == "shop_order_reminder" else False
+            'is_alert': n.notification_type == "shop_order_reminder"
         })
 
-    # 3. DYNAMIC ORDER UPDATES (Last 50 for full view)
-    shop_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:50]
+    # 3. 📦 DYNAMIC ORDER HISTORY (New Orders & Payments)
+    # Fetching the last 50 orders to provide a full history in the Inbox
+    shop_orders = Order.objects.filter(shop=shop).select_related('user').order_by('-created_at')[:50]
     for order in shop_orders:
-        notifications.append({
-            'title': f"Order #{order.id} Status",
-            'message': f"Customer: {order.user.username} | Status: {order.cloth_status} | Amount: ₹{order.amount}.",
-            'time': order.created_at,
-            'icon': 'fas fa-info-circle',
-            'color': '#3b82f6',
-            'is_alert': False
-        })
+        if order.payment_status != "Completed":
+            notifications.append({
+                "title": f"Payment Incomplete - Order #{order.id}",
+                "message": f"Customer {order.user.username} initiated an order for ₹{order.amount} but payment is pending.",
+                "time": order.created_at, 
+                "icon": "fas fa-hand-holding-usd", 
+                "color": "#e74c3c", 
+                "is_alert": False,
+            })
+        else:
+            notifications.append({
+                "title": f"New Order Received #{order.id}",
+                "message": f"Confirmed order from {order.user.username}. Status: {order.cloth_status}. Amount: ₹{order.amount}.",
+                "time": order.created_at, 
+                "icon": "fas fa-shopping-basket", 
+                "color": "#28a745", 
+                "is_alert": False,
+            })
 
-    # Sort everything by time
+    # Sort everything by time descending
     notifications.sort(key=lambda x: x['time'], reverse=True)
 
     return render(request, 'shop_notifications.html', {
         'shop': shop,
         'notifications': notifications,
     })
+
 @shop_login_required
 def shop_dashboard(request):
     """Main shop dashboard with branch overview."""
@@ -2396,13 +2412,19 @@ def shop_dashboard(request):
         delivery_date__lt=now, 
         cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
     ).order_by('delivery_date')
+    pending_count = Order.objects.filter(
+        shop=shop,
+        payment_status="Completed",
+        cloth_status="Pending"
+    ).count()
 
     # DB Notifications (Handle unread_count BEFORE slicing)
-    db_notifs_query = Notification.objects.filter(
-        shop=shop
-    ).order_by("-created_at")
-    
-    unread_count = db_notifs_query.filter(is_read=False).count()
+    db_notifs_query = Notification.objects.filter(shop=shop).order_by("-created_at")
+    unread_count = (
+        db_notifs_query.filter(is_read=False).count()
+        + (1 if pending_count > 0 else 0)
+    )
+
 
     for n in db_notifs_query:
         shop_notifications.append({
@@ -2412,24 +2434,30 @@ def shop_dashboard(request):
             "icon": n.icon, 
             "color": n.color, 
             "is_read": n.is_read,
-            "is_alert": True if "Reminder" in n.title else False # Style logic
+            "is_alert": True if "Reminder" in n.title else False
         })
 
-    # Auto-generated notifications
-    notif_recent_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:10]
+    # 2. ADD SYSTEM ALERTS (Pending Orders)
+    pending_count = Order.objects.filter(shop=shop, payment_status="Completed", cloth_status="Pending").count()
+    if pending_count > 0:
+        shop_notifications.append({
+            "title": "Action Required!",
+            "message": f"You have {pending_count} pending order(s) to process.",
+            "time": now, 
+            "icon": "fas fa-exclamation-triangle", 
+            "color": "#f59e0b", 
+            "is_read": False,
+            "is_alert": True
+        })
+
+    # 3. ADD RECENT ORDER LOGIC (Auto-generated)
+    notif_recent_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:5]
     for order in notif_recent_orders:
         if order.payment_status != "Completed":
             shop_notifications.append({
-                "title": f"Payment Pending - Order #{order.id}",
-                "message": f"Customer {order.user.username} hasn't paid",
-                "time": order.created_at, "icon": "fas fa-exclamation-circle", "color": "#e74c3c", "is_read": True,
-            })
-        elif order.cloth_status == "Pending":
-            shop_notifications.append({
-                "title": f"New Order #{order.id}",
-                "message": f"Order from {order.user.username} - ₹{order.amount}",
-                "time": order.created_at, "icon": "fas fa-shopping-cart", "color": "#28a745",
-                "is_read": True,  # ✅ CHANGE THIS
+                "title": f"Unpaid Order #{order.id}",
+                "message": f"Customer {order.user.username} hasn't paid.",
+                "time": order.created_at, "icon": "fas fa-clock", "color": "#e74c3c", "is_read": True,
             })
 
     if not shop_notifications:
@@ -2457,7 +2485,7 @@ def shop_dashboard(request):
     # Ratings
     shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
-    limited_notifications = shop_notifications[:5]
+    limited_notifications = shop_notifications[:3]
     context = {
         'shop': shop,
         'branches': branches,
@@ -2475,11 +2503,10 @@ def shop_dashboard(request):
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
         'now': now,
-        'shop_notifications': final_notifications,
         'unread_count': unread_count,
         "rating_percentages": rating_percentages,
         'total_notifications_count': len(shop_notifications),
-        'shop_notifications': limited_notifications,
+        'shop_notifications': limited_notifications, # dropdown only gets 3
         
     }
 
@@ -3400,15 +3427,18 @@ def update_location(request):
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
-@login_required # or @shop_login_required depending on your auth
+@require_POST
 def mark_notifications_read(request):
+    # Get shop_id from session (standard for your shop login system)
     shop_id = request.session.get('shop_id')
-    if request.method == "POST" and shop_id:
+    
+    if shop_id:
         Notification.objects.filter(
-            shop_id=shop_id, # Use shop_id from session
+            shop_id=shop_id, 
             is_read=False
         ).update(is_read=True)
         return JsonResponse({"status": "ok"})
+        
     return JsonResponse({"status": "invalid"}, status=400)
 
 from django.core.mail import send_mail
