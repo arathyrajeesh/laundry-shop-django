@@ -1005,29 +1005,30 @@
             }
 
             navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
+            async (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
 
-                    const res = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-                        { headers: { "User-Agent": "ShineAndBright/1.0" } }
-                    );
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+                    { headers: { "User-Agent": "ShineAndBright/1.0" } }
+                );
 
-                    const data = await res.json();
+                const data = await res.json();
 
-                    // 🔑 IMPORTANT: pick CITY, not village
-                    const city =
-                        data.address.city ||
-                        data.address.town ||
-                        data.address.county ||
-                        data.address.state_district ||
-                        data.address.state;
+                // FIXED LOGIC: Prioritize specific location over the general district/city
+                const city =
+                    data.address.village ||      // Cherukunnu is likely here
+                    data.address.suburb ||       
+                    data.address.neighbourhood || 
+                    data.address.town ||         
+                    data.address.city ||         // Kannur is likely here
+                    data.address.county;
 
-                    if (!city) {
-                        alert("Unable to detect city");
-                        return;
-                    }
+                if (!city) {
+                    alert("Unable to detect city");
+                    return;
+                }
 
                     // send to backend
                     await fetch("/update-location/", {

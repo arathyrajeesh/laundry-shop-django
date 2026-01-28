@@ -589,7 +589,7 @@ def user_dashboard(request):
 
     # 2. Filter by City (Restrict to user city if it exists)
     if user_city:
-        services_qs = services_qs.filter(branch__city__iexact=user_city)
+        services_qs = services_qs.filter(branch__city__iexact=user_city)    
 
     # 3. Filter by Search Query if provided
     if search_query:
@@ -3399,14 +3399,18 @@ import json
 def update_location(request):
     if request.method == "POST":
         data = json.loads(request.body)
-
-        profile = request.user.profile
-        profile.city = data.get("city")
-        profile.latitude = data.get("latitude")
-        profile.longitude = data.get("longitude")
-        profile.save()
-
-        return JsonResponse({"success": True})
+        new_city = data.get("city")
+        
+        if new_city and new_city != "undefined":
+            profile = request.user.profile
+            profile.city = new_city
+            profile.latitude = data.get("latitude")
+            profile.longitude = data.get("longitude")
+            profile.location_updated_at = timezone.now() # track when it changed
+            profile.save()
+            return JsonResponse({"success": True})
+            
+    return JsonResponse({"success": false}, status=400)
 
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
