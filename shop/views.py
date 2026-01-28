@@ -551,7 +551,7 @@ from django.shortcuts import render
 def user_dashboard(request):
 
     # ===============================
-    # ORDER STATISTICS
+    # ORDER STATISTICS (Keeping your existing logic)
     # ===============================
     pending = Order.objects.filter(
         user=request.user,
@@ -579,65 +579,50 @@ def user_dashboard(request):
     profile = getattr(request.user, "profile", None)
     user_city = profile.city.strip() if profile and profile.city else None
 
-    services_nearby = []
-    shops_nearby = []
-    nearby_shop_count = 0
+    # ===============================
+    # SERVICES & RATINGS LOGIC (Updated for consistency)
+    # ===============================
+    # 1. Start with the base queryset
+    services_qs = Service.objects.filter(
+        branch__shop__is_approved=True
+    ).select_related("branch", "branch__shop")
 
+    # 2. Filter by City (Restrict to user city if it exists)
+    if user_city:
+        services_qs = services_qs.filter(branch__city__iexact=user_city)
+
+    # 3. Filter by Search Query if provided
     if search_query:
-        services = (
-            Service.objects
-            .filter(
-                name__icontains=search_query,
-                branch__shop__is_approved=True
-            )
-            .select_related("branch", "branch__shop")
-            .annotate(
-                avg_rating=Avg("branch__shop__shoprating__rating")
-            )
-        )
+        services_qs = services_qs.filter(name__icontains=search_query)
 
-        if user_city:
-            services = services.filter(branch__city__iexact=user_city)
-
-        if rating_filter:
-            services = services.filter(avg_rating__gte=float(rating_filter))
-
-        services_nearby = services[:10]
-
-    elif user_city:
-        services_nearby = (
-            Service.objects
-            .filter(
-                branch__city__iexact=user_city,
-                branch__shop__is_approved=True
-            )
-            .select_related("branch", "branch__shop")
-            .annotate(
-                avg_rating=Avg("branch__shop__shoprating__rating")
-            )
-        )
-
-    if rating_filter:
-        services_nearby = services_nearby.filter(
-            avg_rating__gte=float(rating_filter)
-        )
-
-    services_nearby = services_nearby[:10]
-
-    nearby_shops_qs = (
-        LaundryShop.objects
-        .filter(
-            is_approved=True,
-            branches__city__iexact=user_city
-        )
-        .distinct()
+    # 4. ⭐ ANNOTATE: Use "shop_avg_rating" consistently to match your template
+    services_qs = services_qs.annotate(
+        shop_avg_rating=Avg("branch__shop__shoprating__rating"),
+        shop_total_reviews=Count("branch__shop__shoprating", distinct=True)
     )
 
+    # 5. ⭐ APPLY RATING FILTER: Use the annotated name "shop_avg_rating"
+    if rating_filter:
+        try:
+            services_qs = services_qs.filter(shop_avg_rating__gte=float(rating_filter))
+        except (ValueError, TypeError):
+            pass
+
+    services_nearby = services_qs[:10]
+
+    # ===============================
+    # SHOPS LOGIC (Keeping your existing logic)
+    # ===============================
+    nearby_shops_qs = LaundryShop.objects.filter(is_approved=True)
+    if user_city:
+        nearby_shops_qs = nearby_shops_qs.filter(branches__city__iexact=user_city)
+    
+    nearby_shops_qs = nearby_shops_qs.distinct()
     shops_nearby = nearby_shops_qs[:10]
     nearby_shop_count = nearby_shops_qs.count()
 
     # ===============================
-    # NOTIFICATIONS
+    # NOTIFICATIONS (Keeping your existing logic)
     # ===============================
     create_order_notifications(request.user)
     create_welcome_notifications(request.user)
@@ -661,7 +646,7 @@ def user_dashboard(request):
     )
 
     # ===============================
-    # PREVIOUS SHOPS
+    # PREVIOUS SHOPS (Keeping your existing logic)
     # ===============================
     previous_shops = (
         LaundryShop.objects
@@ -696,7 +681,6 @@ def user_dashboard(request):
             "rating_filter": rating_filter,
         },
     )
-
 # --- NEW DROPDOWN VIEWS ---
 
 @login_required

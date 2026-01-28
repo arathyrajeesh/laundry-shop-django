@@ -38,6 +38,8 @@
 
         .shop-card h3 {
             font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2px;
         }
 
         body {
@@ -181,13 +183,23 @@
             overflow: hidden;
             border: 1px solid var(--border);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding-top: 5px;
         }
-
+        .review-count {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
         .shop-card:hover {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
             border-color: var(--accent);
         }
-
+        .shop-card:hover .fa-star {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
         .card-body { padding: 1.5rem; }
 
         .badge-price {
@@ -784,20 +796,36 @@
                     <div class="shop-card">
                         <div class="card-body">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <h3 style="font-size: 1.1rem;">{{ service.name }}</h3>
+                                <div>
+                                    <h3 style="font-size: 1.1rem; margin-bottom: 2px;">{{ service.name }}</h3>
+                                    
+                                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                        <i class="fas fa-store" style="font-size: 0.75rem;"></i>
+                                        {{ service.branch.shop.name }}
+                                    </p>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                        <i class="fas fa-location-dot"></i>
+                                        {{ service.branch.name }}
+                                    </p>
+                                </div>
+
+                                <div style="text-align: right;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; color: #facc15;">
+                                        <i class="fas fa-star" style="font-size: 0.9rem;"></i>
+                                        <span style="color: var(--text-dark); font-weight: 800; font-size: 1rem;">
+                                            {{ service.shop_avg_rating|floatformat:1|default:"0.0" }}
+                                        </span>
+                                    </div>
+                                    <p style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 2px;">
+                                        {{ service.shop_total_reviews }} Reviews
+                                    </p>
+                                </div>
                             </div>
 
-                            <p style="font-size: 0.85rem; color: #64748b; margin-top: 6px;">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ service.branch.name }} · {{ service.branch.city }}
-                            </p>
-
-
                             <a href="{% url 'select_services' service.branch.shop.id service.branch.id %}"
-                            class="btn-main">
+                            class="btn-main" style="margin-top: 18px;">
                                 Book Now
                             </a>
-
                         </div>
                     </div>
                 {% endfor %}
