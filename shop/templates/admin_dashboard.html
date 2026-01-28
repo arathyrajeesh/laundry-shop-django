@@ -455,7 +455,193 @@ th{
     gap:8px;
     margin-bottom:16px;
 }
+/* ================= NOTIFICATIONS ================= */
+.notification-wrapper {
+    position: relative;
+    cursor: pointer;
+    margin-right: 20px;
+}
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+.notif-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 300px;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    display: none;
+    z-index: 1000;
+    border: 1px solid #eee;
+}
+.notif-dropdown.active {
+    display: block;
+}
+.notif-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+}
+.notif-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f9f9f9;
+    display: flex;
+    gap: 12px;
+    transition: background 0.2s;
+}
+.notif-item:hover {
+    background: #f8fafc;
+}
+.notif-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.notif-content p {
+    font-size: 12px;
+    color: var(--text);
+    margin: 0;
+}
+.notif-content span {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+/* Notification Specifics */
+.notification-wrapper { position: relative; }
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: pulse-red 2s infinite;
+}
+@keyframes pulse-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+.notif-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 9999;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+.notif-dropdown.active { display: block; }
+.notif-header {
+    padding: 15px;
+    background: #f8fafc;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+.btn-clear { background: none; border: none; color: var(--primary); font-size: 11px; cursor: pointer; }
+.notif-item {
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    border-bottom: 1px solid #f1f5f9;
+}
+.notif-item:hover { background: #f8fafc; }
+.notif-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.notif-warning { background: #fff4e5; color: #a16207; }
+.notif-danger { background: #fdecea; color: #e74c3c; }
+.notif-text p { margin: 0; font-size: 12px; line-height: 1.4; }
+.empty-notif { padding: 30px; text-align: center; color: var(--text-muted); }
+.empty-notif i { font-size: 24px; margin-bottom: 10px; display: block; opacity: 0.5; }
+.badge-dot {
+    height: 8px;
+    width: 8px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 5px;
+}
+/* Notification Page Cards */
+.notification-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.notif-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: #fff;
+    border-radius: var(--radius-md);
+    border-left: 5px solid #ddd;
+    box-shadow: var(--shadow-sm);
+    transition: 0.3s;
+    cursor: pointer;
+}
+.notif-card:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
+}
+.notif-card.warning { border-left-color: #f59e0b; }
+.notif-card.danger { border-left-color: #ef4444; }
+.notif-card.info { border-left-color: #3b82f6; }
 
+.notif-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 20px;
+}
+.warning .notif-card-icon { background: #fff4e5; color: #a16207; }
+.danger .notif-card-icon { background: #fdecea; color: #e74c3c; }
+.info .notif-card-icon { background: #eff6ff; color: #1e40af; }
+
+.notif-card-body { flex: 1; }
+.notif-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+.notif-card-header h4 { font-size: 16px; color: var(--sidebar); }
+.notif-card-header span { font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: 0.6; }
+.notif-card-body p { font-size: 13px; color: var(--text-muted); }
+.arrow { color: #ccc; margin-left: 15px; }
 </style>
 </head>
 
@@ -490,6 +676,14 @@ th{
             </a>
         </li>
         <li class="nav-item">
+            <a onclick="showSection('notifications-page', this.parentElement)">
+                <i class="fas fa-bell"></i> Notifications 
+                {% if pending_approvals|add:delayed_orders_count > 0 %}
+                    <span class="badge-dot"></span>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="{% url 'logout' %}">
                 <i class="fas fa-power-off"></i> Logout
             </a>
@@ -507,9 +701,58 @@ th{
 
     <div class="top-bar">
         <h3>Admin Panel</h3>
-        <div class="user-info">
-            <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0f334b&color=fff">
-            <strong>{{ request.user.username }}</strong>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            
+            <div class="notification-wrapper" id="notifBtn">
+                <i class="fas fa-bell" style="font-size: 20px; color: var(--sidebar); cursor: pointer;"></i>
+                {% if pending_approvals > 0 or delayed_orders_count > 0 %}
+                    <span class="notification-badge">{{ pending_approvals|add:delayed_orders_count }}</span>
+                {% endif %}
+                
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>Recent Alerts</span>
+                        <button class="btn-clear" onclick="clearNotifs()">Mark All Read</button>
+                    </div>
+                    <div class="notif-body">
+                        {% if pending_approvals > 0 %}
+                        <div class="notif-item" onclick="showSection('shops', document.querySelector('.nav-item i.fa-store').parentElement.parentElement)">
+                            <div class="notif-icon notif-warning">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="notif-text">
+                                <p><strong>{{ pending_approvals }} New Shop Requests</strong></p>
+                                <p>Action required: Approve or Reject new business registrations.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if delayed_orders_count > 0 %}
+                        <div class="notif-item" onclick="showDelayedOrders()">
+                            <div class="notif-icon notif-danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="notif-text">
+                                <p><strong>{{ delayed_orders_count }} Orders Delayed</strong></p>
+                                <p>Warning: These orders have passed their predicted delivery time.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if pending_approvals == 0 and delayed_orders_count == 0 %}
+                        <div class="empty-notif">
+                            <i class="fas fa-check-circle"></i>
+                            <p>All caught up!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-info">
+                <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0f334b&color=fff">
+                <strong>{{ request.user.username }}</strong>
+            </div>
         </div>
     </div>
     <div id ="dashboard" class="content-section active">
@@ -656,7 +899,72 @@ th{
             </div>
         </div>
     </div>
+    <div id="notifications-page" class="content-section">
+        <div class="dashboard-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 class="section-title" style="margin-bottom: 0;">
+                    <i class="fas fa-bell"></i> Administrative Notifications
+                </h2>
+                <button class="btn btn-secondary" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> Refresh Feed
+                </button>
+            </div>
 
+            <div class="notification-feed">
+                {% if pending_approvals > 0 %}
+                <div class="notif-card warning" onclick="showSection('shops', document.querySelector('[onclick*=\'shops\']').parentElement)">
+                    <div class="notif-card-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="notif-card-body">
+                        <div class="notif-card-header">
+                            <h4>New Shop Registration</h4>
+                            <span>Action Required</span>
+                        </div>
+                        <p>There are <strong>{{ pending_approvals }}</strong> shops waiting for your verification. Approval is required before they can list services.</p>
+                    </div>
+                    <i class="fas fa-chevron-right arrow"></i>
+                </div>
+                {% endif %}
+
+                {% if delayed_orders_count > 0 %}
+                <div class="notif-card danger" onclick="showDelayedOrders()">
+                    <div class="notif-card-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="notif-card-body">
+                        <div class="notif-card-header">
+                            <h4>Order Delays Detected</h4>
+                            <span>Urgent</span>
+                        </div>
+                        <p><strong>{{ delayed_orders_count }}</strong> orders have exceeded their predicted delivery time. Please check branch loads.</p>
+                    </div>
+                    <i class="fas fa-chevron-right arrow"></i>
+                </div>
+                {% endif %}
+
+                <div class="notif-card info">
+                    <div class="notif-card-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="notif-card-body">
+                        <div class="notif-card-header">
+                            <h4>System Update</h4>
+                            <span>Info</span>
+                        </div>
+                        <p>Welcome to the 2026 Admin Dashboard. All backup systems are currently operational.</p>
+                    </div>
+                </div>
+
+                {% if pending_approvals == 0 and delayed_orders_count == 0 %}
+                <div class="empty-state">
+                    <i class="fas fa-check-double"></i>
+                    <p>No pending administrative actions. You're all caught up!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
         <!-- ===== ACCESS REQUEST ===== -->
     <div id="shops" class="content-section">
         <div class="dashboard-section">
@@ -729,6 +1037,22 @@ th{
 </div>
 
 <script>
+// Toggle Dropdown
+document.getElementById('notifBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('notifDropdown').classList.toggle('active');
+});
+
+// Close when clicking elsewhere
+window.addEventListener('click', function() {
+    document.getElementById('notifDropdown').classList.remove('active');
+});
+
+// Navigate and close dropdown
+function goToNotif(sectionId, navElement) {
+    showSection(sectionId, navElement);
+    document.getElementById('notifDropdown').classList.remove('active');
+}
 function showSection(id, el) {
     document.querySelectorAll('.content-section')
         .forEach(s => s.classList.remove('active'));
@@ -741,12 +1065,41 @@ function showSection(id, el) {
 
     el.classList.add('active');
 
-    // 🔥 Fix Chart.js resize when dashboard becomes visible
+    // --- NEW: Clear notifications if entering the notification page ---
+    if (id === 'notifications-page') {
+        clearIndicators();
+    }
+
+    // Fix Chart.js resize
     setTimeout(() => {
         if (window.Chart) {
             Object.values(Chart.instances).forEach(chart => chart.resize());
         }
     }, 200);
+}
+
+function clearIndicators() {
+    // 1. Remove the pulsing red badge from the top bar bell
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        badge.style.display = 'none';
+    }
+
+    // 2. Remove the red dot from the sidebar menu
+    const dot = document.querySelector('.badge-dot');
+    if (dot) {
+        dot.style.display = 'none';
+    }
+    
+    // 3. Optional: Call server via AJAX to mark notifications as "read"
+    // fetch('/admin-panel/notifications/mark-read/', { method: 'POST', headers: {'X-CSRFToken': getCookie('csrftoken')} });
+}
+
+// Update your goToNotif function to also clear indicators
+function goToNotif(sectionId, navElement) {
+    showSection(sectionId, navElement);
+    document.getElementById('notifDropdown').classList.remove('active');
+    clearIndicators();
 }
 
 
@@ -973,7 +1326,20 @@ new Chart(ordersCtx, {
         }
     }
 });
+function toggleNotif() {
+    const dropdown = document.getElementById('notifDropdown');
+    dropdown.classList.toggle('active');
+}
 
+// Close dropdown when clicking outside
+window.onclick = function(event) {
+    if (!event.target.closest('.notification-wrapper')) {
+        const dropdown = document.getElementById('notifDropdown');
+        if (dropdown && dropdown.classList.contains('active')) {
+            dropdown.classList.remove('active');
+        }
+    }
+}
 </script>
 
 </body>
