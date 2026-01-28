@@ -291,7 +291,33 @@
                 margin-top: 18px;
             }
         }
+        /* ===============================
+        ERROR MESSAGES & ALERTS
+        ================================ */
+        .error-box {
+            background: rgba(239, 68, 68, 0.15); /* Soft red background */
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fecaca; /* Light red text */
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shake 0.4s ease-in-out;
+        }
 
+        .error-box i {
+            color: #ef4444; /* Bright red icon */
+            font-size: 16px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 
 </head>
@@ -475,7 +501,7 @@
         if (errorBox) {
             errorBox.style.display = 'none';
         }
-    }, 5000); 
+    }, 5000);
     function togglePassword(id) {
         const passwordInput = document.getElementById(id);
         const toggleBtn = passwordInput.nextElementSibling;
