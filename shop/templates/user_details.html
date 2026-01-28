@@ -267,6 +267,66 @@
             .checkout-grid { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
         }
+        .input-styled {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            font-size: 0.95rem;
+            color: var(--brand-secondary); /* Ensure text is visible */
+            background-color: white !important;
+        }
+        /* --- ERROR STYLING --- */
+
+        /* Shake animation for the error container */
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .error-container {
+            animation: shakeError 0.4s ease-in-out;
+        }
+
+        /* Individual error messages */
+        .error-msg {
+            color: #e11d48; /* Bright Rose/Red */
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            background: #fff1f2;
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: fit-content;
+            border: 1px solid #ffe4e6;
+        }
+
+        /* Highlight input border when it has an error */
+        .is-invalid {
+            border-color: #fb7185 !important;
+            background-color: #fffafb !important;
+        }
+
+        .is-invalid:focus {
+            box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.1) !important;
+        }
+
+        /* Global error summary box */
+        .error-summary {
+            background: #fff1f2;
+            border: 1.5px solid #fecdd3;
+            color: #9f1239;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -276,7 +336,7 @@
             <i class="fas fa-bolt" style="color: var(--brand-primary);"></i>
             {{ shop.name }}
         </div>
-        <a href="{% url 'dashboard' %}" class="btn-outline">Cancel</a>
+        <button onclick="showCancelAlert()" class="btn-outline" style="cursor: pointer;">Cancel</button>
     </nav>
 
     <div class="stepper-wrapper">
@@ -302,41 +362,75 @@
                     Delivery Details
                 </h2>
 
-                <form method="POST">
+                <form method="POST" novalidate>
                     {% csrf_token %}
                     
+                    {% if form.non_field_errors %}
+                    <div class="error-summary error-container">
+                        {% for error in form.non_field_errors %}
+                            <p style="font-size: 0.9rem; font-weight: 600;">
+                                <i class="fas fa-circle-exclamation"></i> {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Pickup Date & Time</label>
                             {{ form.pickup_date }}
+                            {% if form.pickup_date.errors %}
+                                <div class="error-msg error-container">
+                                    <i class="fas fa-clock"></i> {{ form.pickup_date.errors.0 }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <label>Preferred Delivery</label>
                             {{ form.delivery_date }}
+                            {% if form.delivery_date.errors %}
+                                <div class="error-msg error-container">
+                                    <i class="fas fa-truck"></i> {{ form.delivery_date.errors.0 }}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Receiver's Full Name</label>
                         {{ form.delivery_name }}
+                        {% if form.delivery_name.errors %}
+                            <div class="error-msg error-container">
+                                <i class="fas fa-user-tag"></i> {{ form.delivery_name.errors.0 }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         <label>Full Delivery Address</label>
                         {{ form.delivery_address }}
+                        {% if form.delivery_address.errors %}
+                            <div class="error-msg error-container">
+                                <i class="fas fa-location-dot"></i> {{ form.delivery_address.errors.0 }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>Contact Phone</label>
                             {{ form.delivery_phone }}
+                            {% if form.delivery_phone.errors %}
+                                <div class="error-msg error-container">
+                                    <i class="fas fa-phone-slash"></i> {{ form.delivery_phone.errors.0 }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <label>Landmark (Optional)</label>
                             <input type="text" class="input-styled" placeholder="e.g. Near Metro Station">
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label>Special Instructions</label>
                         {{ form.special_instructions }}
@@ -411,7 +505,17 @@
             </div>
         </aside>
     </main>
-
+    <div id="cancelAlertModal" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.6); z-index:30000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:30px; border-radius:16px; width:90%; max-width:400px; text-align:center; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+            <h3 style="color:var(--brand-secondary); margin-bottom:10px;">Discard Order?</h3>
+            <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.95rem;">Are you sure you want to cancel? Your progress will be lost.</p>
+            
+            <div style="display:flex; gap:12px; justify-content:center;">
+                <button onclick="closeCancelAlert()" style="flex:1; background:#f1f5f9; color:#475569; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">No, Stay</button>
+                <button onclick="confirmCancel()" style="flex:1; background:#ef4444; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
     <!-- Razorpay Scripts -->
     {% if show_payment and razorpay_order_id %}
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -588,6 +692,53 @@
                 showLeaveWarningModal();
             });
         }
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        // Locate the phone input - Django usually gives it the name 'delivery_phone'
+        const phoneInput = document.querySelector('input[name="delivery_phone"]');
+        
+        if (phoneInput) {
+            // 1. Force numeric keyboard on mobile
+            phoneInput.setAttribute('type', 'tel');
+            phoneInput.setAttribute('inputmode', 'numeric');
+            
+            // 2. Block non-numeric characters while typing
+            phoneInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // 3. Prevent 'e', '+', '-', and '.' (common in numeric inputs)
+            phoneInput.addEventListener('keydown', function(e) {
+                if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+    function showCancelAlert() {
+        document.getElementById('cancelAlertModal').style.display = 'flex';
+    }
+
+    function closeCancelAlert() {
+        document.getElementById('cancelAlertModal').style.display = 'none';
+    }
+
+    function confirmCancel() {
+        // This allows the user to leave without the "Payment Ongoing" browser warning
+        allowLeavePayment = true; 
+        window.location.href = "{% url 'dashboard' %}";
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        // Find all error messages
+        const errors = document.querySelectorAll('.error-msg');
+        
+        errors.forEach(error => {
+            // Find the input element right before the error message
+            const input = error.parentElement.querySelector('input, textarea, select');
+            if (input) {
+                input.classList.add('is-invalid');
+            }
+        });
     });
     </script>
     {% endif %}

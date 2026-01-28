@@ -1212,18 +1212,19 @@ def user_details(request):
                 request.session["razorpay_order_id"] = razorpay_order_id
                 show_payment = True
 
-                messages.success(request, "Delivery details saved. Proceed to payment.")
+                messages.success(request, "Details verified. Please complete payment.")
 
             except Exception as e:
                 show_payment = False
                 messages.error(request, "Payment initialization failed. Try again.")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please fix the errors highlighted below.")
     else:
         form = UserDetailsForm(instance=order)
         # Check if delivery details are already filled
-        if order.delivery_name and order.delivery_address:
+        if order.delivery_name and order.delivery_address and order.razorpay_order_id:
             show_payment = True
+            razorpay_order_id = order.razorpay_order_id
             # Get order items from session
             order_items = request.session.get('order_items', [])
             total_amount = order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount
@@ -3410,7 +3411,7 @@ def update_location(request):
             profile.save()
             return JsonResponse({"success": True})
             
-    return JsonResponse({"success": false}, status=400)
+    return JsonResponse({"success": False}, status=400)
 
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required

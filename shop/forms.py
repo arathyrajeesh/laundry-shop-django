@@ -44,49 +44,67 @@ class BranchForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact phone (optional)'}),
         }
 
+from django import forms
+from django.utils import timezone
+from .models import Order
+import re
+
+from django import forms
+from django.utils import timezone
+from .models import Order
+
+from django import forms
+from django.utils import timezone
+from .models import Order
+
 class UserDetailsForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['pickup_date', 'delivery_date', 'delivery_name', 'delivery_address', 'delivery_phone', 'special_instructions']
         widgets = {
-            'pickup_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local', 'min': timezone.now().strftime('%Y-%m-%dT%H:%M')}),
-            'delivery_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local', 'min': timezone.now().strftime('%Y-%m-%dT%H:%M')}),
-            'delivery_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Full name for delivery'}),
-            'delivery_address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Full delivery address'}),
-            'delivery_phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact phone number'}),
-            'special_instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Special instructions (optional)'}),
+            'pickup_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'input-styled'}),
+            'delivery_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'input-styled'}),
+            'delivery_phone': forms.TextInput(attrs={
+                'placeholder': '10-digit mobile number',
+                'inputmode': 'numeric',
+                # This JS helps prevent typing mistakes, but the Python clean method below is the real security
+                'oninput': "this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10)"
+            }),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['pickup_date'].required = True
-        self.fields['delivery_date'].required = True
-        self.fields['delivery_name'].required = True
-        self.fields['delivery_address'].required = True
-        self.fields['delivery_phone'].required = True
+    # --- Field Specific Validation ---
+
+    def clean_delivery_phone(self):
+        phone = self.cleaned_data.get('delivery_phone')
+        
+        # 1. Catch Alphabets/Special Characters
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain numbers only.")
+        
+        # 2. Catch Incorrect Length (e.g., 9 digits)
+        if len(phone) != 10:
+            raise forms.ValidationError(f"Phone number must be exactly 10 digits. You entered {len(phone)}.")
+            
+        return phone
 
     def clean_pickup_date(self):
-        pickup_date = self.cleaned_data.get('pickup_date')
-        if pickup_date and pickup_date < timezone.now():
-            raise forms.ValidationError("Pickup date cannot be in the past.")
-        return pickup_date
+        date = self.cleaned_data.get('pickup_date')
+        if date and date < timezone.now():
+            raise forms.ValidationError("Pickup time cannot be in the past.")
+        return date
 
-    def clean_delivery_date(self):
-        delivery_date = self.cleaned_data.get('delivery_date')
-        if delivery_date and delivery_date < timezone.now():
-            raise forms.ValidationError("Delivery date cannot be in the past.")
-        return delivery_date
+    # --- Cross-Field Validation ---
 
     def clean(self):
         cleaned_data = super().clean()
-        pickup_date = cleaned_data.get('pickup_date')
-        delivery_date = cleaned_data.get('delivery_date')
+        pickup = cleaned_data.get('pickup_date')
+        delivery = cleaned_data.get('delivery_date')
 
-        if pickup_date and delivery_date and pickup_date == delivery_date:
-            self.add_error('delivery_date', "Pickup date and delivery date cannot be the same.")
-
+        if pickup and delivery and delivery <= pickup:
+            # This attaches an error specifically to the delivery_date field
+            self.add_error('delivery_date', "Delivery must be scheduled after the pickup time.")
+        
         return cleaned_data
-
 class LaundryShopForm(forms.ModelForm):
     class Meta:
         model = LaundryShop
