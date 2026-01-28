@@ -2277,111 +2277,43 @@ def shop_login_required(view_func):
 
 @shop_login_required
 def shop_notifications(request):
-    """Shop notifications page."""
     shop_id = request.session.get('shop_id')
     shop = get_object_or_404(LaundryShop, id=shop_id)
-
-    # Generate comprehensive shop notifications
+    
     notifications = []
+    now = timezone.now()
 
-    # Get all shop orders for notifications
-    shop_orders = Order.objects.filter(shop=shop).select_related('user', 'branch').order_by('-created_at')
-
-    for order in shop_orders:
-        # Order placed notification
+    # 1. ADD CRITICAL ALERTS (Pending Orders)
+    pending_orders = Order.objects.filter(shop=shop, cloth_status="Pending", payment_status="Completed")
+    if pending_orders.exists():
         notifications.append({
-            'type': 'order_placed',
-            'title': f'New Order #{order.id} Placed',
-            'message': f'Order from {order.user.username} at {order.branch.name if order.branch else "Main Branch"} - ₹{order.amount}',
-            'time': order.created_at,
-            'icon': 'fas fa-shopping-cart',
-            'color': '#28a745'
+            'title': "Action Required!",
+            'message': f"You have {pending_orders.count()} pending orders that need attention. Please update their status to avoid delays.",
+            'time': now,
+            'icon': 'fas fa-exclamation-triangle',
+            'color': '#f59e0b',
+            'is_alert': True  # Triggers the yellow warning style
         })
 
-        # Status-based notifications
-        if order.cloth_status == 'Washing':
-            notifications.append({
-                'type': 'status_update',
-                'title': f'Order #{order.id} - Washing Started',
-                'message': f'Laundry for {order.user.username} is now being washed',
-                'time': order.created_at,
-                'icon': 'fas fa-tint',
-                'color': '#17a2b8'
-            })
-        elif order.cloth_status == 'Drying':
-            notifications.append({
-                'type': 'status_update',
-                'title': f'Order #{order.id} - Drying Started',
-                'message': f'Laundry for {order.user.username} is now being dried',
-                'time': order.created_at,
-                'icon': 'fas fa-wind',
-                'color': '#f39c12'
-            })
-        elif order.cloth_status == 'Ironing':
-            notifications.append({
-                'type': 'status_update',
-                'title': f'Order #{order.id} - Ironing Started',
-                'message': f'Laundry for {order.user.username} is now being ironed',
-                'time': order.created_at,
-                'icon': 'fas fa-fire',
-                'color': '#e74c3c'
-            })
-        elif order.cloth_status == 'Ready':
-            notifications.append({
-                'type': 'ready_pickup',
-                'title': f'Order #{order.id} Ready for Pickup',
-                'message': f'Laundry for {order.user.username} is ready! Please notify customer.',
-                'time': order.created_at,
-                'icon': 'fas fa-box-open',
-                'color': '#f39c12'
-            })
-        elif order.cloth_status == 'Completed':
-            notifications.append({
-                'type': 'completed',
-                'title': f'Order #{order.id} Completed',
-                'message': f'Order for {order.user.username} has been successfully completed and delivered.',
-                'time': order.created_at,
-                'icon': 'fas fa-check-circle',
-                'color': '#28a745'
-            })
+    # 2. ADD ORDER UPDATES
+    shop_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:20]
+    for order in shop_orders:
+        notifications.append({
+            'title': f"Order #{order.id} Update",
+            'message': f"Order for {order.user.username} is currently marked as {order.cloth_status}. Amount: ₹{order.amount}.",
+            'time': order.created_at,
+            'icon': 'fas fa-info-circle',
+            'color': '#3b82f6',
+            'is_alert': False
+        })
 
-    # Add some general notifications if shop has no orders
-    if not notifications:
-        notifications = [
-            {
-                'type': 'welcome',
-                'title': f'Welcome to {shop.name} Dashboard',
-                'message': 'Manage your orders and track your business performance',
-                'time': shop.created_at,
-                'icon': 'fas fa-store',
-                'color': '#3498db'
-            },
-            {
-                'type': 'add_branches',
-                'title': 'Add Branches',
-                'message': 'Expand your reach by adding multiple branches to serve more customers',
-                'time': shop.created_at,
-                'icon': 'fas fa-map-marker-alt',
-                'color': '#9b59b6'
-            },
-            {
-                'type': 'add_services',
-                'title': 'Add Services',
-                'message': 'Expand your offerings by adding more laundry services to attract more customers',
-                'time': shop.created_at,
-                'icon': 'fas fa-concierge-bell',
-                'color': '#e67e22'
-            }
-        ]
-
-    # Sort notifications by time (most recent first)
+    # Sort all by time
     notifications.sort(key=lambda x: x['time'], reverse=True)
 
     return render(request, 'shop_notifications.html', {
         'shop': shop,
         'notifications': notifications
     })
-
 
 @shop_login_required
 def shop_dashboard(request):
