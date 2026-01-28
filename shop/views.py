@@ -2283,38 +2283,49 @@ def shop_notifications(request):
     notifications = []
     now = timezone.now()
 
-    # 1. ADD CRITICAL ALERTS (Pending Orders)
-    pending_orders = Order.objects.filter(shop=shop, cloth_status="Pending", payment_status="Completed")
-    if pending_orders.exists():
+    # 1. CRITICAL ALERT: Pending Orders
+    pending_orders_count = Order.objects.filter(shop=shop, cloth_status="Pending", payment_status="Completed").count()
+    if pending_orders_count > 0:
         notifications.append({
             'title': "Action Required!",
-            'message': f"You have {pending_orders.count()} pending orders that need attention. Please update their status to avoid delays.",
+            'message': f"You have {pending_orders_count} pending orders. Start processing them to avoid delivery delays.",
             'time': now,
             'icon': 'fas fa-exclamation-triangle',
             'color': '#f59e0b',
-            'is_alert': True  # Triggers the yellow warning style
+            'is_alert': True
         })
 
-    # 2. ADD ORDER UPDATES
-    shop_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:20]
+    # 2. DATABASE ALERTS (Delayed order reminders etc.)
+    db_notifs = Notification.objects.filter(shop=shop).order_by("-created_at")
+    for n in db_notifs:
+        notifications.append({
+            'title': n.title,
+            'message': n.message,
+            'time': n.created_at,
+            'icon': n.icon or 'fas fa-bell',
+            'color': n.color or '#1a365d',
+            'is_alert': True if n.notification_type == "shop_order_reminder" else False
+        })
+
+    # 3. DYNAMIC ORDER UPDATES (Last 50 for full view)
+    shop_orders = Order.objects.filter(shop=shop).order_by('-created_at')[:50]
     for order in shop_orders:
         notifications.append({
-            'title': f"Order #{order.id} Update",
-            'message': f"Order for {order.user.username} is currently marked as {order.cloth_status}. Amount: ₹{order.amount}.",
+            'title': f"Order #{order.id} Status",
+            'message': f"Customer: {order.user.username} | Status: {order.cloth_status} | Amount: ₹{order.amount}.",
             'time': order.created_at,
             'icon': 'fas fa-info-circle',
             'color': '#3b82f6',
             'is_alert': False
         })
 
-    # Sort all by time
+    # Sort everything by time
     notifications.sort(key=lambda x: x['time'], reverse=True)
 
     return render(request, 'shop_notifications.html', {
         'shop': shop,
-        'notifications': notifications
+        'notifications': notifications,
     })
-
 @shop_login_required
 def shop_dashboard(request):
     """Main shop dashboard with branch overview."""
@@ -2388,17 +2399,20 @@ def shop_dashboard(request):
 
     # DB Notifications (Handle unread_count BEFORE slicing)
     db_notifs_query = Notification.objects.filter(
-        shop=shop,
-        notification_type="shop_order_reminder"
+        shop=shop
     ).order_by("-created_at")
     
     unread_count = db_notifs_query.filter(is_read=False).count()
-    db_notifications = db_notifs_query[:5] # Slice now for display
 
-    for n in db_notifications:
+    for n in db_notifs_query:
         shop_notifications.append({
-            "title": n.title, "message": n.message, "time": n.created_at,
-            "icon": n.icon, "color": n.color, "is_read": n.is_read,
+            "title": n.title, 
+            "message": n.message, 
+            "time": n.created_at,
+            "icon": n.icon, 
+            "color": n.color, 
+            "is_read": n.is_read,
+            "is_alert": True if "Reminder" in n.title else False # Style logic
         })
 
     # Auto-generated notifications
@@ -2423,14 +2437,27 @@ def shop_dashboard(request):
             "title": "Welcome", "message": "Dashboard Ready", "time": now,
             "icon": "fas fa-store", "color": "#3498db", "is_read": True,
         })
-
+    recent_orders_notif = Order.objects.filter(shop=shop).order_by('-created_at')[:10]
+    for order in recent_orders_notif:
+        if order.payment_status != "Completed":
+            shop_notifications.append({
+                "title": f"Payment Pending #{order.id}",
+                "message": f"Customer {order.user.username} hasn't paid.",
+                "time": order.created_at, "icon": "fas fa-exclamation-circle", "color": "#e74c3c", "is_read": True,
+            })
+        elif order.cloth_status == "Pending":
+            shop_notifications.append({
+                "title": f"New Order #{order.id}",
+                "message": f"From {order.user.username} - ₹{order.amount}",
+                "time": order.created_at, "icon": "fas fa-shopping-cart", "color": "#28a745", "is_read": True,
+            })
     shop_notifications.sort(key=lambda x: x["time"], reverse=True)
     final_notifications = shop_notifications[:5]
 
     # Ratings
     shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
-
+    limited_notifications = shop_notifications[:5]
     context = {
         'shop': shop,
         'branches': branches,
@@ -2451,6 +2478,9 @@ def shop_dashboard(request):
         'shop_notifications': final_notifications,
         'unread_count': unread_count,
         "rating_percentages": rating_percentages,
+        'total_notifications_count': len(shop_notifications),
+        'shop_notifications': limited_notifications,
+        
     }
 
     return render(request, 'shop_dashboard.html', context)
@@ -3370,16 +3400,15 @@ def update_location(request):
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
-@login_required
+@login_required # or @shop_login_required depending on your auth
 def mark_notifications_read(request):
-    if request.method == "POST":
+    shop_id = request.session.get('shop_id')
+    if request.method == "POST" and shop_id:
         Notification.objects.filter(
-            shop=request.user.shop,
+            shop_id=shop_id, # Use shop_id from session
             is_read=False
         ).update(is_read=True)
-
         return JsonResponse({"status": "ok"})
-
     return JsonResponse({"status": "invalid"}, status=400)
 
 from django.core.mail import send_mail
