@@ -310,10 +310,10 @@ th{
 }
 
 /* ---------- GRID ---------- */
-.shops-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:16px;
+.shops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Slightly wider cards look better */
+    gap: 20px;
 }
 
 /* ---------- SHOP CARD ---------- */
@@ -354,14 +354,13 @@ th{
 }
 
 /* ---------- STATUS ---------- */
-.shop-card .status{
-    display:inline-flex;
-    align-items:center;
-    padding:3px 10px;
-    border-radius:999px;
-    font-size:10px;
-    font-weight:600;
-    margin-top:6px;
+.shop-card .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* Adds space between icon and text */
+    padding: 4px 12px;
+    font-size: 11px;
+    letter-spacing: 0.3px;
 }
 
 /* State colors */
@@ -659,113 +658,6 @@ th{
     </div>
 
         <!-- ===== ACCESS REQUEST ===== -->
-    <div id="access" class="content-section">
-
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-store"></i>
-                    Shops and Branches
-                </h2>
-            </div>
-
-            {% if shops_with_branches %}
-                {% for shop in shops_with_branches %}
-                <div class="shop-section"
-                    style="margin-bottom:30px;padding:20px;background:#f8f9fa;border-radius:8px;">
-
-                    <h3 style="color:var(--primary-color);margin-bottom:15px;font-size:20px;">
-                        <a href="{% url 'admin_shop_detail' shop.id %}"
-                        style="color:inherit;text-decoration:none;">
-                            <i class="fas fa-store"></i> {{ shop.name }}
-                        </a>
-
-                        {% if shop.is_approved %}
-                            <span class="status-badge status-completed">Approved</span>
-                        {% else %}
-                            <span class="status-badge status-pending">Pending Approval</span>
-                        {% endif %}
-
-                        {% if shop.is_open %}
-                            <span class="status-badge status-completed">Open</span>
-                        {% else %}
-                            <span class="status-badge status-pending">Closed</span>
-                        {% endif %}
-
-                        {% if not shop.is_approved %}
-                            <div style="display:inline-block;margin-left:10px;">
-                                <button onclick="approveShop({{ shop.id }})"
-                                        class="btn btn-primary"
-                                        style="font-size:12px;padding:5px 10px;">
-                                    <i class="fas fa-check"></i> Approve
-                                </button>
-
-                                <button onclick="rejectShop({{ shop.id }})"
-                                        class="btn btn-secondary"
-                                        style="font-size:12px;padding:5px 10px;">
-                                    <i class="fas fa-times"></i> Reject
-                                </button>
-                            </div>
-                        {% endif %}
-                    </h3>
-
-                    <p style="color:#666;margin-bottom:15px;">
-                        <i class="fas fa-map-marker-alt"></i> {{ shop.address }}
-                    </p>
-
-                    {% if shop.is_approved %}
-                        {% if shop.branches.all %}
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Branch Name</th>
-                                        <th>Address</th>
-                                        <th>Phone</th>
-                                        <th>Services</th>
-                                        <th>Created</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for branch in shop.branches.all %}
-                                    <tr>
-                                        <td>{{ branch.name }}</td>
-                                        <td>{{ branch.address|truncatechars:40 }}</td>
-                                        <td>{{ branch.phone|default:"N/A" }}</td>
-                                        <td>
-                                            {% if branch.services.all %}
-                                                {{ branch.services.count }} service{{ branch.services.count|pluralize }}
-                                            {% else %}
-                                                <span class="status-badge status-pending">No Services</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ branch.created_at|date:"M d, Y" }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-info-circle"></i>
-                                <p>No branches for this shop yet</p>
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="fas fa-clock"></i>
-                            <p>Shop is pending approval. Branches will be shown once approved.</p>
-                        </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-store"></i>
-                    <p>No shops yet</p>
-                </div>
-            {% endif %}
-
-        </div>
-    </div>
     <div id="shops" class="content-section">
         <div class="dashboard-section">
             <h2 class="section-titles">
@@ -778,6 +670,7 @@ th{
                 <div class="shop-card">
 
                     <h3>{{ shop.name }}</h3>
+                    <p><i class="fas fa-code-branch"></i> {{ shop.branches.count }} Branches</p>
                     <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
                     <p><i class="fas fa-phone"></i> {{ shop.phone }}</p>
 
@@ -832,9 +725,6 @@ th{
             {% endif %}
 
         </div>
-    </div>
-
-
     </div>
 </div>
 
