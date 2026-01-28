@@ -395,9 +395,12 @@
         <div class="login-box">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="error-box">
-                        <i class="fas fa-circle-exclamation"></i> {{ message }}
-                    </div>
+                    {# Only show messages if they contain specific login-related keywords #}
+                    {% if "Invalid" in message.message or "password" in message.message %}
+                        <div class="error-box">
+                            <i class="fas fa-circle-exclamation"></i> {{ message }}
+                        </div>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             <h2>Welcome back</h2>

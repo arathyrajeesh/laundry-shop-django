@@ -57,6 +57,10 @@ from django import forms
 from django.utils import timezone
 from .models import Order
 
+from django import forms
+from django.utils import timezone
+from .models import Order
+
 class UserDetailsForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -67,43 +71,41 @@ class UserDetailsForm(forms.ModelForm):
             'delivery_phone': forms.TextInput(attrs={
                 'placeholder': '10-digit mobile number',
                 'inputmode': 'numeric',
-                # This JS helps prevent typing mistakes, but the Python clean method below is the real security
+                'class': 'input-styled',
                 'oninput': "this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10)"
             }),
+            'delivery_name': forms.TextInput(attrs={'placeholder': 'Full name', 'class': 'input-styled'}),
+            'delivery_address': forms.Textarea(attrs={'placeholder': 'Full address', 'class': 'input-styled', 'rows': 3}),
+            'special_instructions': forms.Textarea(attrs={'placeholder': 'Optional instructions', 'class': 'input-styled', 'rows': 2}),
         }
 
-    # --- Field Specific Validation ---
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 🚩 Mark these fields as mandatory
+        mandatory_fields = ['pickup_date', 'delivery_date', 'delivery_name', 'delivery_address', 'delivery_phone']
+        for field in mandatory_fields:
+            self.fields[field].required = True
 
     def clean_delivery_phone(self):
         phone = self.cleaned_data.get('delivery_phone')
-        
-        # 1. Catch Alphabets/Special Characters
+        # Catch alphabet or special characters
         if not phone.isdigit():
-            raise forms.ValidationError("Phone number must contain numbers only.")
-        
-        # 2. Catch Incorrect Length (e.g., 9 digits)
+            raise forms.ValidationError("Error: Only numbers are allowed in the phone section.")
+        # Catch 9 digits or less
         if len(phone) != 10:
-            raise forms.ValidationError(f"Phone number must be exactly 10 digits. You entered {len(phone)}.")
-            
+            raise forms.ValidationError(f"Error: Exactly 10 digits required. You typed {len(phone)}.")
         return phone
-
-    def clean_pickup_date(self):
-        date = self.cleaned_data.get('pickup_date')
-        if date and date < timezone.now():
-            raise forms.ValidationError("Pickup time cannot be in the past.")
-        return date
-
-    # --- Cross-Field Validation ---
 
     def clean(self):
         cleaned_data = super().clean()
         pickup = cleaned_data.get('pickup_date')
         delivery = cleaned_data.get('delivery_date')
 
-        if pickup and delivery and delivery <= pickup:
-            # This attaches an error specifically to the delivery_date field
-            self.add_error('delivery_date', "Delivery must be scheduled after the pickup time.")
-        
+        if pickup and delivery:
+            if pickup < timezone.now():
+                self.add_error('pickup_date', "Pickup date cannot be in the past.")
+            if delivery <= pickup:
+                self.add_error('delivery_date', "Delivery must be scheduled after the pickup time.")
         return cleaned_data
 class LaundryShopForm(forms.ModelForm):
     class Meta:

@@ -334,8 +334,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib.messages import get_messages
 
 def login_page(request):
+    storage = get_messages(request)
+    for _ in storage:
+        pass
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
