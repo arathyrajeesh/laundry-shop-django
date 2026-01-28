@@ -3370,39 +3370,39 @@ def update_live_location(request):
         profile.save()
 
         return JsonResponse({"success": True})
-from django.db.models import Q
-
+    
 def admin_orders_filter(request):
-    orders = Order.objects.select_related("user", "shop").order_by("-created_at")
+    # Base queryset: only show confirmed/paid orders
+    orders = Order.objects.filter(payment_status="Completed").select_related("user", "shop").order_by("-created_at")
 
     search = request.GET.get("search", "").strip()
-    cloth_status = request.GET.get("status", "").strip()
-    delayed = request.GET.get("delayed")
+    status = request.GET.get("status", "").strip()
+    delayed = request.GET.get("delayed") # ✅ The separate view trigger
 
     if search:
         orders = orders.filter(
             Q(user__username__icontains=search) |
-            Q(user__email__icontains=search) |
             Q(id__icontains=search)
         )
 
-    if cloth_status:
-        orders = orders.filter(cloth_status=cloth_status)
+    if status:
+        orders = orders.filter(cloth_status=status)
 
-    if delayed:
-        orders = orders.filter(
-            delivery_date__lt=timezone.now(),
-            cloth_status__in=["Pending", "Washing", "Drying", "Ironing"]
-        )
+    # ✅ Separate View Logic: Filter for overdue orders only
+    if delayed == "1":
+        now = timezone.now()
+        orders = orders.filter(delivery_date__lt=now).exclude(cloth_status="Completed")
 
+    # Recalculate count for the dashboard badge
     delayed_orders_count = Order.objects.filter(
-        delivery_date__lt=timezone.now(),
-        cloth_status__in=["Pending", "Washing", "Drying", "Ironing"]
-    ).count()
+        payment_status="Completed",
+        delivery_date__lt=timezone.now()
+    ).exclude(cloth_status="Completed").count()
 
     return render(request, "admin/partials/orders_table.html", {
         "orders": orders,
         "delayed_orders_count": delayed_orders_count,
+        "is_delayed_view": delayed == "1" # Flag to show 'Back' button in template
     })
 
 

@@ -623,30 +623,24 @@ th{
             <!-- Filters -->
             <div class="filters">
                 <form id="ordersFilterForm" style="display:flex; gap:15px; flex-wrap:wrap; width:100%;">
-                    <input type="text"
-                        name="search"
-                        placeholder="Search by user, email, or order ID"
-                        value="{{ search_query }}">
+                    <input type="text" name="search" placeholder="Search by user, email, or order ID">
 
-                        <select name="status" class="filter-select">
-                            <option value="">All Status</option>
-                            {% for code, label in status_choices %}
-                                <option value="{{ code }}">{{ label }}</option>
-                            {% endfor %}
-                        </select>
+                    <select name="status" class="filter-select">
+                        <option value="">All Status</option>
+                        {% for code, label in status_choices %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
 
-                    <button type="submit"
-                            class="btn"
-                            style="background:var(--sidebar); color:white;">
+                    <select name="delayed" class="filter-select" style="border: 1px solid #ef4444; color: #ef4444;">
+                        <option value="">All Timeline</option>
+                        <option value="1">Show Delayed Only</option>
+                    </select>
+
+                    <button type="submit" class="btn" style="background:var(--sidebar); color:white;">
                         <i class="fas fa-search"></i> Filter
                     </button>
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            onclick="resetOrdersFilter()">
-                        <i class="fas fa-redo"></i> Reset
-                    </button>
-                </form>
+                    </form>
             </div>
             <button id="backToAllOrdersBtn"
                     class="btn btn-secondary"
@@ -867,29 +861,25 @@ function showSection(id, el) {
 
 
 function showDelayedOrders() {
-    // Switch to Orders tab
-    showSection('orders', document.querySelector('.nav-item[onclick*="orders"]'));
+    // 1. Ensure the "Orders" tab is active
+    const ordersNavItem = [...document.querySelectorAll(".nav-item")]
+        .find(item => item.getAttribute("onclick")?.includes("orders"));
+    showSection('orders', ordersNavItem);
 
+    // 2. Fetch the filtered data
     fetch(`/admin-panel/orders/filter/?delayed=1`)
         .then(res => res.text())
         .then(html => {
             document.getElementById("ordersTableWrapper").innerHTML = html;
-
-            // show back button
-            document.getElementById("backToAllOrdersBtn").style.display = "inline-block";
-        })
-        .catch(err => console.error(err));
+        });
 }
+
 function loadAllOrders() {
     fetch(`/admin-panel/orders/filter/`)
         .then(res => res.text())
         .then(html => {
             document.getElementById("ordersTableWrapper").innerHTML = html;
-
-            // hide back button
-            document.getElementById("backToAllOrdersBtn").style.display = "none";
-        })
-        .catch(err => console.error(err));
+        });
 }
 
 

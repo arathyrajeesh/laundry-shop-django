@@ -2,34 +2,35 @@
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:20px; flex-wrap:wrap;">
     
     <h3 style="margin-bottom:0">
-        Orders ({{ orders.count }})
+        {% if is_delayed_view %}
+            <span style="color: #e74c3c;"><i class="fas fa-exclamation-circle"></i> Delayed Orders</span>
+        {% else %}
+            All Orders
+        {% endif %} 
+        ({{ orders.count }})
     </h3>
 
-    <!-- Delayed Orders Card -->
-    <div class="stat-card"
-        style="min-width:220px; cursor:pointer;"
-        onclick="showDelayedOrders()">
-
-        <div class="stat-card-header"
-            style="display:flex; align-items:center; justify-content:space-between;">
-            <div>
-                <div class="stat-card-value"
-                    style="color:#e74c3c; font-size:22px; font-weight:700;">
-                    {{ delayed_orders_count }}
+    {% if is_delayed_view %}
+        <button class="btn btn-secondary" onclick="loadAllOrders()">
+            <i class="fas fa-arrow-left"></i> View All Orders
+        </button>
+    {% else %}
+        <div class="stat-card" style="min-width:220px; cursor:pointer;" onclick="showDelayedOrders()">
+            <div class="stat-card-header" style="display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    <div class="stat-card-value" style="color:#e74c3c; font-size:22px; font-weight:700;">
+                        {{ delayed_orders_count }}
+                    </div>
+                    <div class="stat-card-label" style="font-size:13px; color:#777;">Delayed Orders</div>
                 </div>
-                <div class="stat-card-label"
-                    style="font-size:13px; color:#777;">
-                    Delayed Orders
+                <div class="stat-card-icon" style="color: #e74c3c; background: #fdecea; padding: 10px; border-radius: 50%;">
+                    <i class="fas fa-exclamation-triangle"></i>
                 </div>
-            </div>
-            <div class="stat-card-icon icon-red">
-                <i class="fas fa-exclamation-triangle"></i>
             </div>
         </div>
-    </div>
-
-
+    {% endif %}
 </div>
+
 
 {% if orders %}
 <table class="data-table">
