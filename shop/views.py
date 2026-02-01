@@ -3493,7 +3493,7 @@ Shine & Bright System
         Notification.objects.create(
             shop=order.shop,
             title="⏰ Delayed Order Reminder",
-            message=f"Order #{order.id} is delayed. Customer has sent a reminder.",
+            message=f"Order #{order.id} for branch [{order.branch.name}] is delayed. Customer sent a reminder.",
             notification_type="shop_order_reminder",
             icon="fas fa-exclamation-triangle",
             color="#e74c3c"
