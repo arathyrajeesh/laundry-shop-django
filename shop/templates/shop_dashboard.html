@@ -1886,6 +1886,24 @@
             const statusSelect = document.getElementById(`status-${orderId}`);
             const newStatus = statusSelect.value;
 
+            // Logic: If marking as Completed, show the custom Center Alert
+            if (newStatus === "Completed") {
+                showCenterAlert(
+                    "Final Confirmation",
+                    "Once marked as COMPLETED, you cannot change the status again. This action is permanent. Do you want to proceed?",
+                    function() {
+                        // This callback runs only if they click "Confirm"
+                        executeStatusUpdate(orderId, newStatus);
+                    }
+                );
+            } else {
+                // For other statuses, update immediately or add a simpler alert
+                executeStatusUpdate(orderId, newStatus);
+            }
+        }
+
+        // Separate the actual Fetch logic so it can be called by the modal
+        function executeStatusUpdate(orderId, newStatus) {
             const formData = new FormData();
             formData.append('status', newStatus);
             formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
@@ -1901,22 +1919,14 @@
             .then(data => {
                 if (data.success) {
                     showMessage("Order status updated successfully!", "success");
-
-                    // Lock dropdown if completed
-                    if (newStatus === "Completed") {
-                        statusSelect.disabled = true;
-                        statusSelect.setAttribute("data-original", "Completed");
-                    }
-
-                    setTimeout(() => location.reload(), 1200);
-                }
-                else {
-                    alert('Error: ' + data.message);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showMessage(data.message || "Error updating status", "error");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while updating the order status.');
+                showMessage("An error occurred.", "error");
             });
         }
 
