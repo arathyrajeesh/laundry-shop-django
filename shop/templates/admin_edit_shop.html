@@ -204,6 +204,73 @@
             .btn-group { flex-direction: column-reverse; }
             .btn { justify-content: center; }
         }
+        /* Center Alert Box Styling */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 51, 75, 0.4); /* Backdrop dimming */
+            backdrop-filter: blur(5px);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .alert-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-icon {
+            font-size: 3rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
+        }
+
+        .alert-box h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .alert-box p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-alert {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-alert:hover { transform: translateY(-1px); opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -282,8 +349,7 @@
 
                     <div class="btn-group">
                         <a href="{% url 'admin_dashboard' %}#shops"
-                        class="btn btn-outline"
-                        onclick="return confirm('Discard changes and return to Manage Shops?')">
+                        class="btn btn-outline">
                             <i class="fas fa-times-circle"></i> Discard Changes
                         </a>
 
@@ -303,6 +369,43 @@
                 element.classList.add('form-control');
             }
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('customAlertOverlay');
+            const cancelBtn = document.getElementById('cancelAlert');
+            const confirmBtn = document.getElementById('confirmAlert');
+            
+            // Select all links/buttons that should trigger the discard warning
+            const discardTriggers = document.querySelectorAll('a[href*="admin_dashboard"], .btn-outline');
+
+            discardTriggers.forEach(trigger => {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault(); // Stop the link from following
+                    const targetUrl = this.getAttribute('href');
+                    
+                    // Show the centered modal
+                    overlay.style.display = 'flex';
+
+                    // If user confirms, go to the link
+                    confirmBtn.onclick = () => window.location.href = targetUrl;
+                    
+                    // If user cancels, hide the modal
+                    cancelBtn.onclick = () => overlay.style.display = 'none';
+                });
+            });
+        });
     </script>
+    <div id="customAlertOverlay" class="alert-overlay">
+        <div class="alert-box">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Discard Changes?</h3>
+            <p>Are you sure you want to leave? All unsaved changes to the shop details will be lost.</p>
+            <div class="alert-actions">
+                <button id="cancelAlert" class="btn-alert btn-secondary">Stay Here</button>
+                <button id="confirmAlert" class="btn-alert btn-danger">Discard</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
