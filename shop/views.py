@@ -229,18 +229,10 @@ def generate_payment_receipt_pdf(order, order_items):
 # NOTE: The dashboard template expects a 'cloth_status' list. 
 # We'll use the user's last 5 orders as a stand-in.
 def get_cloth_status(user):
-    orders = Order.objects.filter(
-        user=user,
-        payment_status="Completed"
-    ).select_related('shop', 'branch').order_by('-created_at')
-
+    orders = Order.objects.filter(user=user, payment_status="Completed").select_related('shop').order_by('-created_at')
     result = []
     for order in orders:
-        # 🚩 CRITICAL: Check if this SPECIFIC order has been rated
-        # If your ShopRating model links to 'shop', it checks if the user has EVER rated the shop.
-        # It is better to check if they rated the specific order if your model supports it.
-        already_rated = ShopRating.objects.filter(user=user, shop=order.shop).exists()
-
+        rating_obj = ShopRating.objects.filter(user=user, shop=order.shop).first()
         result.append({
             'order_id': order.id,
             'cloth_name': f"Order #{order.id}",
@@ -248,7 +240,10 @@ def get_cloth_status(user):
             'delivery_date': order.delivery_date or order.predicted_delivery,
             'shop_name': order.shop.name,
             'shop_id': order.shop.id,
-            'already_rated': already_rated,
+            'already_rated': rating_obj is not None,
+            # ADD THESE TWO LINES:
+            'existing_rating': rating_obj.rating if rating_obj else 0,
+            'existing_comment': rating_obj.comment if rating_obj else "",
         })
     return result
 
