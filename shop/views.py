@@ -2956,6 +2956,12 @@ def manage_service_prices(request):
                                 cloth=cloth,
                                 defaults={'price': price}
                             )
+
+                            BranchCloth.objects.get_or_create(
+                                branch=service.branch,
+                                cloth=cloth
+                            )
+
                         except ValueError:
                             continue
                     else:
