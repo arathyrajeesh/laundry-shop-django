@@ -1520,7 +1520,23 @@ def admin_dashboard(request):
     search_query = request.GET.get('search', '')
     users = User.objects.all().order_by('-date_joined')
     shops = LaundryShop.objects.all().order_by('name')
+
     orders = Order.objects.select_related('user', 'shop').order_by('-created_at')
+    pending_approvals = LaundryShop.objects.filter(is_approved=False).count()
+    has_seen_notifs = request.session.get('admin_seen_notifications', False)
+
+    now = timezone.now()
+    delayed_orders = Order.objects.filter(
+        payment_status="Completed",
+        delivery_date__isnull=False,
+        delivery_date__lt=now,
+        cloth_status__in=['Pending', 'Washing', 'Drying', 'Ironing']
+    )
+
+    show_indicator = (
+        pending_approvals + delayed_orders.count() > 0
+    ) and not has_seen_notifs
+
 
     today = timezone.now().date()
     now = timezone.now()
@@ -1694,7 +1710,9 @@ def admin_dashboard(request):
         'all_shops': LaundryShop.objects.all(),
         'shops_with_branches': LaundryShop.objects.prefetch_related('branches').all(),
         'shops': shops,
-
+        'show_notification_indicator': show_indicator,
+        'pending_approvals': pending_approvals,
+        'delayed_orders_count': delayed_orders.count(),
         'delayed_orders': delayed_orders,
         'delayed_orders_count': delayed_orders.count(),
         'chart_labels': chart_labels,
@@ -1704,6 +1722,12 @@ def admin_dashboard(request):
     }
 
     return render(request, 'admin_dashboard.html', context)
+
+@require_POST
+@user_passes_test(is_staff_user)
+def mark_admin_notifications_read(request):
+    request.session['admin_seen_notifications'] = True
+    return JsonResponse({'status': 'success'})
 
 def admin_user_search(request):
     query = request.GET.get("q", "")

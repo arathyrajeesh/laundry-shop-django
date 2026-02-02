@@ -75,7 +75,7 @@ urlpatterns = [
         path('shop/branch/<int:branch_id>/delete/', views.delete_branch, name='delete_branch'),
         path("update-live-location/", views.update_live_location, name="update_live_location"),
         path("update-location/", views.update_location, name="update_location"),
-
+        path('admin-panel/mark-notifications-read/', views.mark_admin_notifications_read, name='mark_admin_notifications_read'),
         # Service: can pass branch_id to auto-attach after create
         path('shop/service/add/', views.add_service, name='add_service'),
         path("service/add/<int:branch_id>/", views.add_service, name="add_service_branch"),

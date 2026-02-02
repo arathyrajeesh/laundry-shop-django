@@ -678,7 +678,7 @@ th{
             <li class="nav-item">
                 <a onclick="showSection('notifications-page', this.parentElement)">
                     <i class="fas fa-bell"></i> Notifications 
-                    {% if pending_approvals|add:delayed_orders_count > 0 %}
+                    {% if show_notification_indicator %}
                         <span class="badge-dot"></span>
                     {% endif %}
                 </a>
@@ -705,10 +705,9 @@ th{
                 
                 <div class="notification-wrapper" id="notifBtn">
                     <i class="fas fa-bell" style="font-size: 20px; color: var(--sidebar); cursor: pointer;"></i>
-                    {% if pending_approvals > 0 or delayed_orders_count > 0 %}
+                    {% if show_notification_indicator %}
                         <span class="notification-badge">{{ pending_approvals|add:delayed_orders_count }}</span>
                     {% endif %}
-                    
                     <div class="notif-dropdown" id="notifDropdown">
                         <div class="notif-header">
                             <span>Recent Alerts</span>
@@ -1070,6 +1069,9 @@ th{
                 clearIndicators();
             }
 
+            if (id === 'notifications-page' || id === 'shops') {
+                clearIndicators();
+            }
             // Fix Chart.js resize
             setTimeout(() => {
                 if (window.Chart) {
@@ -1079,21 +1081,24 @@ th{
         }
 
         function clearIndicators() {
-            // 1. Remove the pulsing red badge from the top bar bell
+            // 1. Hide them immediately on the screen
             const badge = document.querySelector('.notification-badge');
-            if (badge) {
-                badge.style.display = 'none';
-            }
-
-            // 2. Remove the red dot from the sidebar menu
             const dot = document.querySelector('.badge-dot');
-            if (dot) {
-                dot.style.display = 'none';
-            }
-            
-            // 3. Optional: Call server via AJAX to mark notifications as "read"
-            // fetch('/admin-panel/notifications/mark-read/', { method: 'POST', headers: {'X-CSRFToken': getCookie('csrftoken')} });
+            if (badge) badge.style.display = 'none';
+            if (dot) dot.style.display = 'none';
+
+            // 2. Tell the Django Server to remember this for the refresh
+            fetch('/admin-panel/mark-notifications-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                console.log("Indicators cleared on server.");
+            }).catch(err => console.error("Session update failed:", err));
         }
+
 
         // Update your goToNotif function to also clear indicators
         function goToNotif(sectionId, navElement) {
