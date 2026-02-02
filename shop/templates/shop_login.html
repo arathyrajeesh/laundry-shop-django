@@ -252,31 +252,45 @@
     </div>
 
     <script>
-        const passInput = document.getElementById('password');
-        const toggleBtn = document.getElementById('toggleBtn');
-        const icon = toggleBtn.querySelector('i');
-        const form = document.getElementById('loginForm');
-        const btn = document.getElementById('submitBtn');
+    const passInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const icon = toggleBtn.querySelector('i');
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('submitBtn');
 
-        // Toggle Password Visibility
-        toggleBtn.addEventListener('click', () => {
-            const isSecret = passInput.type === 'password';
-            passInput.type = isSecret ? 'text' : 'password';
-            icon.className = isSecret ? 'fas fa-eye-slash' : 'fas fa-eye';
-        });
+    // 1. Toggle Password Visibility
+    toggleBtn.addEventListener('click', () => {
+        const isSecret = passInput.type === 'password';
+        passInput.type = isSecret ? 'text' : 'password';
+        icon.className = isSecret ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
 
-        // Loading State Simulation
-        form.addEventListener('submit', () => {
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
-            btn.style.opacity = '0.8';
-            btn.style.pointerEvents = 'none';
-        });
-        setTimeout(() => {
-            const errorBox = document.querySelector('.error-box');
-            if (errorBox) {
-                errorBox.style.display = 'none';
-            }
-        }, 5000); 
+    // 2. Loading State Simulation on Submit
+    form.addEventListener('submit', () => {
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
+        btn.style.opacity = '0.8';
+        btn.style.pointerEvents = 'none';
+    });
+
+    // 3. AUTO-REMOVE ERROR TAGS after 5 seconds (5000ms)
+    window.addEventListener('DOMContentLoaded', () => {
+        const errorBoxes = document.querySelectorAll('.error-box');
+        
+        if (errorBoxes.length > 0) {
+            setTimeout(() => {
+                errorBoxes.forEach(box => {
+                    // Add a smooth fade-out effect
+                    box.style.transition = "opacity 0.5s ease";
+                    box.style.opacity = "0";
+                    
+                    // Actually remove from layout after fade
+                    setTimeout(() => {
+                        box.style.display = 'none';
+                    }, 500);
+                });
+            }, 5000); 
+        }
+    });
     </script>
 </body>
 </html>
