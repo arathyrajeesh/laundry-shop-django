@@ -238,168 +238,168 @@
         </div>
     </form>
 
-<script>
-    function calculateBillingSummary() {
-        const summaryItems = document.getElementById("summary-items");
-        const totalEl = document.getElementById("grand-total");
-        const footerAction = document.getElementById("footer-action");
+    <script>
+        function calculateBillingSummary() {
+            const summaryItems = document.getElementById("summary-items");
+            const totalEl = document.getElementById("grand-total");
+            const footerAction = document.getElementById("footer-action");
 
-        summaryItems.innerHTML = "";
-        let totalAmount = 0;
+            summaryItems.innerHTML = "";
+            let totalAmount = 0;
 
-        document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
-            const sId = cb.value;
-            const sName = cb.getAttribute("data-name");
+            document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
+                const sId = cb.value;
+                const sName = cb.getAttribute("data-name");
 
-            document
-                .querySelectorAll(`input[name="clothes_${sId}"]:checked`)
-                .forEach(clothCb => {
-                    const clothId = clothCb.value;
+                document
+                    .querySelectorAll(`input[name="clothes_${sId}"]:checked`)
+                    .forEach(clothCb => {
+                        const clothId = clothCb.value;
 
-                    const qtyInput = document.querySelector(
-                        `input[name="quantity_${sId}_${clothId}"]`
-                    );
-                    const qty = parseInt(qtyInput?.value || 0);
-                    if (qty <= 0) return;
+                        const qtyInput = document.querySelector(
+                            `input[name="quantity_${sId}_${clothId}"]`
+                        );
+                        const qty = parseInt(qtyInput?.value || 0);
+                        if (qty <= 0) return;
 
-                    const price = clothPrices[sId]?.[clothId];
-                    if (price === undefined) return;
+                        const price = clothPrices[sId]?.[clothId];
+                        if (price === undefined) return;
 
-                    const cloth = (serviceClothes[sId] || []).find(
-                        c => c.id == clothId
-                    );
-                    if (!cloth) return;
+                        const cloth = (serviceClothes[sId] || []).find(
+                            c => c.id == clothId
+                        );
+                        if (!cloth) return;
 
-                    const subtotal = price * qty;
-                    totalAmount += subtotal;
+                        const subtotal = price * qty;
+                        totalAmount += subtotal;
 
-                    summaryItems.innerHTML += `
-                        <div class="summary-row">
-                            <span>${sName} - ${cloth.name} (x${qty})</span>
-                            <span>₹${subtotal.toFixed(2)}</span>
-                        </div>
-                    `;
-                });
-        });
-
-        totalEl.innerText = `₹${totalAmount.toFixed(2)}`;
-
-        // ✅ Enable Proceed button ONLY if a cloth is selected
-        const anyClothSelected =
-            document.querySelectorAll('input[name^="clothes_"]:checked').length > 0;
-
-        footerAction.style.display = anyClothSelected ? "flex" : "none";
-    }
-
-
-    function updateSelections() {
-        syncSelectedServices();
-        const clothSection = document.getElementById("cloth-section");
-        const summarySection = document.getElementById("summary-section");
-        const clothContent = document.getElementById("cloth-content");
-
-        clothContent.innerHTML = "";
-
-        document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
-            const sId = cb.value;
-            const sName = cb.getAttribute("data-name");
-
-            let clothHTML = `
-                <div class="cloth-card">
-                    <div class="service-title-bar">
-                        ${sName} - Select Items
-                    </div>
-            `;
-
-            const availableClothes = serviceClothes[sId] || [];
-
-            if (availableClothes.length === 0) {
-                clothHTML += `
-                    <div style="padding:1rem; text-align:center; color:#64748b; font-size:0.9rem">
-                        No clothes available for this service
-                    </div>
-                `;
-            } else {
-                availableClothes.forEach(c => {
-                    const price = clothPrices[sId]?.[c.id];
-                    if (price === undefined) return;
-
-                    clothHTML += `
-                        <div class="cloth-item">
-                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
-                                <input type="checkbox"
-                                    name="clothes_${sId}"
-                                    value="${c.id}"
-                                    onchange="calculateBillingSummary()">
-                                <span style="font-weight:500">${c.name}</span>
-                            </label>
-
-                            <div class="price-quantity">
-                                <span style="color:var(--primary); font-weight:600">₹${price}</span>
-                                <input type="number"
-                                    name="quantity_${sId}_${c.id}"
-                                    value="1" min="1"
-                                    oninput="calculateBillingSummary()">
+                        summaryItems.innerHTML += `
+                            <div class="summary-row">
+                                <span>${sName} - ${cloth.name} (x${qty})</span>
+                                <span>₹${subtotal.toFixed(2)}</span>
                             </div>
+                        `;
+                    });
+            });
+
+            totalEl.innerText = `₹${totalAmount.toFixed(2)}`;
+
+            // ✅ Enable Proceed button ONLY if a cloth is selected
+            const anyClothSelected =
+                document.querySelectorAll('input[name^="clothes_"]:checked').length > 0;
+
+            footerAction.style.display = anyClothSelected ? "flex" : "none";
+        }
+
+
+        function updateSelections() {
+            syncSelectedServices();
+            const clothSection = document.getElementById("cloth-section");
+            const summarySection = document.getElementById("summary-section");
+            const clothContent = document.getElementById("cloth-content");
+
+            clothContent.innerHTML = "";
+
+            document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
+                const sId = cb.value;
+                const sName = cb.getAttribute("data-name");
+
+                let clothHTML = `
+                    <div class="cloth-card">
+                        <div class="service-title-bar">
+                            ${sName} - Select Items
+                        </div>
+                `;
+
+                const availableClothes = serviceClothes[sId] || [];
+
+                if (availableClothes.length === 0) {
+                    clothHTML += `
+                        <div style="padding:1rem; text-align:center; color:#64748b; font-size:0.9rem">
+                            No clothes available for this service
                         </div>
                     `;
-                });
-            }
+                } else {
+                    availableClothes.forEach(c => {
+                        const price = clothPrices[sId]?.[c.id];
+                        if (price === undefined) return;
 
-            clothHTML += `</div>`;
-            clothContent.insertAdjacentHTML("beforeend", clothHTML);
-        });
+                        clothHTML += `
+                            <div class="cloth-item">
+                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+                                    <input type="checkbox"
+                                        name="clothes_${sId}"
+                                        value="${c.id}"
+                                        onchange="calculateBillingSummary()">
+                                    <span style="font-weight:500">${c.name}</span>
+                                </label>
 
-        clothSection.style.display = "block";
-        summarySection.style.display = "block";
+                                <div class="price-quantity">
+                                    <span style="color:var(--primary); font-weight:600">₹${price}</span>
+                                    <input type="number"
+                                        name="quantity_${sId}_${c.id}"
+                                        value="1" min="1"
+                                        oninput="calculateBillingSummary()">
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                clothHTML += `</div>`;
+                clothContent.insertAdjacentHTML("beforeend", clothHTML);
+            });
+
+            clothSection.style.display = "block";
+            summarySection.style.display = "block";
 
 
-        calculateBillingSummary();
-        document.getElementById('cloth-section').style.display = anySelected ? 'block' : 'none';
-        document.getElementById('summary-section').style.display = anySelected ? 'block' : 'none';
-        document.getElementById('footer-action').style.display = anySelected ? 'flex' : 'none';
-        document.getElementById('grand-total').innerText = `₹${totalAmount.toFixed(2)}`;
-        setTimeout(calculateBillingSummary, 0);
-    }
-
-
-
-        const serviceClothes = {
-        {% for service_id, cloth_list in service_clothes.items %}
-        {{ service_id }}: [
-            {% for cloth in cloth_list %}
-            { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ]{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    };
-
-    const clothPrices = {
-        {% for service_id, prices in cloth_prices.items %}
-        {{ service_id }}: {
-            {% for cloth_id, price in prices.items %}
-            {{ cloth_id }}: {{ price|floatformat:2 }}{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        }{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    };
-
-    function toggleCard(id) {
-            const cb = document.getElementById('cb-' + id);
-            cb.checked = !cb.checked;
-            updateSelections();
+            calculateBillingSummary();
+            document.getElementById('cloth-section').style.display = anySelected ? 'block' : 'none';
+            document.getElementById('summary-section').style.display = anySelected ? 'block' : 'none';
+            document.getElementById('footer-action').style.display = anySelected ? 'flex' : 'none';
+            document.getElementById('grand-total').innerText = `₹${totalAmount.toFixed(2)}`;
+            setTimeout(calculateBillingSummary, 0);
         }
-        function syncSelectedServices() {
-        const hidden = document.getElementById("hidden-inputs");
-        hidden.innerHTML = "";
 
-        document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
-            hidden.innerHTML += `
-                <input type="hidden" name="selected_services" value="${cb.value}">
-            `;
-        });
-    }
-</script>
+
+
+            const serviceClothes = {
+            {% for service_id, cloth_list in service_clothes.items %}
+            {{ service_id }}: [
+                {% for cloth in cloth_list %}
+                { id: {{ cloth.id }}, name: "{{ cloth.name }}" }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+
+        const clothPrices = {
+            {% for service_id, prices in cloth_prices.items %}
+            {{ service_id }}: {
+                {% for cloth_id, price in prices.items %}
+                {{ cloth_id }}: {{ price|floatformat:2 }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+
+        function toggleCard(id) {
+                const cb = document.getElementById('cb-' + id);
+                cb.checked = !cb.checked;
+                updateSelections();
+            }
+            function syncSelectedServices() {
+            const hidden = document.getElementById("hidden-inputs");
+            hidden.innerHTML = "";
+
+            document.querySelectorAll(".service-checkbox:checked").forEach(cb => {
+                hidden.innerHTML += `
+                    <input type="hidden" name="selected_services" value="${cb.value}">
+                `;
+            });
+        }
+    </script>
 
 </body>
 </html>

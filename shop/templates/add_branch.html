@@ -264,80 +264,78 @@
             </form>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const geoIcon = document.getElementById('geo-icon');
+            const geoBox = document.getElementById('geo-box');
+            const cityText = document.getElementById('city-text');
+            const coordsText = document.getElementById('coords-text');
+            const submitBtn = document.getElementById('submitBtn');
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const geoIcon = document.getElementById('geo-icon');
-        const geoBox = document.getElementById('geo-box');
-        const cityText = document.getElementById('city-text');
-        const coordsText = document.getElementById('coords-text');
-        const submitBtn = document.getElementById('submitBtn');
+            // Handle Form Submission Loading
+            document.getElementById('branchForm').onsubmit = function() {
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+                submitBtn.style.opacity = '0.7';
+                submitBtn.style.pointerEvents = 'none';
+            };
 
-        // Handle Form Submission Loading
-        document.getElementById('branchForm').onsubmit = function() {
-            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
-            submitBtn.style.opacity = '0.7';
-            submitBtn.style.pointerEvents = 'none';
-        };
+            if (!navigator.geolocation) {
+                updateStatus("Incompatible", "Browser lacks GPS support", false);
+                return;
+            }
 
-        if (!navigator.geolocation) {
-            updateStatus("Incompatible", "Browser lacks GPS support", false);
-            return;
-        }
+            navigator.geolocation.getCurrentPosition(
+                async function (pos) {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
 
-        navigator.geolocation.getCurrentPosition(
-            async function (pos) {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
+                    document.getElementById("latitude").value = lat;
+                    document.getElementById("longitude").value = lon;
 
-                document.getElementById("latitude").value = lat;
-                document.getElementById("longitude").value = lon;
+                    try {
+                        const res = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                            { headers: { "User-Agent": "Terminal/1.0" } }
+                        );
+                        const data = await res.json();
+                        const addr = data.address || {};
+                        const city =
+                            addr.city ||
+                            addr.city_district ||
+                            addr.town ||
+                            addr.village ||
+                            addr.county ||
+                            addr.state_district ||
+                            addr.municipality ||
+                            addr.suburb ||
+                            addr.state ||
+                            "Location Verified";
 
-                try {
-                    const res = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                        { headers: { "User-Agent": "Terminal/1.0" } }
-                    );
-                    const data = await res.json();
-                    const addr = data.address || {};
-                    const city =
-                        addr.city ||
-                        addr.city_district ||
-                        addr.town ||
-                        addr.village ||
-                        addr.county ||
-                        addr.state_district ||
-                        addr.municipality ||
-                        addr.suburb ||
-                        addr.state ||
-                        "Location Verified";
-
-                    document.getElementById("city").value = city;
-                    updateStatus(city, `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
-                } catch (e) {
-                    updateStatus("Verified", `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
+                        document.getElementById("city").value = city;
+                        updateStatus(city, `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
+                    } catch (e) {
+                        updateStatus("Verified", `${lat.toFixed(4)}, ${lon.toFixed(4)}`, true);
+                    }
+                },
+                function () {
+                    updateStatus("Permission Denied", "Manual entry required", false);
                 }
-            },
-            function () {
-                updateStatus("Permission Denied", "Manual entry required", false);
-            }
-        );
+            );
 
-        function updateStatus(title, sub, isSuccess) {
-            cityText.innerText = title;
-            coordsText.innerText = sub;
-            if (isSuccess) {
-                geoIcon.innerHTML = '<i class="fas fa-check"></i>';
-                geoIcon.style.color = 'var(--success)';
-                geoBox.style.borderColor = 'var(--success)';
-                geoBox.style.background = '#f0fdf4';
-            } else {
-                geoIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                geoIcon.style.color = '#f59e0b';
+            function updateStatus(title, sub, isSuccess) {
+                cityText.innerText = title;
+                coordsText.innerText = sub;
+                if (isSuccess) {
+                    geoIcon.innerHTML = '<i class="fas fa-check"></i>';
+                    geoIcon.style.color = 'var(--success)';
+                    geoBox.style.borderColor = 'var(--success)';
+                    geoBox.style.background = '#f0fdf4';
+                } else {
+                    geoIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    geoIcon.style.color = '#f59e0b';
+                }
             }
-        }
-    });
-</script>
-
+        });
+    </script>
 </body>
 </html>

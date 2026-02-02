@@ -648,699 +648,697 @@ th{
 <body>
 
 <!-- ================= SIDEBAR ================= -->
-<div class="sidebar">
-    <div class="sidebar-brand">Bright & Shine</div>
+    <div class="sidebar">
+        <div class="sidebar-brand">Bright & Shine</div>
 
-    <ul class="nav-menu">
-        <li class="nav-item active">
-    <a onclick="showSection('dashboard', this.parentElement)">
-        <i class="fas fa-th-large"></i> Dashboard
-            </a>
-        </li>
+        <ul class="nav-menu">
+            <li class="nav-item active">
+        <a onclick="showSection('dashboard', this.parentElement)">
+            <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
 
-        <li class="nav-item">
-            <a onclick="showSection('users', this.parentElement)">
-                <i class="fas fa-users"></i> Users
-            </a>
-        </li>
+            <li class="nav-item">
+                <a onclick="showSection('users', this.parentElement)">
+                    <i class="fas fa-users"></i> Users
+                </a>
+            </li>
 
-        <li class="nav-item">
-            <a onclick="showSection('orders', this.parentElement)">
-                <i class="fas fa-list"></i> Orders
-            </a>
-        </li>
+            <li class="nav-item">
+                <a onclick="showSection('orders', this.parentElement)">
+                    <i class="fas fa-list"></i> Orders
+                </a>
+            </li>
 
-        <li class="nav-item">
-            <a onclick="showSection('shops', this.parentElement)">
-                <i class="fas fa-store"></i> Shops
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="showSection('notifications-page', this.parentElement)">
-                <i class="fas fa-bell"></i> Notifications 
-                {% if pending_approvals|add:delayed_orders_count > 0 %}
-                    <span class="badge-dot"></span>
-                {% endif %}
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'logout' %}">
-                <i class="fas fa-power-off"></i> Logout
-            </a>
-        </li>
-    </ul>
+            <li class="nav-item">
+                <a onclick="showSection('shops', this.parentElement)">
+                    <i class="fas fa-store"></i> Shops
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="showSection('notifications-page', this.parentElement)">
+                    <i class="fas fa-bell"></i> Notifications 
+                    {% if pending_approvals|add:delayed_orders_count > 0 %}
+                        <span class="badge-dot"></span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'logout' %}">
+                    <i class="fas fa-power-off"></i> Logout
+                </a>
+            </li>
+        </ul>
 
-    <div class="sidebar-footer">
-        <i class="fas fa-headset"></i>
-        <p>24/7 Support</p>
+        <div class="sidebar-footer">
+            <i class="fas fa-headset"></i>
+            <p>24/7 Support</p>
+        </div>
     </div>
-</div>
 
 <!-- ================= MAIN ================= -->
-<div class="main-content">
+    <div class="main-content">
 
-    <div class="top-bar">
-        <h3>Admin Panel</h3>
-        <div style="display: flex; align-items: center; gap: 20px;">
-            
-            <div class="notification-wrapper" id="notifBtn">
-                <i class="fas fa-bell" style="font-size: 20px; color: var(--sidebar); cursor: pointer;"></i>
-                {% if pending_approvals > 0 or delayed_orders_count > 0 %}
-                    <span class="notification-badge">{{ pending_approvals|add:delayed_orders_count }}</span>
-                {% endif %}
+        <div class="top-bar">
+            <h3>Admin Panel</h3>
+            <div style="display: flex; align-items: center; gap: 20px;">
                 
-                <div class="notif-dropdown" id="notifDropdown">
-                    <div class="notif-header">
-                        <span>Recent Alerts</span>
-                        <button class="btn-clear" onclick="clearNotifs()">Mark All Read</button>
+                <div class="notification-wrapper" id="notifBtn">
+                    <i class="fas fa-bell" style="font-size: 20px; color: var(--sidebar); cursor: pointer;"></i>
+                    {% if pending_approvals > 0 or delayed_orders_count > 0 %}
+                        <span class="notification-badge">{{ pending_approvals|add:delayed_orders_count }}</span>
+                    {% endif %}
+                    
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <span>Recent Alerts</span>
+                            <button class="btn-clear" onclick="clearNotifs()">Mark All Read</button>
+                        </div>
+                        <div class="notif-body">
+                            {% if pending_approvals > 0 %}
+                            <div class="notif-item" onclick="showSection('shops', document.querySelector('.nav-item i.fa-store').parentElement.parentElement)">
+                                <div class="notif-icon notif-warning">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                                <div class="notif-text">
+                                    <p><strong>{{ pending_approvals }} New Shop Requests</strong></p>
+                                    <p>Action required: Approve or Reject new business registrations.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if delayed_orders_count > 0 %}
+                            <div class="notif-item" onclick="showDelayedOrders()">
+                                <div class="notif-icon notif-danger">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div class="notif-text">
+                                    <p><strong>{{ delayed_orders_count }} Orders Delayed</strong></p>
+                                    <p>Warning: These orders have passed their predicted delivery time.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if pending_approvals == 0 and delayed_orders_count == 0 %}
+                            <div class="empty-notif">
+                                <i class="fas fa-check-circle"></i>
+                                <p>All caught up!</p>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="notif-body">
-                        {% if pending_approvals > 0 %}
-                        <div class="notif-item" onclick="showSection('shops', document.querySelector('.nav-item i.fa-store').parentElement.parentElement)">
-                            <div class="notif-icon notif-warning">
-                                <i class="fas fa-store"></i>
-                            </div>
-                            <div class="notif-text">
-                                <p><strong>{{ pending_approvals }} New Shop Requests</strong></p>
-                                <p>Action required: Approve or Reject new business registrations.</p>
-                            </div>
-                        </div>
-                        {% endif %}
+                </div>
 
-                        {% if delayed_orders_count > 0 %}
-                        <div class="notif-item" onclick="showDelayedOrders()">
-                            <div class="notif-icon notif-danger">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="notif-text">
-                                <p><strong>{{ delayed_orders_count }} Orders Delayed</strong></p>
-                                <p>Warning: These orders have passed their predicted delivery time.</p>
-                            </div>
-                        </div>
-                        {% endif %}
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0f334b&color=fff">
+                    <strong>{{ request.user.username }}</strong>
+                </div>
+            </div>
+        </div>
+        <div id ="dashboard" class="content-section active">
+            <div class="dashboard-section" style="margin-top:30px">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i> Today at a Glance
+                </h3>
 
-                        {% if pending_approvals == 0 and delayed_orders_count == 0 %}
-                        <div class="empty-notif">
-                            <i class="fas fa-check-circle"></i>
-                            <p>All caught up!</p>
-                        </div>
-                        {% endif %}
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Orders</h4>
+                        <div class="value">{{ total_orders }}</div>
+                        <div class="icon-circle"><i class="fas fa-shopping-bag"></i></div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h4>Total Revenue</h4>
+                        <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
+                        <div class="icon-circle"><i class="fas fa-rupee-sign"></i></div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h4>Today Revenue</h4>
+                        <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
+                        <div class="icon-circle"><i class="fas fa-calendar-day"></i></div>
                     </div>
                 </div>
             </div>
+        <!-- ================= CHARTS ================= -->
+            <div class="dashboard-section dashboard-charts">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i> Performance Overview
+                </h3>
+                <div style="display:flex;gap:8px;margin-bottom:15px">
+                    <a href="?range=7{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                    class="btn btn-secondary {% if range_days == 7 %}btn-primary{% endif %}">
+                        7 Days
+                    </a>
 
-            <div class="user-info">
-                <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0f334b&color=fff">
-                <strong>{{ request.user.username }}</strong>
+                    <a href="?range=30"
+                    class="btn btn-secondary {% if range_days == 30 %}btn-primary{% endif %}">
+                        30 Days
+                    </a>
+
+                    <a href="?range=90"
+                    class="btn btn-secondary {% if range_days == 90 %}btn-primary{% endif %}">
+                        90 Days
+                    </a>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+
+                    <!-- Revenue Trend -->
+                    <div class="table-box">
+                        <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
+                            Revenue Trend
+                        </h4>
+                        <canvas id="revenueChart" height="120"></canvas>
+                    </div>
+
+                    <!-- Orders Per Day -->
+                    <div class="table-box">
+                        <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
+                            Orders Per Day
+                        </h4>
+                        <canvas id="ordersChart" height="120"></canvas>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
-    <div id ="dashboard" class="content-section active">
-        <div class="dashboard-section" style="margin-top:30px">
-            <h3 class="section-title">
-                <i class="fas fa-chart-line"></i> Today at a Glance
-            </h3>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h4>Total Orders</h4>
-                    <div class="value">{{ total_orders }}</div>
-                    <div class="icon-circle"><i class="fas fa-shopping-bag"></i></div>
-                </div>
-
-                <div class="stat-card">
-                    <h4>Total Revenue</h4>
-                    <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
-                    <div class="icon-circle"><i class="fas fa-rupee-sign"></i></div>
-                </div>
-
-                <div class="stat-card">
-                    <h4>Today Revenue</h4>
-                    <div class="value">₹{{ today_revenue|floatformat:2 }}</div>
-                    <div class="icon-circle"><i class="fas fa-calendar-day"></i></div>
-                </div>
-            </div>
-        </div>
-    <!-- ================= CHARTS ================= -->
-        <div class="dashboard-section dashboard-charts">
-            <h3 class="section-title">
-                <i class="fas fa-chart-line"></i> Performance Overview
-            </h3>
-            <div style="display:flex;gap:8px;margin-bottom:15px">
-                <a href="?range=7{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-                class="btn btn-secondary {% if range_days == 7 %}btn-primary{% endif %}">
-                    7 Days
-                </a>
-
-                <a href="?range=30"
-                class="btn btn-secondary {% if range_days == 30 %}btn-primary{% endif %}">
-                    30 Days
-                </a>
-
-                <a href="?range=90"
-                class="btn btn-secondary {% if range_days == 90 %}btn-primary{% endif %}">
-                    90 Days
-                </a>
-            </div>
-            <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
-
-                <!-- Revenue Trend -->
-                <div class="table-box">
-                    <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
-                        Revenue Trend
-                    </h4>
-                    <canvas id="revenueChart" height="120"></canvas>
-                </div>
-
-                <!-- Orders Per Day -->
-                <div class="table-box">
-                    <h4 style="margin-bottom:10px;font-size:14px;color:#374151">
-                        Orders Per Day
-                    </h4>
-                    <canvas id="ordersChart" height="120"></canvas>
-                </div>
-
-            </div>
-        </div>
-    </div>
-    <!-- ===== USER CONTROL ===== -->
-    <div id="users" class="content-section">
-        <div class="filters">
-            <form id="userSearchForm">
-                <input type="text"
-                    id="userSearchInput"
-                    placeholder="Search by username, email, or name...">
-
-                <button type="submit" class="btn" style="background: var(--sidebar); color: white;">
-                    <i class="fas fa-search"></i> Search
-                </button>
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="loadAllUsers()">
-                    <i class="fas fa-redo"></i> Reset
-                </button>
-            </form>
-        </div>
-
-        <div class="table-box">
-            <h3 style="margin-bottom:15px">Manage Users</h3>
-
-            <!-- THIS PART WILL BE UPDATED DYNAMICALLY -->
-            <div id="usersTableWrapper">
-                {% include "admin/partials/users_table.html" %}
-            </div>
-        </div>
-    </div>
-
-    <div id="orders" class="content-section">
-
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-list-alt"></i> All Orders
-                </h2>
-            </div>
-
-            <!-- Filters -->
+        <!-- ===== USER CONTROL ===== -->
+        <div id="users" class="content-section">
             <div class="filters">
-                <form id="ordersFilterForm" style="display:flex; gap:15px; flex-wrap:wrap; width:100%;">
-                    <input type="text" name="search" placeholder="Search by user, email, or order ID">
+                <form id="userSearchForm">
+                    <input type="text"
+                        id="userSearchInput"
+                        placeholder="Search by username, email, or name...">
 
-                    <select name="status" class="filter-select">
-                        <option value="">All Status</option>
-                        {% for code, label in status_choices %}
-                            <option value="{{ code }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <select name="delayed" class="filter-select" style="border: 1px solid #ef4444; color: #ef4444;">
-                        <option value="">All Timeline</option>
-                        <option value="1">Show Delayed Only</option>
-                    </select>
-
-                    <button type="submit" class="btn" style="background:var(--sidebar); color:white;">
-                        <i class="fas fa-search"></i> Filter
+                    <button type="submit" class="btn" style="background: var(--sidebar); color: white;">
+                        <i class="fas fa-search"></i> Search
                     </button>
-                    </form>
-            </div>
-            <button id="backToAllOrdersBtn"
-                    class="btn btn-secondary"
-                    style="display:none; margin-bottom:15px;"
-                    onclick="loadAllOrders()">
-                <i class="fas fa-arrow-left"></i> Back to All Orders
-            </button>
 
-            <!-- Orders Table -->
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="loadAllUsers()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </form>
+            </div>
+
             <div class="table-box">
-                <div id="ordersTableWrapper">
-                    {% include "admin/partials/orders_table.html" %}
+                <h3 style="margin-bottom:15px">Manage Users</h3>
+
+                <!-- THIS PART WILL BE UPDATED DYNAMICALLY -->
+                <div id="usersTableWrapper">
+                    {% include "admin/partials/users_table.html" %}
                 </div>
             </div>
         </div>
-    </div>
-    <div id="notifications-page" class="content-section">
-        <div class="dashboard-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 class="section-title" style="margin-bottom: 0;">
-                    <i class="fas fa-bell"></i> Administrative Notifications
-                </h2>
-                <button class="btn btn-secondary" onclick="location.reload()">
-                    <i class="fas fa-sync-alt"></i> Refresh Feed
+
+        <div id="orders" class="content-section">
+
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-list-alt"></i> All Orders
+                    </h2>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <form id="ordersFilterForm" style="display:flex; gap:15px; flex-wrap:wrap; width:100%;">
+                        <input type="text" name="search" placeholder="Search by user, email, or order ID">
+
+                        <select name="status" class="filter-select">
+                            <option value="">All Status</option>
+                            {% for code, label in status_choices %}
+                                <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="delayed" class="filter-select" style="border: 1px solid #ef4444; color: #ef4444;">
+                            <option value="">All Timeline</option>
+                            <option value="1">Show Delayed Only</option>
+                        </select>
+
+                        <button type="submit" class="btn" style="background:var(--sidebar); color:white;">
+                            <i class="fas fa-search"></i> Filter
+                        </button>
+                        </form>
+                </div>
+                <button id="backToAllOrdersBtn"
+                        class="btn btn-secondary"
+                        style="display:none; margin-bottom:15px;"
+                        onclick="loadAllOrders()">
+                    <i class="fas fa-arrow-left"></i> Back to All Orders
                 </button>
-            </div>
 
-            <div class="notification-feed">
-                {% if pending_approvals > 0 %}
-                <div class="notif-card warning" onclick="showSection('shops', document.querySelector('[onclick*=\'shops\']').parentElement)">
-                    <div class="notif-card-icon">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <div class="notif-card-body">
-                        <div class="notif-card-header">
-                            <h4>New Shop Registration</h4>
-                            <span>Action Required</span>
-                        </div>
-                        <p>There are <strong>{{ pending_approvals }}</strong> shops waiting for your verification. Approval is required before they can list services.</p>
-                    </div>
-                    <i class="fas fa-chevron-right arrow"></i>
-                </div>
-                {% endif %}
-
-                {% if delayed_orders_count > 0 %}
-                <div class="notif-card danger" onclick="showDelayedOrders()">
-                    <div class="notif-card-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="notif-card-body">
-                        <div class="notif-card-header">
-                            <h4>Order Delays Detected</h4>
-                            <span>Urgent</span>
-                        </div>
-                        <p><strong>{{ delayed_orders_count }}</strong> orders have exceeded their predicted delivery time. Please check branch loads.</p>
-                    </div>
-                    <i class="fas fa-chevron-right arrow"></i>
-                </div>
-                {% endif %}
-
-                <div class="notif-card info">
-                    <div class="notif-card-icon">
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="notif-card-body">
-                        <div class="notif-card-header">
-                            <h4>System Update</h4>
-                            <span>Info</span>
-                        </div>
-                        <p>Welcome to the 2026 Admin Dashboard. All backup systems are currently operational.</p>
+                <!-- Orders Table -->
+                <div class="table-box">
+                    <div id="ordersTableWrapper">
+                        {% include "admin/partials/orders_table.html" %}
                     </div>
                 </div>
-
-                {% if pending_approvals == 0 and delayed_orders_count == 0 %}
-                <div class="empty-state">
-                    <i class="fas fa-check-double"></i>
-                    <p>No pending administrative actions. You're all caught up!</p>
-                </div>
-                {% endif %}
             </div>
         </div>
-    </div>
-        <!-- ===== ACCESS REQUEST ===== -->
-    <div id="shops" class="content-section">
-        <div class="dashboard-section">
-            <h2 class="section-titles">
-                <i class="fas fa-store"></i> Manage Shops
-            </h2>
+        <div id="notifications-page" class="content-section">
+            <div class="dashboard-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">
+                        <i class="fas fa-bell"></i> Administrative Notifications
+                    </h2>
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i> Refresh Feed
+                    </button>
+                </div>
 
-            {% if shops %}
-            <div class="shops-grid">
-                {% for shop in shops %}
-                <div class="shop-card">
+                <div class="notification-feed">
+                    {% if pending_approvals > 0 %}
+                    <div class="notif-card warning" onclick="showSection('shops', document.querySelector('[onclick*=\'shops\']').parentElement)">
+                        <div class="notif-card-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="notif-card-body">
+                            <div class="notif-card-header">
+                                <h4>New Shop Registration</h4>
+                                <span>Action Required</span>
+                            </div>
+                            <p>There are <strong>{{ pending_approvals }}</strong> shops waiting for your verification. Approval is required before they can list services.</p>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    {% endif %}
 
-                    <h3>{{ shop.name }}</h3>
-                    <p><i class="fas fa-code-branch"></i> {{ shop.branches.count }} Branches</p>
-                    <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
-                    <p><i class="fas fa-phone"></i> {{ shop.phone }}</p>
+                    {% if delayed_orders_count > 0 %}
+                    <div class="notif-card danger" onclick="showDelayedOrders()">
+                        <div class="notif-card-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="notif-card-body">
+                            <div class="notif-card-header">
+                                <h4>Order Delays Detected</h4>
+                                <span>Urgent</span>
+                            </div>
+                            <p><strong>{{ delayed_orders_count }}</strong> orders have exceeded their predicted delivery time. Please check branch loads.</p>
+                        </div>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </div>
+                    {% endif %}
 
-                    <span class="status {% if shop.is_open %}status-open{% else %}status-closed{% endif %}">
-                        {% if shop.is_open %}
-                            <i class="fas fa-door-open"></i> Open
-                        {% else %}
-                            <i class="fas fa-door-closed"></i> Closed
-                        {% endif %}
-                    </span>
+                    <div class="notif-card info">
+                        <div class="notif-card-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notif-card-body">
+                            <div class="notif-card-header">
+                                <h4>System Update</h4>
+                                <span>Info</span>
+                            </div>
+                            <p>Welcome to the 2026 Admin Dashboard. All backup systems are currently operational.</p>
+                        </div>
+                    </div>
 
-                    <div class="approval-status">
-                        <span class="status {% if shop.is_approved %}status-approved{% else %}status-pending-approval{% endif %}">
-                            {% if shop.is_approved %}
-                                <i class="fas fa-check"></i> Approved
+                    {% if pending_approvals == 0 and delayed_orders_count == 0 %}
+                    <div class="empty-state">
+                        <i class="fas fa-check-double"></i>
+                        <p>No pending administrative actions. You're all caught up!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+            <!-- ===== ACCESS REQUEST ===== -->
+        <div id="shops" class="content-section">
+            <div class="dashboard-section">
+                <h2 class="section-titles">
+                    <i class="fas fa-store"></i> Manage Shops
+                </h2>
+
+                {% if shops %}
+                <div class="shops-grid">
+                    {% for shop in shops %}
+                    <div class="shop-card">
+
+                        <h3>{{ shop.name }}</h3>
+                        <p><i class="fas fa-code-branch"></i> {{ shop.branches.count }} Branches</p>
+                        <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
+                        <p><i class="fas fa-phone"></i> {{ shop.phone }}</p>
+
+                        <span class="status {% if shop.is_open %}status-open{% else %}status-closed{% endif %}">
+                            {% if shop.is_open %}
+                                <i class="fas fa-door-open"></i> Open
                             {% else %}
-                                <i class="fas fa-clock"></i> Pending Approval
+                                <i class="fas fa-door-closed"></i> Closed
                             {% endif %}
                         </span>
+
+                        <div class="approval-status">
+                            <span class="status {% if shop.is_approved %}status-approved{% else %}status-pending-approval{% endif %}">
+                                {% if shop.is_approved %}
+                                    <i class="fas fa-check"></i> Approved
+                                {% else %}
+                                    <i class="fas fa-clock"></i> Pending Approval
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="actions">
+                            {% if not shop.is_approved %}
+                            <button onclick="approveShop({{ shop.id }})"
+                                    class="btn btn-primary"
+                                    style="font-size:12px">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+
+                            <button onclick="rejectShop({{ shop.id }})"
+                                    class="btn btn-secondary"
+                                    style="font-size:12px">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                            {% endif %}
+
+                            <a href="{% url 'admin_edit_shop' shop.id %}"
+                            class="btn btn-secondary"
+                            style="font-size:12px">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+
                     </div>
-
-                    <div class="actions">
-                        {% if not shop.is_approved %}
-                        <button onclick="approveShop({{ shop.id }})"
-                                class="btn btn-primary"
-                                style="font-size:12px">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
-
-                        <button onclick="rejectShop({{ shop.id }})"
-                                class="btn btn-secondary"
-                                style="font-size:12px">
-                            <i class="fas fa-times"></i> Reject
-                        </button>
-                        {% endif %}
-
-                        <a href="{% url 'admin_edit_shop' shop.id %}"
-                        class="btn btn-secondary"
-                        style="font-size:12px">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                    </div>
-
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-store"></i>
-                <p>No shops found</p>
-            </div>
-            {% endif %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-store"></i>
+                    <p>No shops found</p>
+                </div>
+                {% endif %}
 
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-// Toggle Dropdown
-document.getElementById('notifBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    document.getElementById('notifDropdown').classList.toggle('active');
-});
-
-// Close when clicking elsewhere
-window.addEventListener('click', function() {
-    document.getElementById('notifDropdown').classList.remove('active');
-});
-
-// Navigate and close dropdown
-function goToNotif(sectionId, navElement) {
-    showSection(sectionId, navElement);
-    document.getElementById('notifDropdown').classList.remove('active');
-}
-function showSection(id, el) {
-    document.querySelectorAll('.content-section')
-        .forEach(s => s.classList.remove('active'));
-
-    const section = document.getElementById(id);
-    if (section) section.classList.add('active');
-
-    document.querySelectorAll('.nav-item')
-        .forEach(n => n.classList.remove('active'));
-
-    el.classList.add('active');
-
-    // --- NEW: Clear notifications if entering the notification page ---
-    if (id === 'notifications-page') {
-        clearIndicators();
-    }
-
-    // Fix Chart.js resize
-    setTimeout(() => {
-        if (window.Chart) {
-            Object.values(Chart.instances).forEach(chart => chart.resize());
-        }
-    }, 200);
-}
-
-function clearIndicators() {
-    // 1. Remove the pulsing red badge from the top bar bell
-    const badge = document.querySelector('.notification-badge');
-    if (badge) {
-        badge.style.display = 'none';
-    }
-
-    // 2. Remove the red dot from the sidebar menu
-    const dot = document.querySelector('.badge-dot');
-    if (dot) {
-        dot.style.display = 'none';
-    }
-    
-    // 3. Optional: Call server via AJAX to mark notifications as "read"
-    // fetch('/admin-panel/notifications/mark-read/', { method: 'POST', headers: {'X-CSRFToken': getCookie('csrftoken')} });
-}
-
-// Update your goToNotif function to also clear indicators
-function goToNotif(sectionId, navElement) {
-    showSection(sectionId, navElement);
-    document.getElementById('notifDropdown').classList.remove('active');
-    clearIndicators();
-}
-
-
-function showDelayedOrders() {
-    // 1. Ensure the "Orders" tab is active
-    const ordersNavItem = [...document.querySelectorAll(".nav-item")]
-        .find(item => item.getAttribute("onclick")?.includes("orders"));
-    showSection('orders', ordersNavItem);
-
-    // 2. Fetch the filtered data
-    fetch(`/admin-panel/orders/filter/?delayed=1`)
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById("ordersTableWrapper").innerHTML = html;
+    <script>
+    // Toggle Dropdown
+        document.getElementById('notifBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('notifDropdown').classList.toggle('active');
         });
-}
 
-function loadAllOrders() {
-    fetch(`/admin-panel/orders/filter/`)
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById("ordersTableWrapper").innerHTML = html;
+        // Close when clicking elsewhere
+        window.addEventListener('click', function() {
+            document.getElementById('notifDropdown').classList.remove('active');
         });
-}
 
-
-
-const form = document.getElementById("userSearchForm");
-const input = document.getElementById("userSearchInput");
-const tableWrapper = document.getElementById("usersTableWrapper");
-
-form.addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    fetch(`/dashboard/users/search/?q=${encodeURIComponent(input.value)}`)
-        .then(response => response.text())
-        .then(html => {
-            tableWrapper.innerHTML = html;
-        })
-        .catch(err => console.error(err));
-});
-
-function loadAllUsers() {
-    input.value = "";
-    fetch(`/dashboard/users/search/?q=`)
-        .then(response => response.text())
-        .then(html => {
-            tableWrapper.innerHTML = html;
-        });
-}
-
-function approveShop(shopId) {
-    if (!confirm("Approve this shop?")) return;
-
-    fetch(`/admin-panel/shop/${shopId}/approve/`, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-        },
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Shop approved successfully");
-            location.reload();
-        } else {
-            alert(data.message || "Approval failed");
+        // Navigate and close dropdown
+        function goToNotif(sectionId, navElement) {
+            showSection(sectionId, navElement);
+            document.getElementById('notifDropdown').classList.remove('active');
         }
-    });
-}
+        function showSection(id, el) {
+            document.querySelectorAll('.content-section')
+                .forEach(s => s.classList.remove('active'));
 
-function rejectShop(shopId) {
-    if (!confirm("Reject this shop?")) return;
+            const section = document.getElementById(id);
+            if (section) section.classList.add('active');
 
-    fetch(`/admin-panel/shop/${shopId}/reject/`, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-        },
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Shop rejected successfully");
-            location.reload();
-        } else {
-            alert(data.message || "Rejection failed");
-        }
-    });
-}
+            document.querySelectorAll('.nav-item')
+                .forEach(n => n.classList.remove('active'));
 
-const ordersForm = document.getElementById("ordersFilterForm");
-const ordersWrapper = document.getElementById("ordersTableWrapper");
+            el.classList.add('active');
 
-ordersForm.addEventListener("submit", function (e) {
-    e.preventDefault(); // stop full page reload
-
-    const formData = new FormData(ordersForm);
-    const query = new URLSearchParams(formData).toString();
-
-    fetch(`/admin-panel/orders/filter/?${query}`)
-        .then(response => response.text())
-        .then(html => {
-            ordersWrapper.innerHTML = html; // update orders table only
-        })
-        .catch(err => console.error("Orders filter error:", err));
-});
-
-function resetOrdersFilter() {
-    ordersForm.reset();
-    ordersForm.dispatchEvent(new Event("submit"));
-}
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        document.cookie.split(";").forEach(cookie => {
-            cookie = cookie.trim();
-            if (cookie.startsWith(name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            // --- NEW: Clear notifications if entering the notification page ---
+            if (id === 'notifications-page') {
+                clearIndicators();
             }
-        });
-    }
-    return cookieValue;
-}
-document.addEventListener("DOMContentLoaded", function () {
 
-    const hash = window.location.hash;
-
-    if (hash === "#shops") {
-
-        // Find the sidebar item safely
-        const shopsNavItem = [...document.querySelectorAll(".nav-item")]
-            .find(item => item.getAttribute("onclick")?.includes("shops"));
-
-        if (shopsNavItem && typeof showSection === "function") {
-            showSection("shops", shopsNavItem);
-        }
-    }
-
-});
-
-/* ---------- Revenue Trend Chart ---------- */
-const revenueCtx = document.getElementById("revenueChart");
-
-if (revenueCtx) {
-    const gradient = revenueCtx.getContext("2d").createLinearGradient(0, 0, 0, 200);
-    gradient.addColorStop(0, "rgba(45,138,99,0.35)");
-    gradient.addColorStop(1, "rgba(45,138,99,0.05)");
-
-    new Chart(revenueCtx, {
-        type: "line",
-        data: {
-            labels: {{ chart_labels|safe }},
-            datasets: [{
-                data: {{ revenue_chart_data|safe }},
-                borderColor: "#2d8a63",
-                backgroundColor: gradient,
-                fill: true,
-                tension: 0.45,
-                borderWidth: 3,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                pointBackgroundColor: "#2d8a63",
-                pointBorderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: "#0f334b",
-                    padding: 12,
-                    callbacks: {
-                        label: ctx => ` Revenue: ₹${ctx.raw}`
-                    }
+            // Fix Chart.js resize
+            setTimeout(() => {
+                if (window.Chart) {
+                    Object.values(Chart.instances).forEach(chart => chart.resize());
                 }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: "#6b7280", font: { size: 11 } }
+            }, 200);
+        }
+
+        function clearIndicators() {
+            // 1. Remove the pulsing red badge from the top bar bell
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+
+            // 2. Remove the red dot from the sidebar menu
+            const dot = document.querySelector('.badge-dot');
+            if (dot) {
+                dot.style.display = 'none';
+            }
+            
+            // 3. Optional: Call server via AJAX to mark notifications as "read"
+            // fetch('/admin-panel/notifications/mark-read/', { method: 'POST', headers: {'X-CSRFToken': getCookie('csrftoken')} });
+        }
+
+        // Update your goToNotif function to also clear indicators
+        function goToNotif(sectionId, navElement) {
+            showSection(sectionId, navElement);
+            document.getElementById('notifDropdown').classList.remove('active');
+            clearIndicators();
+        }
+
+
+        function showDelayedOrders() {
+            // 1. Ensure the "Orders" tab is active
+            const ordersNavItem = [...document.querySelectorAll(".nav-item")]
+                .find(item => item.getAttribute("onclick")?.includes("orders"));
+            showSection('orders', ordersNavItem);
+
+            // 2. Fetch the filtered data
+            fetch(`/admin-panel/orders/filter/?delayed=1`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("ordersTableWrapper").innerHTML = html;
+                });
+        }
+
+        function loadAllOrders() {
+            fetch(`/admin-panel/orders/filter/`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("ordersTableWrapper").innerHTML = html;
+                });
+        }
+
+        const form = document.getElementById("userSearchForm");
+        const input = document.getElementById("userSearchInput");
+        const tableWrapper = document.getElementById("usersTableWrapper");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            fetch(`/dashboard/users/search/?q=${encodeURIComponent(input.value)}`)
+                .then(response => response.text())
+                .then(html => {
+                    tableWrapper.innerHTML = html;
+                })
+                .catch(err => console.error(err));
+        });
+
+        function loadAllUsers() {
+            input.value = "";
+            fetch(`/dashboard/users/search/?q=`)
+                .then(response => response.text())
+                .then(html => {
+                    tableWrapper.innerHTML = html;
+                });
+        }
+
+        function approveShop(shopId) {
+            if (!confirm("Approve this shop?")) return;
+
+            fetch(`/admin-panel/shop/${shopId}/approve/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
                 },
-                y: {
-                    grid: { color: "#eef2f0" },
-                    ticks: {
-                        color: "#6b7280",
-                        callback: v => "₹" + v
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Shop approved successfully");
+                    location.reload();
+                } else {
+                    alert(data.message || "Approval failed");
+                }
+            });
+        }
+
+        function rejectShop(shopId) {
+            if (!confirm("Reject this shop?")) return;
+
+            fetch(`/admin-panel/shop/${shopId}/reject/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Shop rejected successfully");
+                    location.reload();
+                } else {
+                    alert(data.message || "Rejection failed");
+                }
+            });
+        }
+
+        const ordersForm = document.getElementById("ordersFilterForm");
+        const ordersWrapper = document.getElementById("ordersTableWrapper");
+
+        ordersForm.addEventListener("submit", function (e) {
+            e.preventDefault(); // stop full page reload
+
+            const formData = new FormData(ordersForm);
+            const query = new URLSearchParams(formData).toString();
+
+            fetch(`/admin-panel/orders/filter/?${query}`)
+                .then(response => response.text())
+                .then(html => {
+                    ordersWrapper.innerHTML = html; // update orders table only
+                })
+                .catch(err => console.error("Orders filter error:", err));
+        });
+
+        function resetOrdersFilter() {
+            ordersForm.reset();
+            ordersForm.dispatchEvent(new Event("submit"));
+        }
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                document.cookie.split(";").forEach(cookie => {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    }
+                });
+            }
+            return cookieValue;
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const hash = window.location.hash;
+
+            if (hash === "#shops") {
+
+                // Find the sidebar item safely
+                const shopsNavItem = [...document.querySelectorAll(".nav-item")]
+                    .find(item => item.getAttribute("onclick")?.includes("shops"));
+
+                if (shopsNavItem && typeof showSection === "function") {
+                    showSection("shops", shopsNavItem);
+                }
+            }
+
+        });
+
+        /* ---------- Revenue Trend Chart ---------- */
+        const revenueCtx = document.getElementById("revenueChart");
+
+        if (revenueCtx) {
+            const gradient = revenueCtx.getContext("2d").createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, "rgba(45,138,99,0.35)");
+            gradient.addColorStop(1, "rgba(45,138,99,0.05)");
+
+            new Chart(revenueCtx, {
+                type: "line",
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [{
+                        data: {{ revenue_chart_data|safe }},
+                        borderColor: "#2d8a63",
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: "#2d8a63",
+                        pointBorderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: "#0f334b",
+                            padding: 12,
+                            callbacks: {
+                                label: ctx => ` Revenue: ₹${ctx.raw}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: "#6b7280", font: { size: 11 } }
+                        },
+                        y: {
+                            grid: { color: "#eef2f0" },
+                            ticks: {
+                                color: "#6b7280",
+                                callback: v => "₹" + v
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* ---------- Orders Per Day Chart ---------- */
+        const ordersCtx = document.getElementById("ordersChart");
+
+        new Chart(ordersCtx, {
+            type: "bar",
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    label: "Orders",
+                    data: {{ orders_chart_data|safe }},
+                    backgroundColor: "#0f334b",
+                    borderRadius: 6,
+                    maxBarThickness: 28
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: "#eef2f0" }
+                    },
+                    x: {
+                        grid: { display: false }
                     }
                 }
             }
+        });
+        function toggleNotif() {
+            const dropdown = document.getElementById('notifDropdown');
+            dropdown.classList.toggle('active');
         }
-    });
-}
 
-/* ---------- Orders Per Day Chart ---------- */
-const ordersCtx = document.getElementById("ordersChart");
-
-new Chart(ordersCtx, {
-    type: "bar",
-    data: {
-        labels: {{ chart_labels|safe }},
-        datasets: [{
-            label: "Orders",
-            data: {{ orders_chart_data|safe }},
-            backgroundColor: "#0f334b",
-            borderRadius: 6,
-            maxBarThickness: 28
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: "#eef2f0" }
-            },
-            x: {
-                grid: { display: false }
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.notification-wrapper')) {
+                const dropdown = document.getElementById('notifDropdown');
+                if (dropdown && dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                }
             }
         }
-    }
-});
-function toggleNotif() {
-    const dropdown = document.getElementById('notifDropdown');
-    dropdown.classList.toggle('active');
-}
-
-// Close dropdown when clicking outside
-window.onclick = function(event) {
-    if (!event.target.closest('.notification-wrapper')) {
-        const dropdown = document.getElementById('notifDropdown');
-        if (dropdown && dropdown.classList.contains('active')) {
-            dropdown.classList.remove('active');
-        }
-    }
-}
-</script>
+    </script>
 
 </body>
 </html>

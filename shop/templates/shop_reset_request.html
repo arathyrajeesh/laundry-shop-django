@@ -91,26 +91,26 @@
 
 <body>
 
-<div class="reset-container">
+    <div class="reset-container">
 
-    <div class="logo-box">
-        <img src="{% static 'images/Shine.png' %}" alt="Logo">
+        <div class="logo-box">
+            <img src="{% static 'images/Shine.png' %}" alt="Logo">
+        </div>
+
+        <h2>Shop Password Reset</h2>
+        <p>Enter your shop email and we’ll send you a password reset link.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Enter shop email" required>
+            <button type="submit">Send Reset Link</button>
+        </form>
+
+        <p class="back-link">
+            <a href="{% url 'shop_login' %}">Back to Shop Login</a>
+        </p>
+
     </div>
-
-    <h2>Shop Password Reset</h2>
-    <p>Enter your shop email and we’ll send you a password reset link.</p>
-
-    <form method="POST">
-        {% csrf_token %}
-        <input type="email" name="email" placeholder="Enter shop email" required>
-        <button type="submit">Send Reset Link</button>
-    </form>
-
-    <p class="back-link">
-        <a href="{% url 'shop_login' %}">Back to Shop Login</a>
-    </p>
-
-</div>
 
 </body>
 </html>

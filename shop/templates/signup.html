@@ -212,236 +212,236 @@
 </head>
 <body>
 
-<div class="page-wrapper">
-    <div class="left-panel">
-        <img src="{% static 'images/login.webp' %}" alt="Background image">
-        <div class="brand-content">
-            <h1>Join Shine & Bright.</h1>
-            <p>Experience the future of laundry with smart location tracking and professional care.</p>
+    <div class="page-wrapper">
+        <div class="left-panel">
+            <img src="{% static 'images/login.webp' %}" alt="Background image">
+            <div class="brand-content">
+                <h1>Join Shine & Bright.</h1>
+                <p>Experience the future of laundry with smart location tracking and professional care.</p>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="signup-box">
+
+                <h2>Create Account</h2>
+                <p class="subtitle">Join our community for fresh clothes delivered fast.</p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="error-box">
+                            <i class="fas fa-circle-exclamation"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" class="form-grid" id="signupForm">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label>Username <span style="color: var(--error);">*</span></label>
+                        <input type="text" name="username" placeholder="johndoe123" required>
+                    </div>
+
+                    <div>
+                        <label>Email Address <span style="color: var(--error);">*</span></label>
+                        <input type="email" name="email" placeholder="john@example.com" required>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Password <span style="color: var(--error);">*</span></label>
+                            <div class="password-container">
+                                <input type="password" id="password1" name="password" placeholder="••••••••" required minlength="8">
+                                <button type="button" class="toggle-password" onclick="togglePassword('password1')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Confirm Password <span style="color: var(--error);">*</span></label>
+                            <div class="password-container">
+                                <input type="password"
+                                    id="password2"
+                                    name="password_confirm"
+                                    placeholder="••••••••"
+                                    required
+                                    minlength="8">
+
+                                <button type="button"
+                                        class="toggle-password"
+                                        onclick="togglePassword('password2')"
+                                        aria-label="Show or hide confirm password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <label>Location (City/Town)</label>
+                        <input type="text" name="manual_location" id="manual_location" placeholder="e.g. Kozhikode">
+
+                        <button type="button"
+                                id="detectLocationBtn"
+                                style="
+                                    margin-top:8px;
+                                    width:100%;
+                                    padding:10px;
+                                    border-radius:10px;
+                                    border:1.5px dashed #c7d2fe;
+                                    background:#eef2ff;
+                                    color:#4338ca;
+                                    font-weight:600;
+                                    cursor:pointer;">
+                            <i class="fas fa-crosshairs"></i> Detect My Location
+                        </button>
+
+                        <p id="location-status"
+                        style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+                        </p>
+                    </div>
+
+
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                    <input type="hidden" name="city" id="city" required>
+
+                    <button type="submit" id="submitBtn">Create Account</button>
+                </form>
+                <p class="signup-text">
+                    Already have an account? <a href="{% url 'login' %}">Login here</a>
+                </p>
+            </div>
         </div>
     </div>
-    
-    <div class="right-panel">
-        <div class="signup-box">
 
-            <h2>Create Account</h2>
-            <p class="subtitle">Join our community for fresh clothes delivered fast.</p>
+    <script>
+        function togglePassword(id) {
+            const passwordInput = document.getElementById(id);
+            const toggleBtn = passwordInput.nextElementSibling;
+            const icon = toggleBtn.querySelector('i');
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="error-box">
-                        <i class="fas fa-circle-exclamation"></i> {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <form method="POST" class="form-grid" id="signupForm">
-                {% csrf_token %}
-                
-                <div>
-                    <label>Username <span style="color: var(--error);">*</span></label>
-                    <input type="text" name="username" placeholder="johndoe123" required>
-                </div>
-
-                <div>
-                    <label>Email Address <span style="color: var(--error);">*</span></label>
-                    <input type="email" name="email" placeholder="john@example.com" required>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label>Password <span style="color: var(--error);">*</span></label>
-                        <div class="password-container">
-                            <input type="password" id="password1" name="password" placeholder="••••••••" required minlength="8">
-                            <button type="button" class="toggle-password" onclick="togglePassword('password1')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <label>Confirm Password <span style="color: var(--error);">*</span></label>
-                        <div class="password-container">
-                            <input type="password"
-                                id="password2"
-                                name="password_confirm"
-                                placeholder="••••••••"
-                                required
-                                minlength="8">
-
-                            <button type="button"
-                                    class="toggle-password"
-                                    onclick="togglePassword('password2')"
-                                    aria-label="Show or hide confirm password">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div>
-                    <label>Location (City/Town)</label>
-                    <input type="text" name="manual_location" id="manual_location" placeholder="e.g. Kozhikode">
-
-                    <button type="button"
-                            id="detectLocationBtn"
-                            style="
-                                margin-top:8px;
-                                width:100%;
-                                padding:10px;
-                                border-radius:10px;
-                                border:1.5px dashed #c7d2fe;
-                                background:#eef2ff;
-                                color:#4338ca;
-                                font-weight:600;
-                                cursor:pointer;">
-                        <i class="fas fa-crosshairs"></i> Detect My Location
-                    </button>
-
-                    <p id="location-status"
-                    style="font-size:11px;color:var(--text-muted);margin-top:6px;">
-                    </p>
-                </div>
-
-
-                <input type="hidden" name="latitude" id="latitude">
-                <input type="hidden" name="longitude" id="longitude">
-                <input type="hidden" name="city" id="city" required>
-
-                <button type="submit" id="submitBtn">Create Account</button>
-            </form>
-            <p class="signup-text">
-                Already have an account? <a href="{% url 'login' %}">Login here</a>
-            </p>
-        </div>
-    </div>
-</div>
-
-<script>
-    function togglePassword(id) {
-        const passwordInput = document.getElementById(id);
-        const toggleBtn = passwordInput.nextElementSibling;
-        const icon = toggleBtn.querySelector('i');
-
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
-    }
-    
-    const locationStatus = document.getElementById("location-status");
-    const manualLocationInput = document.getElementById("manual_location");
+        
+        const locationStatus = document.getElementById("location-status");
+        const manualLocationInput = document.getElementById("manual_location");
 
-    function updateLocationStatus() {
-        const manualLocation = manualLocationInput.value.trim();
-        if (manualLocation) {
-            document.getElementById("city").value = manualLocation;
-            document.getElementById("latitude").value = "";
-            document.getElementById("longitude").value = "";
-            locationStatus.textContent = `Manual location: ${manualLocation}`;
-        } else {
-            const city = document.getElementById("city").value;
-            if (city) locationStatus.textContent = `Location captured: ${city}`;
-            else locationStatus.textContent = "Enter your location manually or allow automatic detection.";
+        function updateLocationStatus() {
+            const manualLocation = manualLocationInput.value.trim();
+            if (manualLocation) {
+                document.getElementById("city").value = manualLocation;
+                document.getElementById("latitude").value = "";
+                document.getElementById("longitude").value = "";
+                locationStatus.textContent = `Manual location: ${manualLocation}`;
+            } else {
+                const city = document.getElementById("city").value;
+                if (city) locationStatus.textContent = `Location captured: ${city}`;
+                else locationStatus.textContent = "Enter your location manually or allow automatic detection.";
+            }
         }
-    }
 
-    manualLocationInput.addEventListener("input", updateLocationStatus);
+        manualLocationInput.addEventListener("input", updateLocationStatus);
 
-    window.onload = function () {
-        if (navigator.geolocation) {
-            locationStatus.textContent = "Attempting to get location...";
-            navigator.geolocation.getCurrentPosition(async function (position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+        window.onload = function () {
+            if (navigator.geolocation) {
+                locationStatus.textContent = "Attempting to get location...";
+                navigator.geolocation.getCurrentPosition(async function (position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
 
-                if (!manualLocationInput.value.trim()) {
+                    if (!manualLocationInput.value.trim()) {
+                        document.getElementById("latitude").value = lat;
+                        document.getElementById("longitude").value = lon;
+
+                        const city = await getCityFromLocation(lat, lon);
+                        document.getElementById("city").value = city;
+
+                        locationStatus.textContent = city ? `Location captured: ${city}` : "Location captured (City pending).";
+                    }
+                }, function (error) {
+                    if (!manualLocationInput.value.trim())
+                        locationStatus.textContent = "Location failed. Please enter manually.";
+                });
+            }
+        };
+
+        async function getCityFromLocation(lat, lon) {
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                    {
+                        headers: {
+                            'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)'
+                        }
+                    }
+                );
+
+                if (!res.ok) return "";
+
+                const data = await res.json();
+
+                return (
+                    data.address?.city ||
+                    data.address?.town ||
+                    data.address?.village ||
+                    data.address?.county ||   // ⭐ Kozhikode comes here
+                    data.address?.state ||    // fallback like Kerala
+                    ""
+                );
+            } catch (err) {
+                return "";
+            }
+        }
+        setTimeout(() => {
+            const errorBox = document.querySelector('.error-box');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+            }
+        }, 5000); 
+        const detectBtn = document.getElementById("detectLocationBtn");
+
+        detectBtn.addEventListener("click", async () => {
+            locationStatus.textContent = "Detecting location...";
+
+            if (!navigator.geolocation) {
+                locationStatus.textContent = "Geolocation not supported.";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
                     document.getElementById("latitude").value = lat;
                     document.getElementById("longitude").value = lon;
 
                     const city = await getCityFromLocation(lat, lon);
                     document.getElementById("city").value = city;
 
-                    locationStatus.textContent = city ? `Location captured: ${city}` : "Location captured (City pending).";
-                }
-            }, function (error) {
-                if (!manualLocationInput.value.trim())
-                    locationStatus.textContent = "Location failed. Please enter manually.";
-            });
-        }
-    };
-
-    async function getCityFromLocation(lat, lon) {
-        try {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                {
-                    headers: {
-                        'User-Agent': 'ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)'
-                    }
+                    manualLocationInput.value = "";
+                    locationStatus.textContent = city
+                        ? `Location detected: ${city}`
+                        : "Location detected, city unavailable.";
+                },
+                () => {
+                    locationStatus.textContent = "Location permission denied.";
                 }
             );
+        });
 
-            if (!res.ok) return "";
-
-            const data = await res.json();
-
-            return (
-                data.address?.city ||
-                data.address?.town ||
-                data.address?.village ||
-                data.address?.county ||   // ⭐ Kozhikode comes here
-                data.address?.state ||    // fallback like Kerala
-                ""
-            );
-        } catch (err) {
-            return "";
-        }
-    }
-    setTimeout(() => {
-        const errorBox = document.querySelector('.error-box');
-        if (errorBox) {
-            errorBox.style.display = 'none';
-        }
-    }, 5000); 
-    const detectBtn = document.getElementById("detectLocationBtn");
-
-    detectBtn.addEventListener("click", async () => {
-        locationStatus.textContent = "Detecting location...";
-
-        if (!navigator.geolocation) {
-            locationStatus.textContent = "Geolocation not supported.";
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-
-                document.getElementById("latitude").value = lat;
-                document.getElementById("longitude").value = lon;
-
-                const city = await getCityFromLocation(lat, lon);
-                document.getElementById("city").value = city;
-
-                manualLocationInput.value = "";
-                locationStatus.textContent = city
-                    ? `Location detected: ${city}`
-                    : "Location detected, city unavailable.";
-            },
-            () => {
-                locationStatus.textContent = "Location permission denied.";
-            }
-        );
-    });
-
-</script>
+    </script>
 
 </body>
 </html>

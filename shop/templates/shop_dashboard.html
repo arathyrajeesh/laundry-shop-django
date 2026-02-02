@@ -1904,50 +1904,50 @@
 
         // Separate the actual Fetch logic so it can be called by the modal
         function executeStatusUpdate(orderId, newStatus) {
-    const btn = document.querySelector(`button[onclick="updateOrderStatus(${orderId})"]`);
-    
-    // 1. Show "Please wait" message and disable button
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
-    btn.classList.add("disabled");
-    btn.style.pointerEvents = "none";
+            const btn = document.querySelector(`button[onclick="updateOrderStatus(${orderId})"]`);
+            
+            // 1. Show "Please wait" message and disable button
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Please wait...';
+            btn.classList.add("disabled");
+            btn.style.pointerEvents = "none";
 
-    // Optional: Show a temporary toast notification immediately
-    showMessage("Updating order, please wait a moment...", "info");
+            // Optional: Show a temporary toast notification immediately
+            showMessage("Updating order, please wait a moment...", "info");
 
-    const formData = new FormData();
-    formData.append('status', newStatus);
-    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+            const formData = new FormData();
+            formData.append('status', newStatus);
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
 
-    fetch(`/shop/order/${orderId}/update-status/`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
+            fetch(`/shop/order/${orderId}/update-status/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage("Order status updated successfully!", "success");
+                    // Reload after a short delay to show the success state
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showMessage(data.message || "Error updating status", "error");
+                    // Re-enable button on error
+                    btn.innerHTML = originalText;
+                    btn.classList.remove("disabled");
+                    btn.style.pointerEvents = "auto";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage("An error occurred. Check your connection.", "error");
+                btn.innerHTML = originalText;
+                btn.classList.remove("disabled");
+                btn.style.pointerEvents = "auto";
+            });
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showMessage("Order status updated successfully!", "success");
-            // Reload after a short delay to show the success state
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            showMessage(data.message || "Error updating status", "error");
-            // Re-enable button on error
-            btn.innerHTML = originalText;
-            btn.classList.remove("disabled");
-            btn.style.pointerEvents = "auto";
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage("An error occurred. Check your connection.", "error");
-        btn.innerHTML = originalText;
-        btn.classList.remove("disabled");
-        btn.style.pointerEvents = "auto";
-    });
-}
 
         function getCookie(name) {
             let cookieValue = null;

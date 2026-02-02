@@ -189,145 +189,145 @@
 
 <body>
 
-<div class="dashboard-container">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="avatar-wrapper">
-                {% if profile.profile_image %}
-                    <img id="imgPreview" src="{{ profile.profile_image.url }}" class="profile-img">
-                {% else %}
-                    <div id="imgPreview" class="profile-img avatar-fallback">
-                        {{ request.user.username|slice:":1"|upper }}
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="avatar-wrapper">
+                    {% if profile.profile_image %}
+                        <img id="imgPreview" src="{{ profile.profile_image.url }}" class="profile-img">
+                    {% else %}
+                        <div id="imgPreview" class="profile-img avatar-fallback">
+                            {{ request.user.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.profile_image.id_for_label }}" class="avatar-edit-btn">
+                        <i class="fa-solid fa-camera"></i>
+                    </label>
+                </div>
+                <div class="sidebar-info">
+                    <h2>{{ profile.full_name|default:request.user.username }}</h2>
+                    <p>Personal Settings</p>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+                <a href="{% url 'edit_profile' %}" class="nav-item active">
+                    <i class="fa-solid fa-user-pen"></i> Edit Profile
+                </a>
+                <a href="{% url 'password_change' %}" class="nav-item">
+                    <i class="fa-solid fa-lock"></i> Security
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Personal Details</h1>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="display:none">{{ form.profile_image }}</div>
+
+                <div class="form-grid">
+                    <div class="form-section">
+                        <label>Full Name</label>
+                        {{ form.full_name }}
                     </div>
-                {% endif %}
-                <label for="{{ form.profile_image.id_for_label }}" class="avatar-edit-btn">
-                    <i class="fa-solid fa-camera"></i>
-                </label>
-            </div>
-            <div class="sidebar-info">
-                <h2>{{ profile.full_name|default:request.user.username }}</h2>
-                <p>Personal Settings</p>
-            </div>
-        </div>
 
-        <nav class="side-nav">
-            <a href="{% url 'dashboard' %}" class="nav-item">
-                <i class="fa-solid fa-house"></i> Dashboard
-            </a>
-            <a href="{% url 'edit_profile' %}" class="nav-item active">
-                <i class="fa-solid fa-user-pen"></i> Edit Profile
-            </a>
-            <a href="{% url 'password_change' %}" class="nav-item">
-                <i class="fa-solid fa-lock"></i> Security
-            </a>
-            <a href="{% url 'logout' %}" class="nav-item">
-                <i class="fa-solid fa-power-off"></i> Logout
-            </a>
-        </nav>
-    </aside>
+                    <div class="form-section">
+                        <label>Phone Number</label>
+                        {{ form.phone }}
+                    </div>
 
-    <main class="main-content">
-        <h1>Personal Details</h1>
-        
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div style="display:none">{{ form.profile_image }}</div>
+                    <div class="form-section full-width">
+                        <label>Email Address (Verified)</label>
+                        <input type="email" class="form-input" value="{{ request.user.email }}" readonly style="background:#f1f5f9; color:#94a3b8; cursor:not-allowed;">
+                    </div>
 
-            <div class="form-grid">
-                <div class="form-section">
-                    <label>Full Name</label>
-                    {{ form.full_name }}
-                </div>
+                    <div class="form-section">
+                        <label>City</label>
+                        {{ form.city }}
+                    </div>
+                    
+                    <div class="form-section">
+                        <label>GPS Status</label>
+                        <div id="detectedLocation" style="font-size:13px; color:var(--text-muted); padding:10px 0;">
+                            {% if profile.latitude %} <i class="fa-solid fa-check-circle" style="color:#10b981"></i> Location Saved {% else %} No coordinates captured {% endif %}
+                        </div>
+                    </div>
 
-                <div class="form-section">
-                    <label>Phone Number</label>
-                    {{ form.phone }}
-                </div>
-
-                <div class="form-section full-width">
-                    <label>Email Address (Verified)</label>
-                    <input type="email" class="form-input" value="{{ request.user.email }}" readonly style="background:#f1f5f9; color:#94a3b8; cursor:not-allowed;">
-                </div>
-
-                <div class="form-section">
-                    <label>City</label>
-                    {{ form.city }}
-                </div>
-                
-                <div class="form-section">
-                    <label>GPS Status</label>
-                    <div id="detectedLocation" style="font-size:13px; color:var(--text-muted); padding:10px 0;">
-                        {% if profile.latitude %} <i class="fa-solid fa-check-circle" style="color:#10b981"></i> Location Saved {% else %} No coordinates captured {% endif %}
+                    <div class="util-card">
+                        <h3 style="font-size: 14px; margin-bottom: 5px;"><i class="fa-solid fa-location-crosshairs"></i> Precise Delivery</h3>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Update your location to help our drivers find you faster.</p>
+                        <button type="button" id="geoBtn" class="submit-btn" style="padding: 10px; font-size: 13px; background: var(--accent);">
+                            Update Current Location
+                        </button>
+                        <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
+                        <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default:'' }}">
+                        <div id="statusMsg" style="margin-top: 10px; font-size: 12px;"></div>
                     </div>
                 </div>
 
-                <div class="util-card">
-                    <h3 style="font-size: 14px; margin-bottom: 5px;"><i class="fa-solid fa-location-crosshairs"></i> Precise Delivery</h3>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Update your location to help our drivers find you faster.</p>
-                    <button type="button" id="geoBtn" class="submit-btn" style="padding: 10px; font-size: 13px; background: var(--accent);">
-                        Update Current Location
-                    </button>
-                    <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
-                    <input type="hidden" id="lng" name="longitude" value="{{ profile.longitude|default:'' }}">
-                    <div id="statusMsg" style="margin-top: 10px; font-size: 12px;"></div>
+                <div class="footer-actions">
+                    <a href="{% url 'dashboard' %}" class="discard-btn">Cancel</a>
+                    <button type="submit" class="submit-btn">Save Profile</button>
                 </div>
-            </div>
+            </form>
+        </main>
+    </div>
 
-            <div class="footer-actions">
-                <a href="{% url 'dashboard' %}" class="discard-btn">Cancel</a>
-                <button type="submit" class="submit-btn">Save Profile</button>
-            </div>
-        </form>
-    </main>
-</div>
+    <script>
+        // Style the Django-generated inputs automatically
+        document.querySelectorAll('input:not([type="hidden"]), select').forEach(el => {
+            el.classList.add('form-input');
+        });
 
-<script>
-    // Style the Django-generated inputs automatically
-    document.querySelectorAll('input:not([type="hidden"]), select').forEach(el => {
-        el.classList.add('form-input');
-    });
-
-    // Handle Image Preview
-    const fileInput = document.getElementById("{{ form.profile_image.id_for_label }}");
-    if (fileInput) {
-        fileInput.onchange = e => {
-            const [file] = e.target.files;
-            if (file) {
-                const preview = document.getElementById("imgPreview");
-                if(preview.tagName === 'IMG') {
-                    preview.src = URL.createObjectURL(file);
-                } else {
-                    // If it was a div (fallback), replace with img
-                    const newImg = document.createElement('img');
-                    newImg.src = URL.createObjectURL(file);
-                    newImg.className = 'profile-img';
-                    newImg.id = 'imgPreview';
-                    preview.replaceWith(newImg);
+        // Handle Image Preview
+        const fileInput = document.getElementById("{{ form.profile_image.id_for_label }}");
+        if (fileInput) {
+            fileInput.onchange = e => {
+                const [file] = e.target.files;
+                if (file) {
+                    const preview = document.getElementById("imgPreview");
+                    if(preview.tagName === 'IMG') {
+                        preview.src = URL.createObjectURL(file);
+                    } else {
+                        // If it was a div (fallback), replace with img
+                        const newImg = document.createElement('img');
+                        newImg.src = URL.createObjectURL(file);
+                        newImg.className = 'profile-img';
+                        newImg.id = 'imgPreview';
+                        preview.replaceWith(newImg);
+                    }
                 }
-            }
-        };
-    }
+            };
+        }
 
-    // Geolocation logic
-    document.getElementById("geoBtn").onclick = function() {
-        const msg = document.getElementById("statusMsg");
-        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
-        
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
-                document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
-                msg.innerHTML = '<span style="color: #10b981">Location captured!</span>';
-                this.innerHTML = 'Location Updated';
-                this.style.background = "#10b981";
-            },
-            () => {
-                msg.innerHTML = '<span style="color: #ef4444">Permission denied.</span>';
-                this.innerHTML = 'Retry Capture';
-            }
-        );
-    };
-</script>
+        // Geolocation logic
+        document.getElementById("geoBtn").onclick = function() {
+            const msg = document.getElementById("statusMsg");
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
+            
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
+                    document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
+                    msg.innerHTML = '<span style="color: #10b981">Location captured!</span>';
+                    this.innerHTML = 'Location Updated';
+                    this.style.background = "#10b981";
+                },
+                () => {
+                    msg.innerHTML = '<span style="color: #ef4444">Permission denied.</span>';
+                    this.innerHTML = 'Retry Capture';
+                }
+            );
+        };
+    </script>
 
 </body>
 </html>

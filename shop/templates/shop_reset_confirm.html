@@ -91,27 +91,27 @@
 
 <body>
 
-<div class="reset-container">
+    <div class="reset-container">
 
-    <div class="logo-box">
-        <img src="{% static 'images/Shine.png' %}" alt="Logo">
+        <div class="logo-box">
+            <img src="{% static 'images/Shine.png' %}" alt="Logo">
+        </div>
+
+        <h2>Set New Password</h2>
+        <p>Create a new password for your shop account.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="password" name="password" placeholder="New Password" required>
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            <button type="submit">Update Password</button>
+        </form>
+
+        <p class="back-link">
+            <a href="{% url 'shop_login' %}">Back to Shop Login</a>
+        </p>
+
     </div>
-
-    <h2>Set New Password</h2>
-    <p>Create a new password for your shop account.</p>
-
-    <form method="POST">
-        {% csrf_token %}
-        <input type="password" name="password" placeholder="New Password" required>
-        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-        <button type="submit">Update Password</button>
-    </form>
-
-    <p class="back-link">
-        <a href="{% url 'shop_login' %}">Back to Shop Login</a>
-    </p>
-
-</div>
 
 </body>
 </html>
