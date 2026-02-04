@@ -123,7 +123,7 @@
         }
         .nav-item i { margin-right: 12px; width: 20px; text-align: center; }
         .nav-item:hover, .nav-item.active { background: #f1f5f9; color: var(--primary); }
-        .nav-item.active { background: #eff6ff; color: var(--accent); }
+        .nav-item.active { background: #eff6ff; color: var(--primary); }
 
         /* --- Main Content --- */
         .main-content { flex: 1; padding: 40px; }
@@ -264,7 +264,7 @@
                     <div class="util-card">
                         <h3 style="font-size: 14px; margin-bottom: 5px;"><i class="fa-solid fa-location-crosshairs"></i> Precise Delivery</h3>
                         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Update your location to help our drivers find you faster.</p>
-                        <button type="button" id="geoBtn" class="submit-btn" style="padding: 10px; font-size: 13px; background: var(--accent);">
+                        <button type="button" id="geoBtn" class="submit-btn" style="padding: 10px; font-size: 13px;">
                             Update Current Location
                         </button>
                         <input type="hidden" id="lat" name="latitude" value="{{ profile.latitude|default:'' }}">
