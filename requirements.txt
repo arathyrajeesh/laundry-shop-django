@@ -15,6 +15,7 @@ charset-normalizer==3.4.4
 cloudinary==1.44.1
 cryptography==46.0.3
 distro==1.9.0
+dj-database-url==3.1.0
 Django==5.2.9
 django-allauth==65.13.1
 django-cloudinary-storage==0.3.0
@@ -62,6 +63,7 @@ pillow==12.1.0
 propcache==0.4.1
 proto-plus==1.27.0
 protobuf==4.25.8
+psycopg2-binary==2.9.11
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.23
