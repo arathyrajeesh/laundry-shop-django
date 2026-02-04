@@ -184,6 +184,11 @@
             .submit-btn, .discard-btn { width: 100%; order: 1; }
             .discard-btn { order: 2; }
         }
+        .submit-btn:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
     </style>
 </head>
 
@@ -275,7 +280,13 @@
 
                 <div class="footer-actions">
                     <a href="{% url 'dashboard' %}" class="discard-btn">Cancel</a>
-                    <button type="submit" class="submit-btn">Save Profile</button>
+                    <button type="submit" class="submit-btn" id="saveBtn">
+                        <span class="btn-text">Save Profile</span>
+                        <span class="btn-spinner" style="display:none;">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Saving...
+                        </span>
+                    </button>
+
                 </div>
             </form>
         </main>
@@ -327,6 +338,16 @@
                 }
             );
         };
+        const form = document.querySelector("form");
+        const saveBtn = document.getElementById("saveBtn");
+        const btnText = saveBtn.querySelector(".btn-text");
+        const btnSpinner = saveBtn.querySelector(".btn-spinner");
+
+        form.addEventListener("submit", () => {
+            saveBtn.disabled = true;
+            btnText.style.display = "none";
+            btnSpinner.style.display = "inline-block";
+        });
     </script>
 
 </body>
