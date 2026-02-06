@@ -7,410 +7,338 @@
     <title>Shop Registration - Shine & Bright Laundry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --brand-primary: #3b82f6;
-            --brand-hover: #2563eb;
-            --bg-dark: #020617;
-            --glass-bg: rgba(30, 41, 59, 0.75);
-            --text-main: #f8fafc;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #ffffff;
             --text-muted: #94a3b8;
-            --border-color: rgba(255,255,255,0.08);
+            --input-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            background:
-                radial-gradient(at 0% 0%, #1e293b 0, transparent 50%),
-                radial-gradient(at 50% 0%, #0f172a 0, transparent 50%),
-                radial-gradient(at 100% 0%, #1e293b 0, transparent 50%),
-                var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            background: var(--bg-dark);
             color: var(--text-main);
+            overflow-x: hidden;
         }
 
-        .register-container {
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
             width: 100%;
-            max-width: 480px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(14px);
-            border-radius: 20px;
-            padding: 48px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 25px 40px rgba(0,0,0,0.35);
         }
 
-        .logo-container {
-            text-align: center;
-            margin-bottom: 32px;
+        /* --- LEFT PANEL: FORM --- */
+        .left-panel {
+            width: 50%;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--bg-dark);
+            z-index: 2;
+        }
+
+        .register-box {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo {
-            width: 70px;
-            height: 70px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,.4));
+            width: 60px;
+            height: 60px;
+            margin-bottom: 30px;
         }
 
         h2 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            color: var(--text-main);
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: span 2;
         }
 
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
             margin-bottom: 8px;
-            color: var(--text-main);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         input {
             width: 100%;
-            padding: 12px 14px;
-            border-radius: 10px;
-            background: rgba(15,23,42,0.6);
+            padding: 14px 16px;
+            background: var(--input-bg);
             border: 1px solid var(--border-color);
-            color: var(--text-main);
+            border-radius: 12px;
+            color: white;
             font-size: 14px;
-            transition: all .2s ease;
-        }
-
-        input::placeholder {
-            color: var(--text-muted);
+            transition: var(--transition);
         }
 
         input:focus {
             outline: none;
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 4px rgba(59,130,246,.15);
-            background: rgba(15,23,42,0.85);
+            border-color: var(--primary);
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 0 0 4px rgba(59, 130, 241, 0.15);
         }
 
-        button[type="submit"],
         #detectLocationBtn {
             width: 100%;
-            padding: 14px;
-            background: var(--brand-primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s ease;
-        }
-        .password-container {
-            position: relative;
-        }
-
-        .password-container input {
-            padding-right: 44px; /* space for eye icon */
-        }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 12px;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .toggle-password i {
-            color: var(--text-muted);
-            transition: color 0.2s ease;
-        }
-
-        .toggle-password:hover i {
-            color: var(--text-main);
-        }
-
-        button[type="submit"]:hover,
-        #detectLocationBtn:hover:not([disabled]) {
-            background: var(--brand-hover);
-            transform: translateY(-1px);
-        }
-
-        #detectLocationBtn {
-            background: rgba(15,23,42,.8);
+            padding: 12px;
+            background: transparent;
             border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-top: 5px;
+        }
+
+        #detectLocationBtn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
         }
 
         #detectLocationBtn:disabled {
-            opacity: .6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .toggle-password {
-            color: var(--text-muted);
+        button[type="submit"] {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 15px;
         }
 
-        .toggle-password:hover {
-            color: var(--text-main);
+        button[type="submit"]:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 241, 0.3);
         }
 
-        #locationStatus {
-            font-size: 13px;
-            color: var(--text-muted);
+        /* --- RIGHT PANEL: IMAGE --- */
+        .right-panel {
+            width: 50%;
+            position: relative;
+            background: url("{% static 'images/login.webp' %}") center/cover no-repeat;
+        }
+
+        .right-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, var(--bg-dark) 0%, transparent 100%);
+        }
+
+        .overlay-card {
+            position: absolute;
+            bottom: 80px;
+            left: 80px;
+            right: 80px;
+        }
+
+        .overlay-card h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            color: white;
         }
 
         .footer-text {
-            margin-top: 24px;
+            margin-top: 30px;
             text-align: center;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
         }
 
         .footer-text a {
-            color: var(--brand-primary);
+            color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
         }
 
-        .footer-text a:hover {
-            text-decoration: underline;
+        .password-container { position: relative; }
+        .toggle-password {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: var(--text-muted);
         }
 
-        .error-message {
-            background: rgba(239,68,68,.15);
-            border: 1px solid rgba(239,68,68,.3);
-            color: #fecaca;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .success-message {
-            background: rgba(16,185,129,.15);
-            border: 1px solid rgba(16,185,129,.3);
-            color: #bbf7d0;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-        /* ===============================
-        RESPONSIVE – SHOP REGISTRATION
-        ================================ */
-
-        /* Tablets */
-        @media (max-width: 768px) {
-            .register-container {
-                padding: 36px;
-                max-width: 94%;
-                border-radius: 18px;
-            }
-
-            h2 {
-                font-size: 22px;
-            }
-
-            .subtitle {
-                font-size: 13px;
-            }
-        }
-
-        /* Mobile */
-        @media (max-width: 480px) {
-            body {
-                padding: 16px;
-                min-height: 100svh; /* iOS safe viewport */
-                align-items: flex-start;
-            }
-
-            .register-container {
-                padding: 28px 22px;
-                border-radius: 16px;
-                width: 100%;
-            }
-
-            .logo {
-                width: 56px;
-                height: 56px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            .subtitle {
-                font-size: 12px;
-            }
-
-            label {
-                font-size: 12px;
-            }
-
-            input {
-                font-size: 14px;
-                padding: 11px 13px;
-            }
-
-            button[type="submit"],
-            #detectLocationBtn {
-                font-size: 14px;
-                padding: 13px;
-            }
-
-            #locationStatus {
-                font-size: 12px;
-            }
-
-            .footer-text {
-                font-size: 12px;
-                margin-top: 18px;
-            }
-        }
-        /* ===============================
-        ERROR MESSAGES & ALERTS
-        ================================ */
         .error-box {
-            background: rgba(239, 68, 68, 0.15); /* Soft red background */
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fecaca; /* Light red text */
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-bottom: 24px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            animation: shake 0.4s ease-in-out;
+            gap: 12px;
         }
 
-        .error-box i {
-            color: #ef4444; /* Bright red icon */
-            font-size: 16px;
+        #locationStatus {
+            font-size: 12px;
+            margin-top: 8px;
+            color: var(--text-muted);
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        @media (max-width: 1024px) {
+            .right-panel { display: none; }
+            .left-panel { width: 100%; padding: 40px 24px; }
         }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            h2 { font-size: 28px; }
+        }
+        
     </style>
-
 </head>
 <body>
 
-    <div class="register-container">
-        <div class="logo-container">
-            <img src="{% static 'images/Shine.png' %}" alt="Shine & Bright Logo" class="logo">
-            <h2>Shop Registration</h2>
-            <p class="subtitle">Create your laundry shop account</p>
+    <div class="page-wrapper">
+        <div class="left-panel">
+            <div class="register-box">
+                
+                <h2>Start for free</h2>
+                <p class="subtitle">Join our network of professional laundry shops.</p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="error-box">
+                            <i class="fas fa-circle-exclamation"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="shop_name">Shop Name *</label>
+                            <input type="text" id="shop_name" name="shop_name" placeholder="Enter your shop name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="name@company.com" required autocomplete="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+91 ...">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="address">Street Address</label>
+                            <input type="text" id="address" name="address" placeholder="123 Laundry Lane">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" placeholder="Select or detect city">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Location Service</label>
+                            <button type="button" id="detectLocationBtn">Detect My Location</button>
+                            <div id="locationStatus"></div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="latitude" name="latitude">
+                    <input type="hidden" id="longitude" name="longitude">
+
+                    <div class="form-group">
+                        <label for="password1">Password *</label>
+                        <div class="password-container">
+                            <input type="password" id="password1" name="password" placeholder="Min 8 characters" required minlength="8" autocomplete="new-password">
+                            <button type="button" class="toggle-password" onclick="togglePassword('password1')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2">Confirm Password *</label>
+                        <div class="password-container">
+                            <input type="password" id="password2" name="password_confirm" placeholder="••••••••" required minlength="8">
+                            <button type="button" class="toggle-password" onclick="togglePassword('password2')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit">Create Shop Account</button>
+                </form>
+
+                <div class="footer-text">
+                    Already a member? <a href="{% url 'shop_login' %}">Log In</a>
+                </div>
+            </div>
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="error-box">
-                    <i class="fas fa-circle-exclamation"></i> {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="shop_name">Shop Name *</label>
-                <input type="text" id="shop_name" name="shop_name" placeholder="Enter your shop name" required>
+        <div class="right-panel">
+            <div class="overlay-card">
+                <h1>Scale your laundry <br>business effortlessly.</h1>
+                <p style="color: var(--text-muted); font-size: 18px; line-height: 1.6;">Access our premium management dashboard and connect with thousands of customers in your city.</p>
             </div>
-
-            <div class="form-group">
-                <label for="email">Email Address *</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
-            </div>
-
-            <div class="form-group">
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address" placeholder="Enter your shop address">
-            </div>
-
-            <div class="form-group">
-                <label for="city">City</label>
-                <input type="text" id="city" name="city" placeholder="Enter your city">
-            </div>
-
-            <div class="form-group">
-                <button type="button" id="detectLocationBtn">
-                    Detect My Location
-                </button>
-                <div id="locationStatus" style="font-size: 14px; color: #666; margin-top: 5px;"></div>
-            </div>
-
-            <input type="hidden" id="latitude" name="latitude">
-            <input type="hidden" id="longitude" name="longitude">
-
-            <div class="form-group">
-                <label for="password1">Password *</label>
-                <div class="password-container">
-                <input type="password"
-                    id="password1"
-                    name="password"
-                    placeholder="Enter password (min 8 characters)"
-                    required
-                    minlength="8"
-                    autocomplete="new-password">
-                    <button type="button" class="toggle-password" onclick="togglePassword('password1')" aria-label="Toggle password visibility">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="password2">Confirm Password *</label>
-                <div class="password-container">
-                    <input type="password" id="password2" name="password_confirm" placeholder="••••••••" required minlength="8">
-                    <button type="button"
-                            class="toggle-password"
-                            onclick="togglePassword('password2')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-
-
-            <button type="submit">Register Shop</button>
-        </form>
-
-        <div class="footer-text">
-            Already have an account? <a href="{% url 'shop_login' %}">Login here</a>
         </div>
     </div>
 
@@ -419,16 +347,13 @@
         const statusDiv = document.getElementById("locationStatus");
         const locationBtn = document.getElementById("detectLocationBtn");
 
-        statusDiv.setAttribute("aria-live", "polite");
-
         locationBtn.addEventListener("click", function () {
             locationBtn.disabled = true;
             locationBtn.textContent = "Detecting location...";
-            statusDiv.textContent = "Please wait while we detect your location.";
+            statusDiv.textContent = "Please wait...";
 
             if (!navigator.geolocation) {
-                statusDiv.textContent =
-                    "Geolocation is not supported by your browser. Please enter your city manually.";
+                statusDiv.textContent = "Geolocation not supported.";
                 resetButton();
                 return;
             }
@@ -441,23 +366,21 @@
                     document.getElementById("latitude").value = lat;
                     document.getElementById("longitude").value = lon;
 
-                    statusDiv.textContent = "Location detected. Resolving city name…";
+                    statusDiv.textContent = "Resolving city name...";
 
                     const city = await getCityFromLocation(lat, lon);
 
                     if (city) {
                         document.getElementById("city").value = city;
+                        statusDiv.style.color = "#3b82f6";
                         statusDiv.textContent = `Location set to ${city}.`;
                     } else {
-                        statusDiv.textContent =
-                            "Location detected, but the city could not be identified. Please enter it manually.";
+                        statusDiv.textContent = "City not identified. Please enter manually.";
                     }
-
                     resetButton();
                 },
                 function () {
-                    statusDiv.textContent =
-                        "Location access was denied. Please enter your city manually.";
+                    statusDiv.textContent = "Access denied.";
                     resetButton();
                 }
             );
@@ -472,63 +395,36 @@
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                    {
-                        headers: {
-                            "User-Agent":
-                                "ShineAndBrightLaundryApp/1.0 (contact@yourdomain.com)",
-                        },
-                    }
+                    { headers: { "User-Agent": "ShineAndBrightLaundryApp/1.0" } }
                 );
-
                 if (!response.ok) return "";
-
                 const data = await response.json();
-
                 return (
                     data.address?.city ||
                     data.address?.town ||
                     data.address?.village ||
                     data.address?.county ||
-                    data.address?.state ||
-                    ""
+                    data.address?.state || ""
                 );
-            } catch {
-                return "";
-            }
+            } catch { return ""; }
         }
-        setTimeout(() => {
-            const errorBox = document.querySelector('.error-box');
-            if (errorBox) {
-                errorBox.style.display = 'none';
-            }
-        }, 5000);
+
         function togglePassword(id) {
             const passwordInput = document.getElementById(id);
-            const toggleBtn = passwordInput.nextElementSibling;
-            const icon = toggleBtn.querySelector('i');
-
+            const icon = passwordInput.nextElementSibling.querySelector('i');
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
                 passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
-        document.querySelector("form").addEventListener("submit", function (e) {
-            const city = document.getElementById("city").value.trim();
 
-            if (!city) {
-                e.preventDefault();
-                statusDiv.textContent =
-                    "Please detect your location or enter your city before registering.";
-                statusDiv.style.color = "#ef4444";
-            }
-        });
+        setTimeout(() => {
+            const errorBox = document.querySelector('.error-box');
+            if (errorBox) errorBox.style.display = 'none';
+        }, 5000);
     </script>
-
-
 </body>
 </html>
