@@ -198,7 +198,67 @@
                 text-align: center;
             }
         }
+        /* --- ENHANCED TYPOGRAPHY --- */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            /* Switching to Plus Jakarta Sans for a more premium merchant feel */
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
+        }
 
+        h1 { 
+            font-size: 26px; 
+            font-weight: 800; /* Extra Bold for the main title */
+            letter-spacing: -0.03em; 
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .tagline { 
+            font-size: 14px; 
+            font-weight: 400;
+            color: var(--text-muted); 
+            letter-spacing: 0.01em;
+        }
+
+        label { 
+            display: block; 
+            font-size: 12px; 
+            font-weight: 600; /* Semi-bold labels */
+            text-transform: uppercase; /* Professional standard for admin portals */
+            letter-spacing: 0.08em; 
+            color: var(--text-muted); 
+            margin-bottom: 10px;
+        }
+
+        input {
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        input::placeholder {
+            font-weight: 300;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .btn-submit {
+            font-size: 15px; 
+            font-weight: 700; /* Bold button text */
+            letter-spacing: 0.02em;
+        }
+
+        .footer-nav a { 
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        /* ERROR BOX TEXT */
+        .error-box {
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
     </style>
 </head>
 <body>
