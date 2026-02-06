@@ -1574,11 +1574,12 @@
             <li><a href="#about">About</a></li>
             <li><a href="#services">Services</a></li>
             <li><a href="#pricing">Pricing</a></li>
+            
             {% if not user.is_authenticated %}
                 <li><a href="{% url 'login' %}">Login</a></li>
                 <li class="mobile-only"><a href="{% url 'signup' %}" class="schedule-btn">Get Started</a></li>
             {% else %}
-                <li><a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a></li>
+                <li class="mobile-only"><a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a></li>
             {% endif %}
         </ul>
 
@@ -1597,7 +1598,15 @@
             <h1>Clean Clothes, <br><span style="color: var(--accent-color);">Zero Effort.</span></h1>
             <p>Experience the most professional laundry and dry cleaning service in Kerala. We pick up, clean, and deliver to your doorstep within 24 hours.</p>
             <div class="hero-btn-container" style="display: flex; gap: 1rem;">
-                <a href="{% url 'login' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">Book a Pickup Now</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
+                        Book a Pickup Now
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
+                        Book a Pickup Now
+                    </a>
+                {% endif %}
             </div>
         </div>
         
@@ -1748,7 +1757,11 @@
                                 <span class="price-value">60</span>
                                 <span class="unit">/ kg</span>
                             </div>
-                            <a href="{% url 'dashboard' %}" class="card-btn">Schedule Pickup</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'dashboard' %}" class="card-btn">Schedule Pickup</a>
+                            {% else %}
+                                <a href="{% url 'login' %}" class="card-btn">Schedule Pickup</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -1868,7 +1881,7 @@
                 <p>Premium care shouldn't break the bank. We offer the most competitive rates in Kerala with zero hidden costs.</p>
             </div>
             <div class="why-card" data-aos="fade-up" data-aos-delay="300">
-                <i class="fas fa-"></i>
+                <i class="fas fa-award"></i>
                 <h3>Quality Guaranteed</h3>
                 <p>Our experts use eco-friendly solvents and the latest technology to ensure your fabrics look brand new.</p>
             </div>
