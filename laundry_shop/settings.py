@@ -234,3 +234,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRONJOBS = [
     ('*/10 * * * *', 'utils.overdue_notifications.send_overdue_notifications'),
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://laundry-shop-django-project.onrender.com",
+]
+
