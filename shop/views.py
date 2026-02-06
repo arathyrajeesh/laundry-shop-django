@@ -754,7 +754,6 @@ Shine & Bright Team
         'form': form
     })
 
-@login_required
 def privacy_policy(request):
     """Display the privacy policy page."""
     return render(request, 'privacy_policy.html')
@@ -3536,3 +3535,4 @@ Shine & Bright System
             {"success": False, "message": "Server error"},
             status=500
         )
+
