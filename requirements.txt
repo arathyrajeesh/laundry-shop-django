@@ -4,11 +4,13 @@ psycopg2-binary==2.9.11
 dj-database-url==3.1.0
 python-dotenv==1.2.1
 whitenoise==6.11.0
+
 django-allauth==65.13.1
+cryptography==46.0.3
+
 cloudinary==1.44.1
 django-cloudinary-storage==0.3.0
+
 razorpay==2.0.0
-twilio==9.8.8
 requests==2.32.5
 pillow==12.1.0
-django-crontab==0.7.1
