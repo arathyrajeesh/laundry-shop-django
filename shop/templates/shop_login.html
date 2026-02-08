@@ -3,354 +3,257 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Management Console | Shine & Bright</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Merchant Login | Shine & Bright</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{% static 'images/Shine.png' %}">
     
     <style>
         :root {
-            --brand-primary: #3b82f6; /* Professional Blue */
-            --brand-hover: #2563eb;
-            --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --bg-dark: #020617; 
+            --card-bg: rgba(15, 23, 42, 0.6);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        body { 
-            background: radial-gradient(at 0% 0%, #1e293b 0, transparent 50%), 
-                        radial-gradient(at 50% 0%, #0f172a 0, transparent 50%), 
-                        radial-gradient(at 100% 0%, #1e293b 0, transparent 50%),
-                        #020617;
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; color: var(--text-main);
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
         }
 
-        /* --- THE LOGON CARD --- */
-        .admin-card {
+        /* Animated Ambient Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 20%; left: 50%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- THE GLASS CARD --- */
+        .login-card {
             background: var(--card-bg);
-            width: 100%; max-width: 440px;
-            padding: 48px;
-            border-radius: 20px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-color);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .header { text-align: center; margin-bottom: 32px; }
+        .header { text-align: center; margin-bottom: 35px; }
+        
+        .logo-box {
+            width: 64px; height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(30, 41, 59, 0.5));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+        .logo-box i { font-size: 28px; color: var(--primary); }
 
-        .logo-wrapper {
-            width: 56px; height: 56px; 
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.2));
-            border-radius: 12px; display: flex; align-items: center;
-            justify-content: center; margin: 0 auto 20px;
-            border: 1.5px solid rgba(59, 130, 246, 0.3);
+        h2 {
+            font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .logo-wrapper i { font-size: 24px; color: var(--brand-primary); }
-
-        h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
-        .tagline { font-size: 14px; color: var(--text-muted); }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
 
         /* --- FORM ELEMENTS --- */
-        .field { margin-bottom: 24px; position: relative; }
-        
-        label { 
-            display: block; font-size: 13px; font-weight: 500; 
-            color: var(--text-main); margin-bottom: 8px;
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block; font-size: 11px; font-weight: 700;
+            color: var(--primary); text-transform: uppercase;
+            letter-spacing: 0.1em; margin-bottom: 8px;
         }
 
-        .input-group { position: relative; }
+        .input-wrapper { position: relative; }
         
-        .input-group i.prefix { 
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: var(--text-muted); font-size: 15px; pointer-events: none;
+        .input-wrapper i.prefix {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 16px;
         }
 
         input {
-            width: 100%; padding: 12px 14px 12px 42px;
-            background: rgba(15, 23, 42, 0.5);
+            width: 100%; height: 52px;
+            padding: 0 16px 0 48px;
+            background: rgba(15, 23, 42, 0.8);
             border: 1px solid var(--border-color);
-            font-size: 15px; color: var(--text-main); border-radius: 10px;
-            transition: all 0.2s ease;
+            border-radius: 14px;
+            color: white; font-size: 15px;
+            transition: var(--transition);
         }
 
         input:focus {
-            outline: none; 
-            border-color: var(--brand-primary);
-            background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.15);
+            background: rgba(30, 41, 59, 0.6);
         }
 
-        .btn-submit {
-            width: 100%; 
-            background: var(--brand-primary);
-            color: white; padding: 14px; border: none; 
-            font-size: 15px; font-weight: 600; border-radius: 10px;
-            cursor: pointer; transition: all 0.2s;
-            margin-top: 8px;
-        }
-
-        .btn-submit:hover {
-            background: var(--brand-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-submit:active { transform: translateY(0); }
-
-        /* --- TOGGLE BUTTON --- */
-        .toggle-btn {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        .toggle-password {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
             background: none; border: none; cursor: pointer; color: var(--text-muted);
-            padding: 4px; transition: color 0.2s;
-        }
-        
-        .toggle-btn:hover { color: var(--text-main); }
-
-        .footer-nav {
-            margin-top: 32px; display: flex; justify-content: center; gap: 24px;
-            font-size: 13px; border-top: 1px solid var(--border-color);
-            padding-top: 24px;
+            padding: 5px;
         }
 
-        .footer-nav a { color: var(--text-muted); text-decoration: none; transition: 0.2s; }
-        .footer-nav a:hover { color: var(--brand-primary); }
+        button[type="submit"] {
+            width: 100%; height: 56px;
+            background: var(--primary); color: #020617;
+            border: none; border-radius: 14px;
+            font-size: 16px; font-weight: 800;
+            cursor: pointer; transition: var(--transition);
+            margin-top: 10px; text-transform: uppercase;
+        }
 
-        /* --- ERRORS --- */
+        button[type="submit"]:hover {
+            background: #fff; transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(96, 165, 250, 0.3);
+        }
+
+        /* --- FOOTER --- */
+        .footer-links {
+            margin-top: 30px; text-align: center;
+            display: flex; justify-content: space-between;
+            font-size: 13px; padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-links a {
+            color: var(--text-muted); text-decoration: none;
+            font-weight: 600; transition: var(--transition);
+        }
+
+        .footer-links a:hover { color: var(--primary); }
+
         .error-box {
-            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171; padding: 12px 16px; border-radius: 8px;
-            font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
-        }
-        /* ===============================
-        RESPONSIVE – ADMIN LOGIN
-        ================================ */
-
-        /* Tablets & small laptops */
-        @media (max-width: 768px) {
-            .admin-card {
-                padding: 36px;
-                max-width: 92%;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            .tagline {
-                font-size: 13px;
-            }
+            background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444;
+            padding: 12px; border-radius: 8px; margin-bottom: 20px;
+            font-size: 13px; display: flex; align-items: center; gap: 10px;
+            animation: shake 0.4s ease-in-out;
         }
 
-        /* Mobile devices */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
         @media (max-width: 480px) {
-            body {
-                padding: 16px;
-                min-height: 100svh; /* iOS safe viewport */
-            }
-
-            .admin-card {
-                padding: 28px 22px;
-                border-radius: 16px;
-            }
-
-            .logo-wrapper {
-                width: 48px;
-                height: 48px;
-            }
-
-            .logo-wrapper i {
-                font-size: 20px;
-            }
-
-            h1 {
-                font-size: 20px;
-            }
-
-            .tagline {
-                font-size: 12px;
-                text-align: center;
-            }
-
-            label {
-                font-size: 12px;
-            }
-
-            input {
-                font-size: 14px;
-                padding: 11px 14px 11px 40px;
-            }
-
-            .btn-submit {
-                padding: 13px;
-                font-size: 14px;
-            }
-
-            .footer-nav {
-                flex-direction: column;
-                gap: 12px;
-                text-align: center;
-            }
-        }
-        /* --- ENHANCED TYPOGRAPHY --- */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            /* Switching to Plus Jakarta Sans for a more premium merchant feel */
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
-        }
-
-        h1 { 
-            font-size: 26px; 
-            font-weight: 800; /* Extra Bold for the main title */
-            letter-spacing: -0.03em; 
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .tagline { 
-            font-size: 14px; 
-            font-weight: 400;
-            color: var(--text-muted); 
-            letter-spacing: 0.01em;
-        }
-
-        label { 
-            display: block; 
-            font-size: 12px; 
-            font-weight: 600; /* Semi-bold labels */
-            text-transform: uppercase; /* Professional standard for admin portals */
-            letter-spacing: 0.08em; 
-            color: var(--text-muted); 
-            margin-bottom: 10px;
-        }
-
-        input {
-            font-weight: 400;
-            letter-spacing: 0.02em;
-        }
-
-        input::placeholder {
-            font-weight: 300;
-            color: var(--text-muted);
-            opacity: 0.7;
-        }
-
-        .btn-submit {
-            font-size: 15px; 
-            font-weight: 700; /* Bold button text */
-            letter-spacing: 0.02em;
-        }
-
-        .footer-nav a { 
-            font-weight: 500;
-            letter-spacing: 0.01em;
-        }
-
-        /* ERROR BOX TEXT */
-        .error-box {
-            font-weight: 500;
-            letter-spacing: -0.01em;
+            .login-card { padding: 30px 20px; }
+            h2 { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="admin-card">
-        <div class="header">
-            <div class="logo-wrapper">
-                <i class="fas fa-lock"></i>
-            </div>
-            <h1>Merchant Portal</h1>
-            <p class="tagline">Enter your credentials to manage your store</p>
-        </div>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="error-box">
-                    <i class="fas fa-circle-exclamation"></i> {{ message }}
+    <div class="login-container">
+        <div class="login-card">
+            <div class="header">
+                <div class="logo-box">
+                    <i class="fas fa-shield-halved"></i>
                 </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST" id="loginForm">
-            {% csrf_token %}
-            
-            <div class="field">
-                <label for="shop_name">Shop Name</label>
-                <div class="input-group">
-                    <i class="fas fa-hashtag prefix"></i>
-                    <input type="text" id="shop_name" name="shop_name" placeholder="e.g. SHOP_4402" required autofocus>
-                </div>
+                <h2>Merchant Portal</h2>
+                <p class="subtitle">Secure access to your dashboard</p>
             </div>
 
-            <div class="field">
-                <label for="password">Password</label>
-                <div class="input-group">
-                    <i class="fas fa-key prefix"></i>
-                    <input type="password" id="password" name="password" placeholder="Enter key" required>
-                    <button type="button" class="toggle-btn" id="toggleBtn" tabindex="-1">
-                        <i class="fas fa-eye"></i>
-                    </button>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-box" id="errorMsg">
+                        <i class="fas fa-circle-exclamation"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" id="loginForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Shop Identification</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-store prefix"></i>
+                        <input type="text" name="shop_name" placeholder="Shop Name " required autofocus>
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <label>Secure Key</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key prefix"></i>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn">Sign In</button>
+            </form>
+
+            <div class="footer-links">
+                <a href="{% url 'home' %}">← Back Home</a>
+                <a href="{% url 'shop_register' %}">New Merchant?</a>
             </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">Sign In to Dashboard</button>
-        </form>
-
-        <div class="footer-nav">
-            <a href="{% url 'home' %}">Return Home</a>
-            <a href="{% url 'shop_register' %}">New Register?</a>
         </div>
     </div>
 
     <script>
-        const passInput = document.getElementById('password');
-        const toggleBtn = document.getElementById('toggleBtn');
-        const icon = toggleBtn.querySelector('i');
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
         const form = document.getElementById('loginForm');
         const btn = document.getElementById('submitBtn');
 
-        // 1. Toggle Password Visibility
-        toggleBtn.addEventListener('click', () => {
-            const isSecret = passInput.type === 'password';
-            passInput.type = isSecret ? 'text' : 'password';
-            icon.className = isSecret ? 'fas fa-eye-slash' : 'fas fa-eye';
-        });
-
-        // 2. Loading State Simulation on Submit
         form.addEventListener('submit', () => {
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
-            btn.style.opacity = '0.8';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authorizing...';
             btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.8';
         });
 
-        // 3. AUTO-REMOVE ERROR TAGS after 5 seconds (5000ms)
-        window.addEventListener('DOMContentLoaded', () => {
-            const errorBoxes = document.querySelectorAll('.error-box');
-            
-            if (errorBoxes.length > 0) {
-                setTimeout(() => {
-                    errorBoxes.forEach(box => {
-                        // Add a smooth fade-out effect
-                        box.style.transition = "opacity 0.5s ease";
-                        box.style.opacity = "0";
-                        
-                        // Actually remove from layout after fade
-                        setTimeout(() => {
-                            box.style.display = 'none';
-                        }, 500);
-                    });
-                }, 5000); 
-            }
-        });
+        // Auto-hide errors
+        setTimeout(() => {
+            const err = document.getElementById('errorMsg');
+            if(err) err.style.display = 'none';
+        }, 5000);
     </script>
 </body>
 </html>
