@@ -1553,7 +1553,73 @@
         .chat-widget-container {
             padding-bottom: env(safe-area-inset-bottom);
         }
+        /* Floating Map Card Styling */
+        .map-info-card {
+            position: absolute;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            background: white;
+            padding: 30px;
+            width: 320px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
 
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .info-item i {
+            color: var(--primary-color);
+            margin-top: 3px;
+        }
+
+        .open-location-btn {
+            display: block;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            text-align: center;
+            transition: color 0.3s;
+        }
+
+        .open-location-btn:hover {
+            color: var(--secondary);
+        }
+
+        /* Mobile Responsiveness for Map Card */
+        @media (max-width: 768px) {
+            .map-wrapper {
+                height: auto !important;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            #google-map {
+                height: 300px;
+            }
+
+            .map-info-card {
+                position: relative;
+                top: 0;
+                right: 0;
+                transform: none;
+                width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
     </style>
 </head>
 
@@ -1888,6 +1954,47 @@
         </div>
     </section>
 
+    <section class="branches-section" id="location" style="padding: 80px 20px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h2 style="font-size: 36px; font-weight: 800; color: var(--primary-color);">About Our Business</h2>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">We aim to provide high-quality laundry services and exceed customer expectations at every doorstep.</p>
+        </div>
+
+        <div class="map-wrapper" style="position: relative; width: 100%; max-width: 1100px; margin: 0 auto; height: 500px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            
+            <iframe 
+                id="google-map"
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                style="border:0;" 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31307.72836262963!2d75.770932!3d11.258753!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba65938563a4157%3A0x73d3106597793d9a!2sKozhikode%2C%20Kerala!5e0!3m2!1sen!2sin!4v1700000000000" 
+                allowfullscreen>
+            </iframe>
+
+            <div class="map-info-card" data-aos="fade-left">
+                <h3 style="color: var(--secondary); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Our Hub</h3>
+                <h2 style="color: var(--primary-color); font-size: 22px; margin-bottom: 15px;">Kozhikode</h2>
+                
+                <div class="info-item">
+                    <i class="fas fa-location-dot"></i>
+                    <span>Beach Road, Near Corporation Office, Kerala</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+91 98765 43210</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>care@shinebright.com</span>
+                </div>
+
+                <a href="https://maps.app.goo.gl/..." target="_blank" class="open-location-btn">
+                    Open Location <i class="fas fa-external-link-alt" style="font-size: 12px; margin-left: 5px;"></i>
+                </a>
+            </div>
+        </div>
+    </section>
     <footer class="pro-laundry-footer">
         <div class="footer-container">
             <div class="footer-col footer-about" data-aos="fade-right">
@@ -2137,6 +2244,24 @@
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
+        // --- AI FABRIC ANALYZER LOGIC ---
+        function displayFileName(input) {
+            const display = document.getElementById('fileNameDisplay');
+            if (input.files.length > 0) {
+                display.textContent = "Selected: " + input.files[0].name;
+                display.style.color = "var(--secondary)";
+            }
+        }
+        // --- GOOGLE MAPS TOGGLE LOGIC ---
+        function toggleMap() {
+            const mapContainer = document.getElementById('map-container');
+            if (mapContainer.style.display === 'none') {
+                mapContainer.style.display = 'block';
+                mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                mapContainer.style.display = 'none';
+            }
+        }
     </script>
 
 </body>
