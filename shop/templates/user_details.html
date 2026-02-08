@@ -219,7 +219,11 @@
             </div>
         </div>
     </div>
-
+    <div id="processingSubmissionOverlay" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); z-index:40000; align-items:center; justify-content:center; flex-direction:column; color:white; backdrop-filter: blur(5px);">
+        <div style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+        <h2 style="font-weight: 700; margin-bottom: 8px;">Validating Details</h2>
+        <p style="opacity: 0.8; font-size: 0.95rem;">Preparing your secure payment gateway...</p>
+    </div>
     {% if show_payment and razorpay_order_id %}
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     {% endif %}
@@ -289,9 +293,46 @@
             };
             new Razorpay(options).open();
         }
-
         // Prevent accidental exit
         window.addEventListener("beforeunload", (e) => { if (!allowLeavePayment) e.returnValue = ""; });
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainForm = document.querySelector('form');
+            const submissionOverlay = document.getElementById('processingSubmissionOverlay');
+
+            if (mainForm) {
+                mainForm.addEventListener('submit', function(e) {
+                    // Check if form is valid before showing spinner
+                    if (this.checkValidity()) {
+                        // Show the waiting spinner
+                        submissionOverlay.style.display = 'flex';
+                        
+                        // Set allowLeave to true so the browser doesn't 
+                        // show an "Are you sure?" popup during the actual redirect
+                        allowLeavePayment = true; 
+                    }
+                });
+            }
+
+            // Existing error logic...
+            document.querySelectorAll('.error-msg').forEach(error => {
+                const input = error.parentElement.querySelector('input, textarea, select');
+                if (input) input.classList.add('is-invalid');
+            });
+
+            // Existing phone logic...
+            const phoneInput = document.querySelector('input[name="delivery_phone"]');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
+                });
+            }
+
+            // Auto scroll logic...
+            const paymentGate = document.getElementById('payment-gate');
+            if (paymentGate) {
+                paymentGate.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
     </script>
     <div id="successRedirectOverlay" style="display:none; position:fixed; inset:0; background:rgba(16, 185, 129, 0.9); z-index:50000; align-items:center; justify-content:center; flex-direction:column; color:white; backdrop-filter: blur(8px);">
         <div class="success-icon" style="font-size: 60px; margin-bottom: 20px;">
