@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     "django_crontab",
     'shop',
 ]
+if DEBUG:
+    INSTALLED_APPS += ["django_crontab"]
 
 CRONJOBS = [
     ('*/10 * * * *', 'utils.overdue_notifications.send_overdue_notifications'),
