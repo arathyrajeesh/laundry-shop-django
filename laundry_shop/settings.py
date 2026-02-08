@@ -55,15 +55,17 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    "django_crontab",
     'shop',
 ]
 if DEBUG:
     INSTALLED_APPS += ["django_crontab"]
 
-CRONJOBS = [
-    ('*/10 * * * *', 'utils.overdue_notifications.send_overdue_notifications'),
-]
+
+if DEBUG:
+    CRONJOBS = [
+        ('*/10 * * * *', 'utils.overdue_notifications.send_overdue_notifications'),
+    ]
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
