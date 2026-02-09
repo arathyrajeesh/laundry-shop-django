@@ -1,0 +1,3600 @@
+[
+{
+  "model": "shop.profile",
+  "pk": 8,
+  "fields": {
+    "user": 19,
+    "full_name": "rohini",
+    "phone": "9034562896",
+    "profile_image": "image/upload/v1767251292/gu2eta7dd1emml6t0cs4.jpg",
+    "city": "Kozhikode",
+    "latitude": 11.3082368,
+    "longitude": 75.9103488,
+    "email_verified": false,
+    "notifications_enabled": true,
+    "login_email_sent": true,
+    "location_updated_at": null
+  }
+},
+{
+  "model": "shop.profile",
+  "pk": 10,
+  "fields": {
+    "user": 6,
+    "full_name": "",
+    "phone": "",
+    "profile_image": null,
+    "city": "കണ്ണപുരം",
+    "latitude": 11.9936181,
+    "longitude": 75.312064,
+    "email_verified": false,
+    "notifications_enabled": true,
+    "login_email_sent": true,
+    "location_updated_at": null
+  }
+},
+{
+  "model": "shop.profile",
+  "pk": 17,
+  "fields": {
+    "user": 28,
+    "full_name": "",
+    "phone": "",
+    "profile_image": null,
+    "city": "അത്തോളി",
+    "latitude": 11.3901568,
+    "longitude": 75.7497856,
+    "email_verified": true,
+    "notifications_enabled": true,
+    "login_email_sent": true,
+    "location_updated_at": null
+  }
+},
+{
+  "model": "shop.profile",
+  "pk": 19,
+  "fields": {
+    "user": 30,
+    "full_name": "",
+    "phone": "",
+    "profile_image": null,
+    "city": "കൊയിലാണ്ടി",
+    "latitude": 11.452416,
+    "longitude": 75.7006336,
+    "email_verified": true,
+    "notifications_enabled": true,
+    "login_email_sent": true,
+    "location_updated_at": null
+  }
+},
+{
+  "model": "shop.profile",
+  "pk": 20,
+  "fields": {
+    "user": 31,
+    "full_name": "",
+    "phone": "",
+    "profile_image": null,
+    "city": "Kozhikode",
+    "latitude": 11.2852992,
+    "longitude": 75.8874112,
+    "email_verified": true,
+    "notifications_enabled": true,
+    "login_email_sent": true,
+    "location_updated_at": null
+  }
+},
+{
+  "model": "shop.profile",
+  "pk": 21,
+  "fields": {
+    "user": 21,
+    "full_name": "",
+    "phone": "",
+    "profile_image": "image/upload/v1770187029/hhimeolahv9cozaakawp.jpg",
+    "city": "ഒളവണ്ണ",
+    "latitude": 11.2295936,
+    "longitude": 75.8349824,
+    "email_verified": false,
+    "notifications_enabled": true,
+    "login_email_sent": false,
+    "location_updated_at": "2026-02-04T06:38:25.427Z"
+  }
+},
+{
+  "model": "shop.profile",
+  "pk": 22,
+  "fields": {
+    "user": 29,
+    "full_name": "",
+    "phone": "",
+    "profile_image": null,
+    "city": "പുതിയങ്ങാടി",
+    "latitude": 12.0127348,
+    "longitude": 75.2537397,
+    "email_verified": false,
+    "notifications_enabled": true,
+    "login_email_sent": false,
+    "location_updated_at": "2026-02-08T15:57:36.565Z"
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 2,
+  "fields": {
+    "name": "shine",
+    "email": "shine@gmail.com",
+    "password": "pbkdf2_sha256$1000000$8GGbqHG8rRpLu1jIvlETEw$Jy3UL8z2bkQ0UMEKKrQ9wLW7dQ31c9+SxEg4VFfc9Qs=",
+    "address": "",
+    "phone": "6235877911",
+    "city": "കെട്ടാങ്ങൽ",
+    "latitude": 11.321344,
+    "longitude": 75.9463936,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2025-12-05T08:25:20Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": "rzp_test_RvIw35M3Ym0mGd",
+    "razorpay_key_secret": "byS88E4fqtdD2hosJK7B5a30",
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 3,
+  "fields": {
+    "name": "washer",
+    "email": "washer@gmail.com",
+    "password": "pbkdf2_sha256$1000000$Br2RDX3fV9PYZjdWNyyLTr$DPDVK+mVnACFZmjWeioZODWEfSEqRkUGGwmP4pfZfd8=",
+    "address": "",
+    "phone": "8547189033",
+    "city": "Kozhikode",
+    "latitude": 11.2263168,
+    "longitude": 75.8120448,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2025-12-08T05:26:08.963Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 4,
+  "fields": {
+    "name": "quick",
+    "email": "quick@gmail.com",
+    "password": "pbkdf2_sha256$1000000$KmWtlQ6nsKuHewIxuDOCsG$x+f53nSjyyM1TnATbbKUanaOeE4YKRyp2RxEUUxrtMA=",
+    "address": "kannur",
+    "phone": "6235877911",
+    "city": "Kozhikode",
+    "latitude": 11.2454486,
+    "longitude": 75.7850294,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2025-12-24T06:01:57.485Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 5,
+  "fields": {
+    "name": "dry",
+    "email": "dry@gmail.com",
+    "password": "pbkdf2_sha256$1000000$nCniL2Zt6o32vDZ9xKA4tN$UVaqiawlA6etoGR4jot0jqhWHBCTYXWW4vs2TU1vHrA=",
+    "address": "kozhikod",
+    "phone": "8547189033",
+    "city": "കൊയിലാണ്ടി",
+    "latitude": 11.4556928,
+    "longitude": 75.726848,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2026-01-03T05:21:36.780Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 6,
+  "fields": {
+    "name": "cleanme",
+    "email": "cleanme@gmail.com",
+    "password": "pbkdf2_sha256$1000000$Up7Tu4wA3CPwXaEzNVyZsQ$xJoQxfDSv3n3WxC7N2N9j//aMw7y04YxJ0mWaE7NzLU=",
+    "address": "nidumbram",
+    "phone": "9778232078",
+    "city": "അരിക്കുളം",
+    "latitude": 11.4753536,
+    "longitude": 75.7006336,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2026-01-05T06:30:48.921Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 7,
+  "fields": {
+    "name": "bright",
+    "email": "bright@gmail.com",
+    "password": "pbkdf2_sha256$1000000$I6JpHwB23ptucfYjHog99H$HCKTTAcSAPS9ZjFpTMpDcaP//mqGZpxlf9OqvIOrahA=",
+    "address": "nidumbram",
+    "phone": "9778232078",
+    "city": "കണ്ണപുരം",
+    "latitude": 11.9936181,
+    "longitude": 75.312064,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2026-01-05T14:11:07.977Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 8,
+  "fields": {
+    "name": "olive",
+    "email": "olive@gmail.com",
+    "password": "pbkdf2_sha256$1000000$EzIVWT18zYSjDs0j4gJjfp$x11Z1xy5hSb29xL4Ge2QaOAHVlW7PfEzLSwUwx0SIM0=",
+    "address": "",
+    "phone": "6235877911",
+    "city": "Kozhikode",
+    "latitude": 11.2852992,
+    "longitude": 75.8874112,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2026-01-22T04:27:34.758Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 9,
+  "fields": {
+    "name": "shop",
+    "email": "shop@gmail.com",
+    "password": "pbkdf2_sha256$1000000$KOVqfzZ2MfIzkLwvn2OKU0$dK/dVmYRLB15FSXuVAgEaZvzwqx4yhoVabE0t2bnthU=",
+    "address": "nidumbram",
+    "phone": "34567890",
+    "city": "വാകമോളി",
+    "latitude": 11.452416,
+    "longitude": 75.7006336,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2026-01-28T05:55:58.253Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.laundryshop",
+  "pk": 10,
+  "fields": {
+    "name": "ks",
+    "email": "k@gmail.com",
+    "password": "pbkdf2_sha256$1000000$aVWsDENEGI5F9aj7uqknTW$0hqZTROtCpQmRcYszCxRsHKeXcrNDrNCeYDLrzCMGXo=",
+    "address": "nidumbram",
+    "phone": "08547189033",
+    "city": "Cherukunnu",
+    "latitude": 12.009472,
+    "longitude": 75.2910336,
+    "is_approved": true,
+    "is_open": true,
+    "created_at": "2026-01-28T14:03:48.497Z",
+    "razorpay_account_id": null,
+    "razorpay_key_id": null,
+    "razorpay_key_secret": null,
+    "bank_account_holder_name": null,
+    "bank_account_number": null,
+    "bank_ifsc_code": null,
+    "bank_name": null,
+    "bank_branch": null,
+    "bank_account_type": null
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 9,
+  "fields": {
+    "shop": 7,
+    "name": "bright I",
+    "address": "nidumbram",
+    "phone": "9778232078",
+    "city": "Kozhikode",
+    "latitude": null,
+    "longitude": null,
+    "created_at": "2026-01-05T14:12:27.467Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 12,
+  "fields": {
+    "shop": 8,
+    "name": "olive 1",
+    "address": "kozhikod sm street",
+    "phone": "1234567890",
+    "city": "Kozhikode",
+    "latitude": 11.2852992,
+    "longitude": 75.8874112,
+    "created_at": "2026-01-22T04:37:21.774Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 13,
+  "fields": {
+    "shop": 8,
+    "name": "olive 2",
+    "address": "nidumbram",
+    "phone": "9778232078",
+    "city": "Kozhikode",
+    "latitude": 11.2852992,
+    "longitude": 75.8874112,
+    "created_at": "2026-01-22T04:43:30.041Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 14,
+  "fields": {
+    "shop": 7,
+    "name": "bright 2",
+    "address": "nidumbram",
+    "phone": "9778232078",
+    "city": "Location Verified",
+    "latitude": 11.2852992,
+    "longitude": 75.8874112,
+    "created_at": "2026-01-22T04:55:33.702Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 15,
+  "fields": {
+    "shop": 7,
+    "name": "bright 5",
+    "address": "nidumbram",
+    "phone": "6235877911",
+    "city": "Kozhikode",
+    "latitude": 11.2852992,
+    "longitude": 75.8874112,
+    "created_at": "2026-01-22T06:52:52.362Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 16,
+  "fields": {
+    "shop": 8,
+    "name": "olive 3",
+    "address": "nidumbram",
+    "phone": "6235877911",
+    "city": "Kozhikode",
+    "latitude": 11.3147904,
+    "longitude": 75.776,
+    "created_at": "2026-01-23T04:24:58.380Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 17,
+  "fields": {
+    "shop": 10,
+    "name": "ks1",
+    "address": "ks buliding",
+    "phone": "+918547189033",
+    "city": "Cherukunnu",
+    "latitude": 12.009472,
+    "longitude": 75.2910336,
+    "created_at": "2026-01-28T14:12:37.344Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 18,
+  "fields": {
+    "shop": 8,
+    "name": "ks4",
+    "address": "nidumbram",
+    "phone": "+918547189033",
+    "city": "കുന്ദമംഗലം",
+    "latitude": 11.3082368,
+    "longitude": 75.8710272,
+    "created_at": "2026-02-02T05:38:24.267Z"
+  }
+},
+{
+  "model": "shop.branch",
+  "pk": 19,
+  "fields": {
+    "shop": 10,
+    "name": "ks2",
+    "address": "nidumbram",
+    "phone": "+918547189033",
+    "city": "കുന്ദമംഗലം",
+    "latitude": 11.3082368,
+    "longitude": 75.8710272,
+    "created_at": "2026-02-02T06:44:45.784Z"
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 17,
+  "fields": {
+    "branch": 9,
+    "name": "washing",
+    "price": null,
+    "created_at": "2026-01-05T14:12:34.673Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 18,
+  "fields": {
+    "branch": 9,
+    "name": "ironing",
+    "price": null,
+    "created_at": "2026-01-05T14:12:40.167Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 21,
+  "fields": {
+    "branch": 9,
+    "name": "Deep Cleaning",
+    "price": null,
+    "created_at": "2026-01-07T07:13:28.851Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 22,
+  "fields": {
+    "branch": 12,
+    "name": "washing",
+    "price": null,
+    "created_at": "2026-01-22T04:37:35.762Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 23,
+  "fields": {
+    "branch": 13,
+    "name": "ironing",
+    "price": null,
+    "created_at": "2026-01-22T04:43:55.220Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 24,
+  "fields": {
+    "branch": 14,
+    "name": "washing",
+    "price": null,
+    "created_at": "2026-01-22T05:02:24.985Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 25,
+  "fields": {
+    "branch": 15,
+    "name": "Whitening",
+    "price": null,
+    "created_at": "2026-01-22T06:54:12.084Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 26,
+  "fields": {
+    "branch": 16,
+    "name": "Deep Cleaning",
+    "price": null,
+    "created_at": "2026-01-23T04:25:09.309Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 27,
+  "fields": {
+    "branch": 17,
+    "name": "washing",
+    "price": null,
+    "created_at": "2026-01-28T14:12:47.475Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 28,
+  "fields": {
+    "branch": 18,
+    "name": "washing",
+    "price": null,
+    "created_at": "2026-02-02T05:38:46.097Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.service",
+  "pk": 29,
+  "fields": {
+    "branch": 19,
+    "name": "washing",
+    "price": null,
+    "created_at": "2026-02-02T06:44:54.427Z",
+    "cloths": []
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 1,
+  "fields": {
+    "name": "Shirt",
+    "created_at": "2025-12-19T06:45:14.107Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 2,
+  "fields": {
+    "name": "T-Shirt",
+    "created_at": "2025-12-19T06:45:14.111Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 3,
+  "fields": {
+    "name": "Pants",
+    "created_at": "2025-12-19T06:45:14.113Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 4,
+  "fields": {
+    "name": "Jeans",
+    "created_at": "2025-12-19T06:45:14.116Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 5,
+  "fields": {
+    "name": "Shorts",
+    "created_at": "2025-12-19T06:45:14.119Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 6,
+  "fields": {
+    "name": "Skirt",
+    "created_at": "2025-12-19T06:45:14.121Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 7,
+  "fields": {
+    "name": "Dress",
+    "created_at": "2025-12-19T06:45:14.125Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 8,
+  "fields": {
+    "name": "Blouse",
+    "created_at": "2025-12-19T06:45:14.128Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 9,
+  "fields": {
+    "name": "Jacket",
+    "created_at": "2025-12-19T06:45:14.130Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 10,
+  "fields": {
+    "name": "Coat",
+    "created_at": "2025-12-19T06:45:14.133Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 11,
+  "fields": {
+    "name": "Sweater",
+    "created_at": "2025-12-19T06:45:14.136Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 12,
+  "fields": {
+    "name": "Hoodie",
+    "created_at": "2025-12-19T06:45:14.140Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 13,
+  "fields": {
+    "name": "Suit",
+    "created_at": "2025-12-19T06:45:14.143Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 14,
+  "fields": {
+    "name": "Tie",
+    "created_at": "2025-12-19T06:45:14.146Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 15,
+  "fields": {
+    "name": "Scarf",
+    "created_at": "2025-12-19T06:45:14.148Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 16,
+  "fields": {
+    "name": "Hat",
+    "created_at": "2025-12-19T06:45:14.152Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 17,
+  "fields": {
+    "name": "Socks",
+    "created_at": "2025-12-19T06:45:14.155Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 20,
+  "fields": {
+    "name": "Pajamas",
+    "created_at": "2025-12-19T06:45:14.163Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 21,
+  "fields": {
+    "name": "Bed Sheet",
+    "created_at": "2025-12-19T06:45:14.166Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 22,
+  "fields": {
+    "name": "Pillowcase",
+    "created_at": "2025-12-19T06:45:14.169Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 23,
+  "fields": {
+    "name": "Towel",
+    "created_at": "2025-12-19T06:45:14.172Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 24,
+  "fields": {
+    "name": "Curtain",
+    "created_at": "2025-12-19T06:45:14.175Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 25,
+  "fields": {
+    "name": "Carpet",
+    "created_at": "2025-12-19T06:45:14.179Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 26,
+  "fields": {
+    "name": "Blanket",
+    "created_at": "2025-12-19T06:45:14.182Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 29,
+  "fields": {
+    "name": "Bedsheet",
+    "created_at": "2025-12-24T05:50:17.635Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 35,
+  "fields": {
+    "name": "silk saree",
+    "created_at": "2026-01-17T04:36:18.345Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 36,
+  "fields": {
+    "name": "trouser",
+    "created_at": "2026-01-17T04:37:06.121Z"
+  }
+},
+{
+  "model": "shop.cloth",
+  "pk": 38,
+  "fields": {
+    "name": "dhoti",
+    "created_at": "2026-01-22T04:44:39.284Z"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 15,
+  "fields": {
+    "service": 17,
+    "cloth": 9,
+    "price": "200.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 18,
+  "fields": {
+    "service": 21,
+    "cloth": 21,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 19,
+  "fields": {
+    "service": 22,
+    "cloth": 23,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 20,
+  "fields": {
+    "service": 22,
+    "cloth": 36,
+    "price": "50.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 21,
+  "fields": {
+    "service": 22,
+    "cloth": 9,
+    "price": "200.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 22,
+  "fields": {
+    "service": 23,
+    "cloth": 38,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 23,
+  "fields": {
+    "service": 24,
+    "cloth": 38,
+    "price": "200.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 24,
+  "fields": {
+    "service": 25,
+    "cloth": 1,
+    "price": "200.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 25,
+  "fields": {
+    "service": 26,
+    "cloth": 25,
+    "price": "1000.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 26,
+  "fields": {
+    "service": 27,
+    "cloth": 23,
+    "price": "50.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 27,
+  "fields": {
+    "service": 28,
+    "cloth": 36,
+    "price": "200.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 28,
+  "fields": {
+    "service": 29,
+    "cloth": 23,
+    "price": "1000.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 29,
+  "fields": {
+    "service": 28,
+    "cloth": 25,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 30,
+  "fields": {
+    "service": 28,
+    "cloth": 9,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 31,
+  "fields": {
+    "service": 28,
+    "cloth": 23,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 32,
+  "fields": {
+    "service": 28,
+    "cloth": 38,
+    "price": "100.00"
+  }
+},
+{
+  "model": "shop.serviceclothprice",
+  "pk": 33,
+  "fields": {
+    "service": 29,
+    "cloth": 9,
+    "price": "2000.00"
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 9,
+  "fields": {
+    "branch": 9,
+    "cloth": 9
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 11,
+  "fields": {
+    "branch": 9,
+    "cloth": 21
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 13,
+  "fields": {
+    "branch": 9,
+    "cloth": 35
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 15,
+  "fields": {
+    "branch": 9,
+    "cloth": 36
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 20,
+  "fields": {
+    "branch": 12,
+    "cloth": 23
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 21,
+  "fields": {
+    "branch": 12,
+    "cloth": 36
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 22,
+  "fields": {
+    "branch": 12,
+    "cloth": 9
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 23,
+  "fields": {
+    "branch": 13,
+    "cloth": 38
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 24,
+  "fields": {
+    "branch": 9,
+    "cloth": 38
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 25,
+  "fields": {
+    "branch": 14,
+    "cloth": 38
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 26,
+  "fields": {
+    "branch": 9,
+    "cloth": 1
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 27,
+  "fields": {
+    "branch": 14,
+    "cloth": 1
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 28,
+  "fields": {
+    "branch": 15,
+    "cloth": 1
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 29,
+  "fields": {
+    "branch": 12,
+    "cloth": 25
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 30,
+  "fields": {
+    "branch": 13,
+    "cloth": 25
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 31,
+  "fields": {
+    "branch": 16,
+    "cloth": 25
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 32,
+  "fields": {
+    "branch": 17,
+    "cloth": 23
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 33,
+  "fields": {
+    "branch": 17,
+    "cloth": 9
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 34,
+  "fields": {
+    "branch": 19,
+    "cloth": 9
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 35,
+  "fields": {
+    "branch": 18,
+    "cloth": 25
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 36,
+  "fields": {
+    "branch": 18,
+    "cloth": 9
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 37,
+  "fields": {
+    "branch": 18,
+    "cloth": 23
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 38,
+  "fields": {
+    "branch": 18,
+    "cloth": 38
+  }
+},
+{
+  "model": "shop.branchcloth",
+  "pk": 39,
+  "fields": {
+    "branch": 18,
+    "cloth": 36
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 39,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Washing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-01T09:10:00Z",
+    "delivery_date": "2026-01-16T10:11:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "rohini",
+    "delivery_phone": "8547189033",
+    "delivery_address": "rohini nilayam kottangal",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T07:08:30.515Z",
+    "gst_amount": "0.00",
+    "amount": "150.00",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_RyWjgoAa9IKCp3",
+    "razorpay_order_id": "order_RyWj2wczlSeXUI"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 40,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T07:22:57.311Z",
+    "gst_amount": "0.00",
+    "amount": "300.00",
+    "base_amount": "0.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 41,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T07:29:15.094Z",
+    "gst_amount": "0.00",
+    "amount": "200.00",
+    "base_amount": "0.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 42,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Washing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-09T11:48:00Z",
+    "delivery_date": "2026-01-16T08:28:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "rohini",
+    "delivery_phone": "8547189033",
+    "delivery_address": "kozhikod",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T08:19:55.505Z",
+    "gst_amount": "0.00",
+    "amount": "230.60",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_RyY2wa2gVC4iQ5",
+    "razorpay_order_id": "order_RyY1FVV80R4QVx"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 43,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T08:52:35.765Z",
+    "gst_amount": "0.00",
+    "amount": "230.60",
+    "base_amount": "0.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 44,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T08:56:52.358Z",
+    "gst_amount": "0.00",
+    "amount": "289.60",
+    "base_amount": "0.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 45,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 19,
+    "shop": 2,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Drying",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-02T10:59:00Z",
+    "delivery_date": "2026-01-15T12:00:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "rohini",
+    "delivery_phone": "9544478033",
+    "delivery_address": "rohini nivas",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-01T08:57:04.105Z",
+    "gst_amount": "0.00",
+    "amount": "289.60",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_RyYa7kMwk1uZbW",
+    "razorpay_order_id": "order_RyYYqq2hEjaACO"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 47,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 21,
+    "shop": 5,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Washing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-03T05:30:00Z",
+    "delivery_date": "2026-01-15T07:30:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "arathy",
+    "delivery_phone": "8547189033",
+    "delivery_address": "kozhikod",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-03T05:29:11.103Z",
+    "gst_amount": "0.00",
+    "amount": "171.60",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_RzI5gxhVaDCVlU",
+    "razorpay_order_id": "order_RzI5NTB1eGKCIM"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 48,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 28,
+    "shop": 6,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Washing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-05T09:54:00Z",
+    "delivery_date": "2026-01-07T07:52:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "naila",
+    "delivery_phone": "9778232078",
+    "delivery_address": "naila nivas",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-05T06:51:33.384Z",
+    "gst_amount": "0.00",
+    "amount": "77.20",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_S06ZGKdHUz2vZP",
+    "razorpay_order_id": "order_S06Yt1tJRKS0mj"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 49,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 28,
+    "shop": 7,
+    "branch": 9,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-05T15:40:26.004Z",
+    "gst_amount": "0.00",
+    "amount": "200.00",
+    "base_amount": "0.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 50,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 28,
+    "shop": 7,
+    "branch": 9,
+    "pending_notification_sent": false,
+    "cloth_status": "Washing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-07T18:59:00Z",
+    "delivery_date": "2026-01-23T17:59:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "naila",
+    "delivery_phone": "9778232078",
+    "delivery_address": "naila nivas",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-05T15:56:46.522Z",
+    "gst_amount": "0.00",
+    "amount": "200.00",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_S0FroGbBMj8E76",
+    "razorpay_order_id": "order_S0FrKhBhvqOnMW"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 51,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 21,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Completed",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-08T07:31:00Z",
+    "delivery_date": "2026-01-11T07:31:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "9778232078",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "0.00",
+    "delivery_fee": "0.00",
+    "created_at": "2026-01-06T05:28:11.160Z",
+    "gst_amount": "0.00",
+    "amount": "200.00",
+    "base_amount": "0.00",
+    "razorpay_payment_id": "pay_S0TfqmxmEFWKz6",
+    "razorpay_order_id": "order_S0TfYWURr3DcdW"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 52,
+  "fields": {
+    "last_reminder_sent": "2026-01-22T05:21:30.431Z",
+    "user": 28,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Ironing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-06T06:59:00Z",
+    "delivery_date": "2026-01-21T10:55:00Z",
+    "predicted_delivery": "2026-01-07T05:56:47.192Z",
+    "delivery_name": "naila anver",
+    "delivery_phone": "8547189033",
+    "delivery_address": "kozhikod railway station",
+    "special_instructions": "rrrrrrrrrrr",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-06T06:55:12.873Z",
+    "gst_amount": "0.00",
+    "amount": "200.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": "pay_S0VAXT4oYXVqFD",
+    "razorpay_order_id": "order_S0VA30hYlj6394"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 53,
+  "fields": {
+    "last_reminder_sent": "2026-01-28T04:40:35.325Z",
+    "user": 21,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Ironing",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-08T09:04:00Z",
+    "delivery_date": "2026-01-19T10:06:00Z",
+    "predicted_delivery": "2026-01-08T06:03:48.685Z",
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "8547189033",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-07T07:02:56.183Z",
+    "gst_amount": "0.00",
+    "amount": "200.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": "pay_S0tp4iocwDrlSQ",
+    "razorpay_order_id": "order_S0topFM09lCsbG"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 54,
+  "fields": {
+    "last_reminder_sent": "2026-01-14T06:14:45.633Z",
+    "user": 28,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Completed",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-23T11:18:00Z",
+    "delivery_date": "2026-01-10T10:17:00Z",
+    "predicted_delivery": "2026-01-08T06:15:31.371Z",
+    "delivery_name": "naila",
+    "delivery_phone": "8547189033",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-07T07:14:26.805Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "100.00",
+    "razorpay_payment_id": "pay_S0u1SFnluXrXJl",
+    "razorpay_order_id": "order_S0u12DVoih7d5p"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 55,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 30,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Completed",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-14T09:44:00Z",
+    "delivery_date": "2026-01-16T04:39:00Z",
+    "predicted_delivery": "2026-01-15T07:25:46.475Z",
+    "delivery_name": "aswathy",
+    "delivery_phone": "8547189033",
+    "delivery_address": "thalaserry kannur",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-14T04:39:04.706Z",
+    "gst_amount": "0.00",
+    "amount": "1000.00",
+    "base_amount": "1000.00",
+    "razorpay_payment_id": "pay_S3dtKbJqSzvJMA",
+    "razorpay_order_id": "order_S3dsYZVGhU13fS"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 56,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 30,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pickup",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-15T06:30:00Z",
+    "delivery_date": "2026-01-30T08:32:00Z",
+    "predicted_delivery": "2026-01-15T08:32:18.605Z",
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "8547189033",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-14T05:27:06.668Z",
+    "gst_amount": "0.00",
+    "amount": "1200.00",
+    "base_amount": "1200.00",
+    "razorpay_payment_id": "pay_S3e0FfosD3jv0A",
+    "razorpay_order_id": "order_S3e02I4msKgPbJ"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 57,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 30,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-14T05:32:56.793Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "100.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 58,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 28,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-14T05:49:41.956Z",
+    "gst_amount": "0.00",
+    "amount": "250.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 59,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 30,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Ready",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-15T08:04:00Z",
+    "delivery_date": "2026-01-18T09:05:00Z",
+    "predicted_delivery": "2026-01-15T10:00:00Z",
+    "delivery_name": "naila",
+    "delivery_phone": "9544478033",
+    "delivery_address": "naila nivas",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-14T06:02:27.135Z",
+    "gst_amount": "0.00",
+    "amount": "550.00",
+    "base_amount": "500.00",
+    "razorpay_payment_id": "pay_S3eXF1t0Ev7DMf",
+    "razorpay_order_id": "order_S3eWyLtRD0zh1v"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 60,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 28,
+    "shop": 7,
+    "branch": null,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": null,
+    "delivery_date": null,
+    "predicted_delivery": null,
+    "delivery_name": "",
+    "delivery_phone": "",
+    "delivery_address": "",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-16T15:05:38.014Z",
+    "gst_amount": "0.00",
+    "amount": "250.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": null
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 61,
+  "fields": {
+    "last_reminder_sent": "2026-02-01T14:06:26.868Z",
+    "user": 21,
+    "shop": 7,
+    "branch": 15,
+    "pending_notification_sent": false,
+    "cloth_status": "Completed",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-22T12:00:00Z",
+    "delivery_date": "2026-01-24T10:59:00Z",
+    "predicted_delivery": "2026-01-23T04:00:00Z",
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "8547189033",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-22T06:55:06.274Z",
+    "gst_amount": "0.00",
+    "amount": "250.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": "pay_S6phg0wWAtAgfh",
+    "razorpay_order_id": "order_S6phPspyK6nwxA"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 62,
+  "fields": {
+    "last_reminder_sent": "2026-02-01T14:19:15.186Z",
+    "user": 28,
+    "shop": 8,
+    "branch": 16,
+    "pending_notification_sent": false,
+    "cloth_status": "Pickup",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-23T05:27:00Z",
+    "delivery_date": "2026-01-31T07:32:00Z",
+    "predicted_delivery": "2026-01-24T05:00:00Z",
+    "delivery_name": "naila",
+    "delivery_phone": "9778232078",
+    "delivery_address": "naila nivas kozhikod",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-23T04:26:37.913Z",
+    "gst_amount": "0.00",
+    "amount": "1050.00",
+    "base_amount": "1000.00",
+    "razorpay_payment_id": "pay_S7BjH28xfNpLgs",
+    "razorpay_order_id": "order_S7Bj4qxVmKBDXa"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 63,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 31,
+    "shop": 7,
+    "branch": 15,
+    "pending_notification_sent": false,
+    "cloth_status": "Completed",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-28T08:27:00Z",
+    "delivery_date": "2026-01-31T10:30:00Z",
+    "predicted_delivery": "2026-01-29T05:00:00Z",
+    "delivery_name": "gopika anand",
+    "delivery_phone": "08547189033",
+    "delivery_address": "pattanur",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-28T07:26:47.441Z",
+    "gst_amount": "0.00",
+    "amount": "250.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": "pay_S9DS5Gtfzcv2ZA",
+    "razorpay_order_id": "order_S9DRgG4ihkjlfm"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 64,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 21,
+    "shop": 10,
+    "branch": 17,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-28T15:22:00Z",
+    "delivery_date": "2026-01-29T00:25:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "1234567890",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-28T14:21:06.549Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "50.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": "order_S9KrEk0dQQYNWn"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 65,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 21,
+    "shop": 10,
+    "branch": 17,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-28T19:13:00Z",
+    "delivery_date": "2026-02-03T14:55:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "0854718903",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-28T14:54:58.324Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "50.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": "order_S9LWl6BSyv9eZy"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 66,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 21,
+    "shop": 10,
+    "branch": 17,
+    "pending_notification_sent": false,
+    "cloth_status": "Ready",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-31T20:11:00Z",
+    "delivery_date": "2026-02-06T15:02:00Z",
+    "predicted_delivery": "2026-01-29T16:00:00Z",
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "0854718903",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-28T15:02:20.316Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "50.00",
+    "razorpay_payment_id": "pay_S9LDZSxhfJoC3B",
+    "razorpay_order_id": "order_S9LDBIegmKHiMx"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 67,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 21,
+    "shop": 10,
+    "branch": 17,
+    "pending_notification_sent": false,
+    "cloth_status": "Completed",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-01-30T20:18:00Z",
+    "delivery_date": "2026-02-02T15:19:00Z",
+    "predicted_delivery": "2026-01-29T16:00:00Z",
+    "delivery_name": "Arathy Rajeesh",
+    "delivery_phone": "8547189033",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-01-28T15:13:20.894Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "50.00",
+    "razorpay_payment_id": "pay_S9LOnlzFmEWpeJ",
+    "razorpay_order_id": "order_S9LOc3XVXS7rYo"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 68,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 29,
+    "shop": 7,
+    "branch": 9,
+    "pending_notification_sent": false,
+    "cloth_status": "Pickup",
+    "payment_status": "Completed",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-02-21T17:24:00Z",
+    "delivery_date": "2026-02-24T19:26:00Z",
+    "predicted_delivery": "2026-02-09T16:00:00Z",
+    "delivery_name": "Arathy tp",
+    "delivery_phone": "0854718903",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-02-08T15:22:17.891Z",
+    "gst_amount": "0.00",
+    "amount": "250.00",
+    "base_amount": "200.00",
+    "razorpay_payment_id": "pay_SDhR0dqH65xGS8",
+    "razorpay_order_id": "order_SDhQVllaRyLbaH"
+  }
+},
+{
+  "model": "shop.order",
+  "pk": 69,
+  "fields": {
+    "last_reminder_sent": null,
+    "user": 29,
+    "shop": 8,
+    "branch": 12,
+    "pending_notification_sent": false,
+    "cloth_status": "Pending",
+    "payment_status": "Pending",
+    "overdue_notification_sent": false,
+    "pickup_date": "2026-02-08T17:57:00Z",
+    "delivery_date": "2026-02-16T21:01:00Z",
+    "predicted_delivery": null,
+    "delivery_name": "Arathy tp",
+    "delivery_phone": "0854718903",
+    "delivery_address": "nidumbram",
+    "special_instructions": "",
+    "platform_fee": "20.00",
+    "delivery_fee": "30.00",
+    "created_at": "2026-02-08T15:55:55.353Z",
+    "gst_amount": "0.00",
+    "amount": "100.00",
+    "base_amount": "50.00",
+    "razorpay_payment_id": null,
+    "razorpay_order_id": "order_SDhzbdQzmRG4g0"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 38,
+  "fields": {
+    "user": 6,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": false,
+    "created_at": "2026-01-01T05:22:52.577Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 39,
+  "fields": {
+    "user": 6,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": false,
+    "created_at": "2026-01-01T05:22:52.581Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 40,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": true,
+    "created_at": "2026-01-01T07:06:10.802Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 41,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": true,
+    "created_at": "2026-01-01T07:06:10.806Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 42,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Your payment for Order #39 was successful. Laundry is now in Washing stage.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": true,
+    "created_at": "2026-01-01T07:10:49.099Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 43,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Order #39 In Progress",
+    "message": "Your laundry from shine is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": true,
+    "created_at": "2026-01-01T07:12:59.749Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 44,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Your payment for Order #42 was successful. Laundry is now in Washing stage.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": true,
+    "created_at": "2026-01-01T08:27:40.136Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 45,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Order #42 In Progress",
+    "message": "Your laundry from shine is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": true,
+    "created_at": "2026-01-01T08:27:55.165Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 46,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Your payment for Order #45 was successful. Laundry is now in Washing stage.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": true,
+    "created_at": "2026-01-01T08:59:03.340Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 47,
+  "fields": {
+    "user": 19,
+    "shop": null,
+    "title": "Order #45 In Progress",
+    "message": "Your laundry from shine is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": true,
+    "created_at": "2026-01-01T09:03:13.134Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 52,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": false,
+    "created_at": "2026-01-03T05:26:02.584Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 53,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": false,
+    "created_at": "2026-01-03T05:26:02.588Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 54,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #47. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-03T05:30:08.148Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 55,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order #47 In Progress",
+    "message": "Your laundry from dry is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": false,
+    "created_at": "2026-01-03T05:31:44.038Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 68,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": false,
+    "created_at": "2026-01-05T06:28:04.796Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 69,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": false,
+    "created_at": "2026-01-05T06:28:04.800Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 70,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #48. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-05T06:52:49.220Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 71,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order #48 In Progress",
+    "message": "Your laundry from cleanme is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": false,
+    "created_at": "2026-01-05T06:54:29.165Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 72,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #50. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-05T15:58:36.105Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 73,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order #50 In Progress",
+    "message": "Your laundry from bright is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": false,
+    "created_at": "2026-01-05T17:25:16.418Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 74,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #51. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-06T05:29:02.901Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 75,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order #51 In Progress",
+    "message": "Your laundry from bright is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": false,
+    "created_at": "2026-01-06T05:30:35.601Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 76,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #52. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-06T06:56:47.108Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 77,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #53. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-07T07:03:48.634Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 78,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #54. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-07T07:15:31.322Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 79,
+  "fields": {
+    "user": 29,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": false,
+    "created_at": "2026-01-08T14:42:34.904Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 80,
+  "fields": {
+    "user": 29,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": false,
+    "created_at": "2026-01-08T14:42:34.910Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 81,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #54 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-13T07:45:56.874Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 82,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #54 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-14T04:16:41.092Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 83,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": false,
+    "created_at": "2026-01-14T04:21:47.638Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 84,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": false,
+    "created_at": "2026-01-14T04:21:47.642Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 85,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #55. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-14T05:25:46.424Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 86,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #56. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-14T05:32:18.502Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 87,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #59. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-14T06:03:31.836Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 88,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #54 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-14T06:14:45.626Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 89,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #52 status changed to Washing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:20:23.303Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 90,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #52 status changed to Washing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:20:25.501Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 91,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #53 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:23:29.343Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 92,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #53 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:23:31.265Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 93,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #55 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:26:51.525Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 94,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #54 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:27:09.905Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 95,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #54 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:32:50.989Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 96,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #54 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:32:52.258Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 97,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #54 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:32:52.902Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 98,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #52 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:33:29.700Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 99,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #52 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:33:31.081Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 100,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #51 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:42:41.772Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 101,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #52 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-17T05:42:47.271Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 102,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Order #54 Completed",
+    "message": "Your laundry from bright is ready for pickup",
+    "notification_type": "completed",
+    "icon": "fas fa-check-circle",
+    "color": "#28a745",
+    "is_read": false,
+    "created_at": "2026-01-22T04:20:13.774Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 103,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #52 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-22T04:20:31.712Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 104,
+  "fields": {
+    "user": 31,
+    "shop": null,
+    "title": "Welcome to Shine & Bright!",
+    "message": "Thanks for joining our laundry service. Start by exploring nearby shops.",
+    "notification_type": "welcome",
+    "icon": "fas fa-handshake",
+    "color": "#9b59b6",
+    "is_read": false,
+    "created_at": "2026-01-22T04:25:19.970Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 105,
+  "fields": {
+    "user": 31,
+    "shop": null,
+    "title": "Complete Your Profile",
+    "message": "Update your profile with your city information to get personalized service recommendations.",
+    "notification_type": "profile_reminder",
+    "icon": "fas fa-user-edit",
+    "color": "#3498db",
+    "is_read": false,
+    "created_at": "2026-01-22T04:25:19.973Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 106,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #52 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-22T05:21:30.428Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 107,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #53 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-22T06:45:31.146Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 108,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #59 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:46:21.846Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 109,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #59 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:46:23.126Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 110,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #59 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:46:24.167Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 111,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #59 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:46:24.761Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 112,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #59 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:46:25.551Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 113,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #61. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:56:02.389Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 114,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #61 status changed to Washing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-22T06:58:00.263Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 115,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order #61 In Progress",
+    "message": "Your laundry from bright is being washed",
+    "notification_type": "status_update",
+    "icon": "fas fa-tint",
+    "color": "#17a2b8",
+    "is_read": false,
+    "created_at": "2026-01-22T06:58:42.922Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 116,
+  "fields": {
+    "user": 28,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #62. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-23T04:28:48.169Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 117,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #61 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-27T06:04:44.778Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 118,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #53 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-01-28T04:40:35.320Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 119,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order #55 Completed",
+    "message": "Your laundry from bright is ready for pickup",
+    "notification_type": "completed",
+    "icon": "fas fa-check-circle",
+    "color": "#28a745",
+    "is_read": false,
+    "created_at": "2026-01-28T06:07:28.116Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 120,
+  "fields": {
+    "user": 31,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #63. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-28T07:27:56.081Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 121,
+  "fields": {
+    "user": 31,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #63 status changed to Washing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-28T07:29:32.353Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 122,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #66. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-28T15:03:45.156Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 123,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #67. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-01-28T15:14:24.232Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 124,
+  "fields": {
+    "user": null,
+    "shop": 7,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #61 is delayed. Customer has sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-02-01T14:06:26.864Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 125,
+  "fields": {
+    "user": null,
+    "shop": 8,
+    "title": "⏰ Delayed Order Reminder",
+    "message": "Order #62 for branch [olive 3] is delayed. Customer sent a reminder.",
+    "notification_type": "shop_order_reminder",
+    "icon": "fas fa-exclamation-triangle",
+    "color": "#e74c3c",
+    "is_read": true,
+    "created_at": "2026-02-01T14:19:15.181Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 126,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:33:09.775Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 127,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:33:11.153Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 128,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:33:12.912Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 129,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:33:13.483Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 130,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Drying.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:33:15.810Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 131,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Ironing.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:33:35.123Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 132,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:34:01.392Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 133,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #66 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-01T15:34:08.348Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 134,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order #66 Ready for Pickup",
+    "message": "Your laundry from ks is ready for pickup",
+    "notification_type": "ready_pickup",
+    "icon": "fas fa-box-open",
+    "color": "#f39c12",
+    "is_read": false,
+    "created_at": "2026-02-01T15:34:51.299Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 135,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order #67 Completed",
+    "message": "Your laundry from ks is ready for pickup",
+    "notification_type": "completed",
+    "icon": "fas fa-check-circle",
+    "color": "#28a745",
+    "is_read": false,
+    "created_at": "2026-02-01T15:34:51.306Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 136,
+  "fields": {
+    "user": 21,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #61 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-02T05:05:52.522Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 137,
+  "fields": {
+    "user": 30,
+    "shop": null,
+    "title": "Order Status Updated",
+    "message": "Your Order #59 status changed to Ready.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-02T05:12:53.239Z"
+  }
+},
+{
+  "model": "shop.notification",
+  "pk": 138,
+  "fields": {
+    "user": 29,
+    "shop": null,
+    "title": "Payment Successful",
+    "message": "Payment successful for Order #68. Please prepare your items for pickup.",
+    "notification_type": "payment",
+    "icon": "fas fa-check-circle",
+    "color": "#2ecc71",
+    "is_read": false,
+    "created_at": "2026-02-08T15:23:45.362Z"
+  }
+},
+{
+  "model": "shop.shoprating",
+  "pk": 3,
+  "fields": {
+    "user": 21,
+    "shop": 7,
+    "rating": 2,
+    "comment": "super",
+    "created_at": "2026-01-27T06:33:19.182Z"
+  }
+},
+{
+  "model": "shop.shoprating",
+  "pk": 4,
+  "fields": {
+    "user": 28,
+    "shop": 7,
+    "rating": 3,
+    "comment": "super",
+    "created_at": "2026-01-27T07:23:47.766Z"
+  }
+},
+{
+  "model": "shop.shoprating",
+  "pk": 5,
+  "fields": {
+    "user": 21,
+    "shop": 10,
+    "rating": 3,
+    "comment": "EXCELLENT",
+    "created_at": "2026-02-01T15:35:05.127Z"
+  }
+},
+{
+  "model": "shop.newslettersubscriber",
+  "pk": 1,
+  "fields": {
+    "email": "rohinimrd@gmail.com",
+    "subscribed_at": "2025-12-15T05:01:03.628Z"
+  }
+},
+{
+  "model": "shop.newslettersubscriber",
+  "pk": 2,
+  "fields": {
+    "email": "adithyaaneesh29@gmail.com",
+    "subscribed_at": "2025-12-15T05:13:31.722Z"
+  }
+},
+{
+  "model": "shop.newslettersubscriber",
+  "pk": 3,
+  "fields": {
+    "email": "arathyrajeesh050@gmail.com",
+    "subscribed_at": "2026-01-20T05:20:02.932Z"
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 35,
+  "fields": {
+    "order": 49,
+    "service": 17,
+    "cloth": 9,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 36,
+  "fields": {
+    "order": 50,
+    "service": 17,
+    "cloth": 9,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 47,
+  "fields": {
+    "order": 61,
+    "service": 25,
+    "cloth": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 48,
+  "fields": {
+    "order": 62,
+    "service": 26,
+    "cloth": 25,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 49,
+  "fields": {
+    "order": 63,
+    "service": 25,
+    "cloth": 1,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 50,
+  "fields": {
+    "order": 64,
+    "service": 27,
+    "cloth": 23,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 51,
+  "fields": {
+    "order": 65,
+    "service": 27,
+    "cloth": 23,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 52,
+  "fields": {
+    "order": 66,
+    "service": 27,
+    "cloth": 23,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 53,
+  "fields": {
+    "order": 67,
+    "service": 27,
+    "cloth": 23,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 54,
+  "fields": {
+    "order": 68,
+    "service": 17,
+    "cloth": 9,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.orderitem",
+  "pk": 55,
+  "fields": {
+    "order": 69,
+    "service": 22,
+    "cloth": 36,
+    "quantity": 1
+  }
+},
+{
+  "model": "shop.passwordresetotp",
+  "pk": 14,
+  "fields": {
+    "user": 29,
+    "otp": "261378",
+    "created_at": "2026-01-15T07:17:52.817Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 9,
+  "fields": {
+    "order_item": 47,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-22T06:55:06.285Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 10,
+  "fields": {
+    "order_item": 48,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-23T04:26:37.923Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 11,
+  "fields": {
+    "order_item": 49,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-28T07:26:47.450Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 12,
+  "fields": {
+    "order_item": 50,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-28T14:21:06.555Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 13,
+  "fields": {
+    "order_item": 51,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-28T14:54:58.334Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 14,
+  "fields": {
+    "order_item": 52,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-28T15:02:20.324Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 15,
+  "fields": {
+    "order_item": 53,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-01-28T15:13:20.901Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 16,
+  "fields": {
+    "order_item": 54,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-02-08T15:22:17.902Z"
+  }
+},
+{
+  "model": "shop.washrecommendation",
+  "pk": 17,
+  "fields": {
+    "order_item": 55,
+    "water_temperature": "Cold",
+    "wash_cycle": "Normal",
+    "detergent": "Regular Detergent",
+    "drying_method": "Air Dry",
+    "created_at": "2026-02-08T15:55:55.360Z"
+  }
+}
+]
