@@ -1,0 +1,92 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden; /* Prevents scrolling during splash */
+}
+
+.splash-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #ffffff 0%, #f4f7f9 100%);
+}
+
+.splash-content {
+    text-align: center;
+}
+
+/* Logo Animation */
+.logo-wrapper {
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.splash-logo {
+    width: 120px; /* Adjust based on your logo size */
+    height: auto;
+}
+
+/* Text Styling & Animations */
+.brand-name {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #1a2a3a; /* Deep Navy for professionalism */
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards 0.4s;
+}
+
+.divider {
+    width: 50px;
+    height: 2px;
+    background-color: #00aaff; /* A clean "water/clean" blue */
+    margin: 15px auto;
+    opacity: 0;
+    animation: expand 0.6s ease forwards 0.8s;
+}
+
+.tagline {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #556677;
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards 1s;
+}
+
+/* Keyframes */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes expand {
+    from { width: 0; opacity: 0; }
+    to { width: 80px; opacity: 1; }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .brand-name { font-size: 1.8rem; }
+    .tagline { font-size: 0.9rem; }
+}
+/* Exit Animation triggered by JS */
+.splash-container.exit {
+    opacity: 0;
+    transform: scale(1.05); /* Slight zoom in as it fades out */
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none; /* Prevents users from clicking things during exit */
+}
