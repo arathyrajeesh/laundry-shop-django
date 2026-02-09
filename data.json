@@ -1,0 +1,18 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "cp197qp9cj2fr21knwqghmzwhbnprh29",
+  "fields": {
+    "session_data": "eyJzb2NpYWxhY2NvdW50X3N0YXRlcyI6eyI3N21EVlozaEhLaW9rQjlBIjpbeyJwcm9jZXNzIjoibG9naW4iLCJkYXRhIjpudWxsLCJwa2NlX2NvZGVfdmVyaWZpZXIiOm51bGx9LDE3NzA1NzAyNDUuNTEyNjg1XX19:1vp8Cb:REGKMF3vwPbkmKbyzmFL3B12mIbstPRFL23VfGHHVuo",
+    "expire_date": "2026-02-22T17:04:05.599Z"
+  }
+},
+{
+  "model": "sites.site",
+  "pk": 1,
+  "fields": {
+    "domain": "example.com",
+    "name": "example.com"
+  }
+}
+]
