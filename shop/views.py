@@ -1261,7 +1261,7 @@ def user_details(request):
     # Get order items and total amount for payment section
     order_items = request.session.get('order_items', [])
     total_amount = order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount
-    
+    total_amount_paise = int(total_amount * 100)
     # If no order_items in session, create a dummy item
     if not order_items:
         order_items = [{
@@ -1282,6 +1282,7 @@ def user_details(request):
         'razorpay_order_id': razorpay_order_id,
         'razorpay_key_id': razorpay_key_id,
         'shop': order.shop,
+        'total_amount_paise': total_amount_paise,
     }
 
     return render(request, 'user_details.html', context)
@@ -1297,169 +1298,44 @@ def create_status_update_notification(user, title, message, notification_type="p
     )
 @login_required
 def payment_success(request):
-    from shop.utils.delivery_ai import predict_delivery_hours
-    """Handle successful payment (MAIN ACCOUNT ONLY)."""
+    razorpay_payment_id = request.POST.get("razorpay_payment_id")
+    razorpay_order_id = request.POST.get("razorpay_order_id")
+    razorpay_signature = request.POST.get("razorpay_signature")
 
-    razorpay_payment_id = request.POST.get('razorpay_payment_id')
-    razorpay_order_id = request.POST.get('razorpay_order_id')
-    razorpay_signature = request.POST.get('razorpay_signature')
+    if not razorpay_payment_id or not razorpay_order_id or not razorpay_signature:
+        messages.error(request, "Invalid payment response.")
+        return redirect("dashboard")
 
-    # 🔒 Check Razorpay configuration
-    if not settings.RAZORPAY_KEY_ID or settings.RAZORPAY_KEY_ID == 'your-razorpay-key-id':
-        messages.error(request, 'Payment service is not configured. Please contact support.')
-        return redirect('dashboard')
-
-    # 🔒 Verify payment signature (MAIN ACCOUNT)
-    if not verify_payment_signature(
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-        settings.RAZORPAY_KEY_ID,
-        settings.RAZORPAY_KEY_SECRET
-    ):
-        messages.error(request, 'Payment verification failed. Please contact support.')
-        return redirect('dashboard')
-
-    # 🔁 Fetch order
-    order_id = request.session.get('order_id')
-    if not order_id:
-        messages.error(request, 'No order found. Please start over.')
-        return redirect('dashboard')
-
-
+    # 1) Fetch order first
     order = get_object_or_404(
         Order,
         razorpay_order_id=razorpay_order_id,
         user=request.user
     )
 
-    # ✅ Store payment details
+    # 2) Decide keys based on shop
+    shop_key_id = order.shop.razorpay_key_id or settings.RAZORPAY_KEY_ID
+    shop_key_secret = order.shop.razorpay_key_secret or settings.RAZORPAY_KEY_SECRET
+
+    # 3) Verify signature
+    if not verify_payment_signature(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        shop_key_id,
+        shop_key_secret
+    ):
+        messages.error(request, "Payment verification failed.")
+        return redirect("dashboard")
+
+    # 4) Mark paid
     order.razorpay_payment_id = razorpay_payment_id
-    order.razorpay_order_id = razorpay_order_id
-
-    # ✅ MAIN ACCOUNT ONLY (NO TRANSFER)
-    order.platform_commission = 0
-    order.shop_amount = 0
-    order.transfer_status = 'not_applicable'
-
-    # ✅ Update order status
-    order.payment_status = 'Completed'
-    order.cloth_status = 'Pickup'
+    order.payment_status = "Completed"
+    order.cloth_status = "Pickup"
     order.save()
 
-    # 🔔 User notification
-    create_status_update_notification(
-        user=order.user,
-        title="Payment Successful",
-        message=f"Payment successful for Order #{order.id}. Please prepare your items for pickup."
-    )
-    
-    # =========================
-    # 🤖 AI DELIVERY PREDICTION (FIXED)
-    # =========================
-
-    branch_load = Order.objects.filter(
-        branch=order.branch,
-        payment_status="Completed",
-        cloth_status__in=["Pickup", "Washing", "Drying", "Ironing"]
-    ).count()
-
-    total_hours = 0
-    total_items = 0
-
-    for item in order.order_items.all():
-        hours = predict_delivery_hours(
-            cloth=item.cloth.name,
-            service=item.service.name,
-            branch_load=branch_load,
-            items=item.quantity
-        )
-
-        total_hours += hours * item.quantity
-        total_items += item.quantity
-
-    # SAFETY CHECK
-    if total_items > 0:
-        predicted_hours = round(total_hours / total_items)
-    else:
-        predicted_hours = 24  # fallback
-
-    # 🕒 Add buffer (realistic)
-    predicted_hours += 2
-
-    # ⏱ Normalize time (clean UI)
-    delivery_time = timezone.now() + timedelta(hours=predicted_hours)
-    delivery_time = delivery_time.replace(minute=0, second=0, microsecond=0)
-
-    order.predicted_delivery = delivery_time
-    order.save()
-
-
-    # 📄 Prepare order items for PDF
-    order_items = request.session.get('order_items', [])
-    if not order_items:
-        order_items = []
-        for item in order.order_items.all():
-            order_items.append({
-                'service_name': item.service.name,
-                'cloth_name': item.cloth.name,
-                'quantity': item.quantity,
-                'price': float(item.service.price) if item.service.price else 0,
-                'total': float(item.service.price * item.quantity) if item.service.price else 0
-            })
-
-    # 📄 Generate receipt PDF
-    pdf_buffer = generate_payment_receipt_pdf(order, order_items)
-
-    # 📧 Send payment success email
-    try:
-        payment_success_message = f"""
-Hi {order.user.get_full_name() or order.user.username},
-
-Your payment has been successfully processed!
-
-Order Details:
-- Order ID: #{order.id}
-- Amount Paid: ₹{order.amount}
-- Shop: {order.shop.name}
-- Status: {order.get_cloth_status_display()}
-
-Your laundry will be processed shortly.
-Please find your payment receipt attached.
-
-Thank you for choosing Shine & Bright!
-
-Best regards,
-Shine & Bright Team
-🧺✨
-"""
-
-        email = EmailMessage(
-            subject=f"Payment Successful - Order #{order.id}",
-            body=payment_success_message,
-            from_email=settings.EMAIL_HOST_USER,
-            to=[order.user.email],
-        )
-
-        email.attach(
-            f'payment_receipt_order_{order.id}.pdf',
-            pdf_buffer.getvalue(),
-            'application/pdf'
-        )
-
-        email.send(fail_silently=True)
-
-    except Exception as e:
-        print(f"Failed to send payment success email: {e}")
-
-    # 🧹 Clear session
-    request.session.pop('order_items', None)
-    request.session.pop('order_id', None)
-    request.session.pop('shop_id', None)
-    request.session.pop('razorpay_order_id', None)
-
-    messages.success(request, f'Payment successful! Your order #{order.id} has been placed.')
-    return redirect('orders')
+    messages.success(request, f"Payment successful! Order #{order.id}")
+    return redirect("orders")
 
 
 @login_required

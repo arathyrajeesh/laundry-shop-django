@@ -258,7 +258,7 @@
         function startPayment(method) {
             const options = {
                 key: '{{ razorpay_key_id }}',
-                amount: {{ total_amount }} * 100,
+                amount: {{ total_amount_paise }},
                 currency: 'INR',
                 order_id: '{{ razorpay_order_id }}',
                 

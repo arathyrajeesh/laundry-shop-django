@@ -171,27 +171,20 @@ def capture_payment_and_transfer(payment_id, order_amount, shop_account_id, comm
         }
 
 
-def verify_payment_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature, shop_key_id=None, shop_key_secret=None):
-    """
-    Verify Razorpay payment signature.
-
-    Args:
-        razorpay_order_id: Razorpay order ID
-        razorpay_payment_id: Razorpay payment ID
-        razorpay_signature: Razorpay signature
-        shop_key_id: Shop's Razorpay key ID
-        shop_key_secret: Shop's Razorpay key secret
-
-    Returns:
-        bool: True if signature is valid
-    """
+def verify_payment_signature(
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    shop_key_id=None,
+    shop_key_secret=None
+):
     client = get_razorpay_client(shop_key_id, shop_key_secret)
-    
+
     try:
         client.utility.verify_payment_signature({
-            'razorpay_order_id': razorpay_order_id,
-            'razorpay_payment_id': razorpay_payment_id,
-            'razorpay_signature': razorpay_signature
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_payment_id": razorpay_payment_id,
+            "razorpay_signature": razorpay_signature
         })
         return True
     except razorpay.errors.SignatureVerificationError:
