@@ -75,7 +75,7 @@ urlpatterns = [
         path("update-location/", views.update_location, name="update_location"),
         path('admin-panel/mark-notifications-read/', views.mark_admin_notifications_read, name='mark_admin_notifications_read'),
         # Service: can pass branch_id to auto-attach after create
-        path('shop/service/add/', views.add_service, name='add_service'),
+        path('shop/service/add/<int:branch_id>/', views.add_service, name='add_service'),
         path("service/add/<int:branch_id>/", views.add_service, name="add_service_branch"),
         path('shop/service/<int:service_id>/edit/', views.edit_service, name='edit_service'),
         path('shop/service/<int:service_id>/delete/', views.delete_service, name='delete_service'),
@@ -85,7 +85,6 @@ urlpatterns = [
         path('shop/toggle-shop-status/', views.toggle_shop_status, name='toggle_shop_status'),
 
         # Ratings
-        path("shop/<int:shop_id>/rate/", views.rate_shop, name="rate_shop"),
         path("service/<int:service_id>/rate/", views.rate_service, name="rate_service"),
         path("branch/<int:branch_id>/rate/", views.rate_branch, name="rate_branch"),
         path(
@@ -138,4 +137,4 @@ urlpatterns = [
         path("shop/reset/<str:token>/", views.shop_reset_confirm, name="shop_reset_confirm"),
         path("send-order-reminder/<int:order_id>/",views.send_order_reminder,name="send_order_reminder"),
         path("rate-shop/<int:shop_id>/", views.rate_shop, name="rate_shop"),
-]
+        ]

@@ -12,9 +12,7 @@ from django.utils import timezone
 from django.db.models import Sum, Count
 from shop.utils.wash_ai import get_wash_recommendation
 from .models import WashRecommendation
-from datetime import timedelta
 from shop.utils.delivery_ai import predict_delivery_hours
-from .models import Order, OrderItem
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 import random
@@ -41,7 +39,6 @@ from django.http import HttpResponse, JsonResponse # Added for placeholder views
 from django.db.models import Count, Q
 from datetime import datetime
 from django.views.decorators.http import require_POST
-import uuid
 from django.http import HttpResponseRedirect
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -50,13 +47,10 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 from io import BytesIO
 import uuid
-from django.core.mail import send_mail
 from django.conf import settings
-from .models import LaundryShop, ShopPasswordResetToken,NewsletterSubscriber
+from .models import ShopPasswordResetToken,NewsletterSubscriber
 from django.template.loader import render_to_string
-from .models import Order, Profile
 from django.db.models import Count
-from datetime import timedelta
 
 def splash(request):
     return render(request, 'splash.html')
@@ -3119,8 +3113,9 @@ def shop_reset_request(request):
         token = str(uuid.uuid4())
         ShopPasswordResetToken.objects.create(shop=shop, token=token)
 
-        reset_link = f"http://localhost:8000/shop/reset/{token}/"
-
+        reset_link = request.build_absolute_uri(
+            reverse("shop_reset_confirm", args=[token])
+        )
         send_mail(
             "Shop Password Reset - Shine & Bright",
             f"Click to reset your password:\n{reset_link}",
@@ -3191,6 +3186,7 @@ def newsletter_subscribe(request):
         messages.success(request, "Subscribed successfully! Shop details sent to your email.")
         return redirect(request.META.get("HTTP_REFERER", "/"))
 
+@login_required
 @require_POST
 def update_order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -3423,7 +3419,6 @@ def mark_notifications_read(request):
         
     return JsonResponse({"status": "invalid"}, status=400)
 
-from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
