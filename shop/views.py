@@ -2021,40 +2021,33 @@ def admin_edit_shop(request, shop_id):
 # --- SHOP AUTHENTICATION VIEWS ---
 
 def shop_register(request):
-    """Shop registration page."""
     if request.method == "POST":
-        shop_name = request.POST.get("shop_name")
-        email = request.POST.get("email")
-        password1 = request.POST.get("password")
-        password2 = request.POST.get("password_confirm")
-        address = request.POST.get("address", "")
-        phone = request.POST.get("phone", "")
-        latitude = request.POST.get("latitude", "")
-        longitude = request.POST.get("longitude", "")
-        city = request.POST.get("city", "")
+        shop_name = request.POST.get("shop_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        password1 = request.POST.get("password", "").strip()
 
-        # Validation
-        if not shop_name or not email or not password1 or not password2:
-            messages.error(request, "All fields are required")
+        address = request.POST.get("address", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        latitude = request.POST.get("latitude") or None
+        longitude = request.POST.get("longitude") or None
+        city = request.POST.get("city", "").strip()
+
+        if not shop_name or not email or not password1:
+            messages.error(request, "Shop name, email and password are required")
             return redirect("shop_register")
 
-        if password1 != password2:
-            messages.error(request, "Passwords do not match")
+        if len(password1) < 8:
+            messages.error(request, "Password must be at least 8 characters long")
             return redirect("shop_register")
 
-        if len(password1) < 6:
-            messages.error(request, "Password must be at least 6 characters long")
-            return redirect("shop_register")
-
-        if LaundryShop.objects.filter(name=shop_name).exists():
+        if LaundryShop.objects.filter(name__iexact=shop_name).exists():
             messages.error(request, "Shop name already taken")
             return redirect("shop_register")
 
-        if LaundryShop.objects.filter(email=email).exists():
+        if LaundryShop.objects.filter(email__iexact=email).exists():
             messages.error(request, "Email already registered")
             return redirect("shop_register")
 
-        # Create shop
         shop = LaundryShop(
             name=shop_name,
             email=email,
@@ -2072,6 +2065,7 @@ def shop_register(request):
         return redirect("shop_login")
 
     return render(request, "shop_register.html")
+
 
 
 def shop_login(request):
