@@ -2184,7 +2184,6 @@ def shop_register(request):
 
 
 def shop_login(request):
-    """Shop login page."""
     if request.method == "POST":
         shop_name = request.POST.get("shop_name")
         password = request.POST.get("password")
@@ -2195,59 +2194,25 @@ def shop_login(request):
 
         try:
             shop = LaundryShop.objects.get(name=shop_name)
-            if shop.check_password(password):
-                if not shop.is_approved:
-                    messages.error(request, "Your shop is pending approval. Please wait for admin approval.")
-                    return redirect("shop_login")
-                if not shop.is_approved:
-                    messages.error(request, "Shop not approved by admin")
-                    return redirect("shop_login")
 
-                # Store shop ID in session
-                request.session['shop_id'] = shop.id
-                request.session['shop_name'] = shop.name
-
-                # Send login success email
-                login_message = f"""
-Hi {shop.name},
-
-You have successfully logged in to your Shine & Bright Laundry shop account.
-
-Login Details:
-- Shop Name: {shop.name}
-- Email: {shop.email}
-- Login Time: {timezone.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
-
-If this login was not initiated by you, please contact our support team immediately and consider changing your password.
-
-For your security, we recommend:
-- Using a strong, unique password
-- Regularly monitoring your account activity
-- Keeping your shop information up to date
-
-Thank you for using Shine & Bright!
-
-Best regards,
-Shine & Bright Team
-🧺✨
-"""
-
-                send_mail(
-                    subject="Shop Login Successful - Shine & Bright",
-                    message=login_message,
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[shop.email],
-                    fail_silently=True,
-                )
-
-                messages.success(request, f"Welcome back, {shop.name}!")
-                return redirect("shop_dashboard")
-            else:
+            if not shop.check_password(password):
                 messages.error(request, "Invalid shop name or password")
+                return redirect("shop_login")
+
+            if not shop.is_approved:
+                messages.error(request, "Your shop is pending approval.")
+                return redirect("shop_login")
+
+            request.session["shop_id"] = shop.id
+            request.session["shop_name"] = shop.name
+
+            # ✅ IMPORTANT: NO EMAIL ON LOGIN (Render will kill worker)
+            messages.success(request, f"Welcome back, {shop.name}!")
+            return redirect("shop_dashboard")
+
         except LaundryShop.DoesNotExist:
             messages.error(request, "Invalid shop name or password")
-
-        return redirect("shop_login")
+            return redirect("shop_login")
 
     return render(request, "shop_login.html")
 

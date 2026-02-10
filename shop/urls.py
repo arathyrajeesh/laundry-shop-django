@@ -39,7 +39,6 @@ urlpatterns = [
         path("settings/delete-account/", views.delete_account, name="delete_account"),
         path("help/", views.help_view, name="help"),
         path("notifications/", views.notifications_view, name="notifications"),
-        path("notifications/mark-read/", views.mark_notifications_read, name="mark_notifications_read"),
         path("notifications/<int:notification_id>/mark-read/", views.mark_notification_read, name="mark_notification_read"),
         path("orders/", views.my_orders, name="orders"),
         path("billing/", views.billing_payments, name="billing"),
@@ -59,7 +58,6 @@ urlpatterns = [
         path("admin-panel/shop/<int:shop_id>/", views.admin_shop_detail, name="admin_shop_detail"),
         path("admin-panel/order/<int:order_id>/update-status/", views.admin_update_order_status, name="admin_update_order_status"),
         path("save-login-location/", views.save_login_location, name="save_login_location"),
-        path("notifications/mark-read/",views.mark_notifications_read,name="mark_notifications_read"),
         # SHOP AUTHENTICATION
         path("shop/register/", views.shop_register, name="shop_register"),
         path("shop/login/", views.shop_login, name="shop_login"),
