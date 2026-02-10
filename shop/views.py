@@ -340,8 +340,8 @@ def login_page(request):
 
             # Send login success email only once
             try:
-                profile = user.profile
-                if not profile.login_email_sent:
+                profile = getattr(user, "profile", None)
+                if profile and hasattr(profile, "login_email_sent") and not profile.login_email_sent:
                     send_mail(
                         subject="Login Successful - Shine & Bright",
                         message=f"""
@@ -3317,7 +3317,7 @@ def reset_password(request):
 @login_required
 @require_POST
 def save_login_location(request):
-    profile = request.user.profile
+    profile, _ = Profile.objects.get_or_create(user=request.user)
 
     # Do NOT overwrite if already set
     if profile.city:
