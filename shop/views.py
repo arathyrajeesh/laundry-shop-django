@@ -385,7 +385,6 @@ If this wasn’t you, please contact support immediately.
 
 def signup(request):
     if request.method == "POST":
-
         username = request.POST.get("username")
         email = request.POST.get("email")
         password1 = request.POST.get("password")
@@ -405,6 +404,14 @@ def signup(request):
             messages.error(request, "Password must be at least 8 characters long")
             return redirect("signup")
 
+        # Extra password validation (recommended)
+        try:
+            validate_password(password1)
+        except ValidationError as e:
+            for msg in e.messages:
+                messages.error(request, msg)
+            return redirect("signup")
+
         # Username check
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already taken")
@@ -415,31 +422,38 @@ def signup(request):
             messages.error(request, "Email already registered")
             return redirect("signup")
 
-        # Create user (activate immediately)
-        user = User.objects.create_user(username=username, email=email, password=password1, is_active=True)
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password1,
+            is_active=True
+        )
 
-        # Update Profile with location data (Profile is created automatically via signal)
-        try:
-            profile = user.profile
-            if manual_location:
-                profile.city = manual_location.strip()
-                profile.latitude = None
-                profile.longitude = None
-            else:
-                if city and city.strip():   # 🔑 THIS CHECK
-                    profile.city = city.strip()
-                    profile.latitude = latitude
-                    profile.longitude = longitude
-            profile.email_verified = True  # Mark email as verified since no verification needed
-            profile.save()
-        except Exception as e:
-            # Profile creation/update failed, but don't fail signup
-            pass
+        # Profile safe update
+        profile, _ = Profile.objects.get_or_create(user=user)
 
-        # Create welcome notifications
+        if manual_location:
+            profile.city = manual_location
+            profile.latitude = None
+            profile.longitude = None
+        else:
+            if city and city.strip():
+                profile.city = city.strip()
+                try:
+                    profile.latitude = float(latitude) if latitude else None
+                    profile.longitude = float(longitude) if longitude else None
+                except ValueError:
+                    profile.latitude = None
+                    profile.longitude = None
+
+        profile.email_verified = True
+        profile.save()
+
+        # Notifications
         create_welcome_notifications(user)
 
-        # Send welcome email
+        # Welcome Email (DO NOT REMOVE)
         welcome_message = f"""
 Hi {username},
 
@@ -447,18 +461,9 @@ Welcome to Shine & Bright Laundry Services! 🧺✨
 
 Thank you for registering with us. Your account has been created successfully and is ready to use.
 
-What you can do now:
-• Browse and discover nearby laundry shops
-• Place orders for washing, dry cleaning, and ironing services
-• Track your orders in real-time
-• Manage your profile and preferences
-• Receive notifications about your orders
-
 Your login credentials:
 - Username: {username}
 - Email: {email}
-
-You can now log in to your account and start exploring our services.
 
 Thank you for choosing Shine & Bright!
 
@@ -467,13 +472,16 @@ Shine & Bright Team
 🧺✨
 """
 
-        send_mail(
-            subject="Welcome to Shine & Bright Laundry Services!",
-            message=welcome_message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[email],
-            fail_silently=True,
-        )
+        try:
+            send_mail(
+                subject="Welcome to Shine & Bright Laundry Services!",
+                message=welcome_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
 
         messages.success(request, "Account created successfully! Welcome email sent to your inbox.")
         return redirect("login")
