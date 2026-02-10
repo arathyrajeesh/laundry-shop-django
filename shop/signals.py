@@ -2,14 +2,24 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Order
+from django.contrib.auth.models import User
+
+from .models import Order, Profile
 
 
 @receiver(post_save, sender=Order)
 def send_thank_you_email(sender, instance, created, **kwargs):
+    # IMPORTANT: skip signals during loaddata
+    if kwargs.get("raw", False):
+        return
+
+    # If field doesn't exist, safely skip
+    if not hasattr(instance, "thank_you_sent"):
+        return
+
     if (
-        instance.cloth_status == 'Completed'
-        and instance.payment_status == 'Completed'
+        instance.cloth_status == "Completed"
+        and instance.payment_status == "Completed"
         and not instance.thank_you_sent
     ):
         user = instance.user
@@ -48,19 +58,14 @@ Shine & Bright Team
         )
 
         instance.thank_you_sent = True
-        instance.save(update_fields=['thank_you_sent'])
+        instance.save(update_fields=["thank_you_sent"])
 
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from .models import Profile
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+    # IMPORTANT: skip during loaddata
+    if kwargs.get("raw", False):
+        return
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'profile'):
-        instance.profile.save()
+    if created:
+        Profile.objects.get_or_create(user=instance)
