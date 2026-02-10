@@ -1,56 +1,64 @@
-import razorpay
-from django.shortcuts import render, redirect, get_object_or_404
-from .payment_utils import (
-    create_razorpay_order,
-    capture_payment_and_transfer,
-    verify_payment_signature,
-    calculate_commission,
-    get_razorpay_client,
-)
-from datetime import timedelta
-from django.utils import timezone
-from django.db.models import Sum, Count
-from shop.utils.wash_ai import get_wash_recommendation
-from .models import WashRecommendation
-from shop.utils.delivery_ai import predict_delivery_hours
-from django.core.exceptions import ValidationError
-from django.contrib.auth.password_validation import validate_password
+import json
 import random
-from django.conf import settings
-from .models import PasswordResetOTP
-from django.urls import reverse
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
-from .forms import CustomPasswordChangeForm
-from django.utils.translation import activate, get_language
-from .forms import ProfileForm,BranchForm,ServiceForm,UserDetailsForm,LaundryShopForm,ShopBankDetailsForm
-# NOTE: Assuming you have Profile, Order, and LaundryShop models
-from .models import Profile, Order, LaundryShop ,Service,Branch, Notification, ShopRating, ServiceRating, BranchRating, Cloth, OrderItem, ServiceClothPrice, BranchCloth
-from django.contrib.auth import authenticate, login, logout
-from django.db.models import Sum, Avg
-from django.db import IntegrityError
-from django.db.utils import IntegrityError as DjangoIntegrityError
-from django.core.mail import send_mail, EmailMessage
-from django.conf import settings
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse, JsonResponse # Added for placeholder views
-from django.db.models import Count, Q
-from datetime import datetime
-from django.views.decorators.http import require_POST
-from django.http import HttpResponseRedirect
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib import colors
-from reportlab.lib.units import inch
-from io import BytesIO
 import uuid
+from datetime import datetime, timedelta
+
 from django.conf import settings
-from .models import ShopPasswordResetToken,NewsletterSubscriber
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage, send_mail
+from django.db import IntegrityError
+from django.db.models import Avg, Count, Q, Sum
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
-from django.db.models import Count
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+from .forms import (
+    BranchForm,
+    CustomPasswordChangeForm,
+    LaundryShopForm,
+    ProfileForm,
+    ServiceForm,
+    ShopBankDetailsForm,
+    UserDetailsForm,
+)
+
+from .models import (
+    Branch,
+    BranchCloth,
+    BranchRating,
+    Cloth,
+    LaundryShop,
+    NewsletterSubscriber,
+    Notification,
+    Order,
+    OrderItem,
+    PasswordResetOTP,
+    Profile,
+    Service,
+    ServiceClothPrice,
+    ServiceRating,
+    ShopPasswordResetToken,
+    ShopRating,
+    WashRecommendation,
+)
+
+from .payment_utils import (
+    calculate_commission,
+    capture_payment_and_transfer,
+    create_razorpay_order,
+    get_razorpay_client,
+    verify_payment_signature,
+)
+
 
 def splash(request):
     return render(request, 'splash.html')
@@ -62,6 +70,13 @@ def shop_entry(request):
     return redirect('shop_login')
 
 def generate_payment_receipt_pdf(order, order_items):
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from io import BytesIO
+
     """Generate a PDF payment receipt for the order (with fees & GST)."""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
@@ -319,9 +334,7 @@ def hero(request):
     shops = LaundryShop.objects.filter(is_approved=True)
     return render(request, 'home.html', {'shops': shops})
 
-from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.messages import get_messages
 
@@ -544,9 +557,7 @@ def edit_profile(request):
         "form": form, 
         "profile": profile
     })
-from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Avg
-from django.shortcuts import render
 
 @login_required
 def user_dashboard(request):
@@ -1038,6 +1049,7 @@ def select_services(request, shop_id, branch_id=None):
 
 @login_required
 def create_order(request, shop_id, branch_id):
+    from shop.utils.wash_ai import get_wash_recommendation
     if request.method != "POST":
         return redirect(
             "select_services",
@@ -1285,6 +1297,7 @@ def create_status_update_notification(user, title, message, notification_type="p
     )
 @login_required
 def payment_success(request):
+    from shop.utils.delivery_ai import predict_delivery_hours
     """Handle successful payment (MAIN ACCOUNT ONLY)."""
 
     razorpay_payment_id = request.POST.get('razorpay_payment_id')
@@ -2195,7 +2208,7 @@ def shop_login(request):
             return redirect("shop_login")
 
         try:
-            shop = LaundryShop.objects.get(name=shop_name)
+            shop = LaundryShop.objects.get(name__iexact=shop_name.strip())
 
             if not shop.check_password(password):
                 messages.error(request, "Invalid shop name or password")
@@ -2907,7 +2920,7 @@ def manage_service_prices(request):
                     messages.error(request, 'Cloth type not found.')
             return redirect('manage_service_prices')
         else:
-    # Process price updates
+        # Process price updates
             for service in services:
                 for cloth in clothes:
                     price_key = f'price_{service.id}_{cloth.id}'
@@ -3001,10 +3014,6 @@ def toggle_shop_status(request):
 
 
 import json
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
 
 @require_POST
 @login_required
@@ -3389,7 +3398,6 @@ def admin_orders_filter(request):
 
 
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 import json
 
 @login_required
@@ -3410,7 +3418,6 @@ def update_location(request):
             
     return JsonResponse({"success": False}, status=400)
 
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 @require_POST
@@ -3427,11 +3434,6 @@ def mark_notifications_read(request):
         
     return JsonResponse({"status": "invalid"}, status=400)
 
-from django.conf import settings
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 
 @login_required
 @require_POST
