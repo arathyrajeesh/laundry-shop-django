@@ -1234,7 +1234,7 @@ def user_details(request):
     else:
         form = UserDetailsForm(instance=order)
         # Check if delivery details are already filled
-        if order.delivery_name and order.delivery_address and order.razorpay_order_id:
+        if order.delivery_name and order.delivery_address:
             show_payment = True
             razorpay_order_id = order.razorpay_order_id
             # Get order items from session
