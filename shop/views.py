@@ -1215,7 +1215,12 @@ def user_details(request):
             try:
                 total_amount = order.base_amount + order.platform_fee + order.delivery_fee + order.gst_amount
 
-                razorpay_order = create_razorpay_order(total_amount)
+                shop_account_id = order.shop.razorpay_account_id if hasattr(order.shop, 'razorpay_account_id') else None
+                shop_key_id = order.shop.razorpay_key_id if order.shop.razorpay_key_id else settings.RAZORPAY_KEY_ID
+                shop_key_secret = order.shop.razorpay_key_secret if order.shop.razorpay_key_secret else settings.RAZORPAY_KEY_SECRET
+
+                razorpay_order = create_razorpay_order(total_amount, shop_account_id, shop_key_id, shop_key_secret)
+
                 razorpay_order_id = razorpay_order["id"]
 
                 order.razorpay_order_id = razorpay_order_id
@@ -1296,28 +1301,27 @@ def create_status_update_notification(user, title, message, notification_type="p
         icon="fas fa-check-circle",
         color="#2ecc71"
     )
+    
 @login_required
+@require_POST
 def payment_success(request):
-    razorpay_payment_id = request.POST.get("razorpay_payment_id")
-    razorpay_order_id = request.POST.get("razorpay_order_id")
-    razorpay_signature = request.POST.get("razorpay_signature")
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        data = request.POST
+
+    razorpay_payment_id = data.get("razorpay_payment_id")
+    razorpay_order_id = data.get("razorpay_order_id")
+    razorpay_signature = data.get("razorpay_signature")
 
     if not razorpay_payment_id or not razorpay_order_id or not razorpay_signature:
-        messages.error(request, "Invalid payment response.")
-        return redirect("dashboard")
+        return JsonResponse({"success": False, "message": "Invalid payment response"}, status=400)
 
-    # 1) Fetch order first
-    order = get_object_or_404(
-        Order,
-        razorpay_order_id=razorpay_order_id,
-        user=request.user
-    )
+    order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id, user=request.user)
 
-    # 2) Decide keys based on shop
     shop_key_id = order.shop.razorpay_key_id or settings.RAZORPAY_KEY_ID
     shop_key_secret = order.shop.razorpay_key_secret or settings.RAZORPAY_KEY_SECRET
 
-    # 3) Verify signature
     if not verify_payment_signature(
         razorpay_order_id,
         razorpay_payment_id,
@@ -1325,17 +1329,14 @@ def payment_success(request):
         shop_key_id,
         shop_key_secret
     ):
-        messages.error(request, "Payment verification failed.")
-        return redirect("dashboard")
+        return JsonResponse({"success": False, "message": "Payment verification failed"}, status=400)
 
-    # 4) Mark paid
     order.razorpay_payment_id = razorpay_payment_id
     order.payment_status = "Completed"
     order.cloth_status = "Pickup"
     order.save()
 
-    messages.success(request, f"Payment successful! Order #{order.id}")
-    return redirect("orders")
+    return JsonResponse({"success": True})
 
 
 @login_required

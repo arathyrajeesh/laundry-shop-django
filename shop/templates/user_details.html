@@ -263,30 +263,35 @@
                 order_id: '{{ razorpay_order_id }}',
                 
                 handler: function (response) {
-                    // 1. Show the Green Success Spinner immediately
+
                     document.getElementById('successRedirectOverlay').style.display = 'flex';
-                    
-                    // 2. Prevent the user from navigating away manually
                     allowLeavePayment = true;
 
-                    // 3. Create and submit the success form to backend
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{% url "payment_success" %}';
-                    
-                    form.innerHTML = `
-                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                        <input type="hidden" name="razorpay_payment_id" value="${response.razorpay_payment_id}">
-                        <input type="hidden" name="razorpay_order_id" value="${response.razorpay_order_id}">
-                        <input type="hidden" name="razorpay_signature" value="${response.razorpay_signature}">
-                    `;
-                    
-                    document.body.appendChild(form);
-                    
-                    // Short delay to let the user see the success state before redirect
-                    setTimeout(() => {
-                        form.submit();
-                    }, 1500); 
+                    fetch("{% url 'payment_success' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = "{% url 'orders' %}";
+                        } else {
+                            alert(data.message || "Payment verification failed");
+                            window.location.href = "{% url 'orders' %}";
+                        }
+                    })
+                    .catch(() => {
+                        alert("Server error while confirming payment");
+                        window.location.href = "{% url 'orders' %}";
+                    });
                 },
                 
                 // ... rest of your options
