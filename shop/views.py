@@ -1317,7 +1317,9 @@ def payment_success(request):
     if not razorpay_payment_id or not razorpay_order_id or not razorpay_signature:
         return JsonResponse({"success": False, "message": "Invalid payment response"}, status=400)
 
-    order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id, user=request.user)
+    order_id = request.session.get("order_id")
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
 
     shop_key_id = order.shop.razorpay_key_id or settings.RAZORPAY_KEY_ID
     shop_key_secret = order.shop.razorpay_key_secret or settings.RAZORPAY_KEY_SECRET

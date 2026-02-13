@@ -225,26 +225,37 @@
 
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="error-box" style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-circle-exclamation"></i> {{ message }}
+                        <div style="
+                        background: {% if message.tags == 'error' %}rgba(239, 68, 68, 0.1){% else %}rgba(34, 197, 94, 0.1){% endif %};
+                        border-left: 3px solid {% if message.tags == 'error' %}#ef4444{% else %}#22c55e{% endif %};
+                        padding: 12px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                        font-size: 13px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        ">
+                        <i class="fas {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
+                        {{ message }}
                         </div>
                     {% endfor %}
-                {% endif %}
+                    {% endif %}
 
-                <form method="POST">
+                <form method="POST" autocomplete="on">
                     {% csrf_token %}
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Shop Identity</label>
-                            <input type="text" name="shop_name" placeholder="Shop Name" required>
+                            <input type="text" name="shop_name" placeholder="Shop Name" autocomplete="organization" required>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <input type="email" name="email" placeholder="contact@shop.com" required>
+                            <input type="email" name="email" placeholder="contact@shop.com" autocomplete="email" required>
                         </div>
                         <div class="form-group">
                             <label>Phone</label>
-                            <input type="tel" name="phone" placeholder="+91">
+                            <input type="tel" name="phone" placeholder="8547xxxxxx" pattern="[0-9]{10}">
                         </div>
                         <div class="form-group full-width">
                             <label>Street Address</label>
@@ -267,7 +278,7 @@
                     <div class="form-group">
                         <label>Password</label>
                         <div class="password-container">
-                            <input type="password" id="password1" name="password" placeholder="••••••••" required minlength="8">
+                            <input type="password" id="password1" name="password" placeholder="••••••••" required minlength="8" autocomplete="new-password">
                             <button type="button" class="toggle-password" onclick="togglePassword('password1')">
                                 <i class="fas fa-eye"></i>
                             </button>

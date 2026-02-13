@@ -338,6 +338,21 @@
                 paymentGate.scrollIntoView({ behavior: 'smooth' });
             }
         });
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
     </script>
     <div id="successRedirectOverlay" style="display:none; position:fixed; inset:0; background:rgba(16, 185, 129, 0.9); z-index:50000; align-items:center; justify-content:center; flex-direction:column; color:white; backdrop-filter: blur(8px);">
         <div class="success-icon" style="font-size: 60px; margin-bottom: 20px;">
