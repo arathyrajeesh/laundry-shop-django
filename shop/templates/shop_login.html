@@ -189,9 +189,21 @@
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="error-box" id="errorMsg">
-                        <i class="fas fa-circle-exclamation"></i> {{ message }}
-                    </div>
+                    {% if message.message == "REGISTRATION_PENDING" %}
+                        <div class="pending-approval-box">
+                            <div class="pending-icon">
+                                <i class="fas fa-clock fa-spin"></i>
+                            </div>
+                            <div class="pending-text">
+                                <strong>Registration Received</strong>
+                                <p>Admin approval is pending. Please try again later once your shop is verified.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="error-box" id="errorMsg">
+                            <i class="fas fa-circle-exclamation"></i> {{ message }}
+                        </div>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
 

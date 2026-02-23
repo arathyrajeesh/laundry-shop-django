@@ -2064,7 +2064,7 @@ def shop_register(request):
         shop.set_password(password1)
         shop.save()
 
-        messages.success(request, "Shop registered successfully! Please login.")
+        messages.success(request, "Registration successfully! Please wait admin approve.")
         return redirect("shop_login")
 
     return render(request, "shop_register.html")
