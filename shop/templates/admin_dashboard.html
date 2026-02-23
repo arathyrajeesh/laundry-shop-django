@@ -1281,18 +1281,36 @@
 
         // Updated Approve function
         function approveShop(shopId) {
+            console.log("Attempting to approve shop ID:", shopId); // Debug line
             showConfirm("Approve Shop", "Are you sure you want to approve this shop?", () => {
+                const token = getCookie("csrftoken");
+                if (!token) {
+                    console.error("CSRF Token not found!");
+                    showToast("Security error: Token missing", "error");
+                    return;
+                }
+
                 fetch(`/admin-panel/shop/${shopId}/approve/`, {
                     method: "POST",
-                    headers: { "X-CSRFToken": getCookie("csrftoken") },
+                    headers: { 
+                        "X-CSRFToken": token,
+                        "Content-Type": "application/json"
+                    },
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Server returned ' + res.status);
+                    return res.json();
+                })
                 .then(data => {
                     if (data.success) {
                         showToast("Shop approved successfully!"); 
                     } else {
                         showToast(data.message || "Approval failed", "error");
                     }
+                })
+                .catch(err => {
+                    console.error("Fetch Error:", err);
+                    showToast("Network error: Check console", "error");
                 });
             });
         }
