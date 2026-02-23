@@ -682,11 +682,53 @@ th{
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10001;
+}
+
+.toast {
+    background: white;
+    color: var(--text);
+    padding: 16px 25px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    border-left: 5px solid var(--primary);
+    animation: slideInRight 0.3s ease forwards;
+}
+
+.toast.error {
+    border-left-color: #ef4444;
+}
+
+.toast i {
+    font-size: 18px;
+    color: var(--primary);
+}
+
+.toast.error i {
+    color: #ef4444;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-10px); }
+}
 </style>
 </head>
 
 <body>
-
+    <div id="toastContainer" class="toast-container"></div>
 <!-- ================= SIDEBAR ================= -->
     <div class="sidebar">
         <div class="sidebar-brand">Bright & Shine</div>
@@ -1224,16 +1266,44 @@ th{
             };
         }
 
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            toast.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+
+            // Auto-remove and reload after 2 seconds
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => {
+                    toast.remove();
+                    if (type === 'success') location.reload(); // Reload to update lists
+                }, 500);
+            }, 2000);
+        }
+
+        // Updated Approve function
         function approveShop(shopId) {
-            showConfirm("Approve Shop", "Are you sure you want to approve this shop request?", () => {
+            showConfirm("Approve Shop", "Are you sure you want to approve this shop?", () => {
                 fetch(`/admin-panel/shop/${shopId}/approve/`, {
                     method: "POST",
                     headers: { "X-CSRFToken": getCookie("csrftoken") },
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) location.reload();
-                    else alert(data.message);
+                    if (data.success) {
+                        showToast("Shop approved successfully!"); 
+                    } else {
+                        showToast(data.message || "Approval failed", "error");
+                    }
                 });
             });
         }
