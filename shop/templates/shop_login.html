@@ -173,6 +173,44 @@
             .login-card { padding: 30px 20px; }
             h2 { font-size: 24px; }
         }
+        .pending-approval-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pending-icon {
+            background: #f59e0b;
+            color: #020617;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .pending-text strong {
+            display: block;
+            color: #f59e0b;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .pending-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
