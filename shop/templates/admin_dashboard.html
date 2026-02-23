@@ -703,18 +703,15 @@ th{
     animation: slideInRight 0.3s ease forwards;
 }
 
+/* Styling specifically for rejection or error messages */
 .toast.error {
-    border-left-color: #ef4444;
-}
-
-.toast i {
-    font-size: 18px;
-    color: var(--primary);
+    border-left: 5px solid #ef4444; /* Bright red border */
 }
 
 .toast.error i {
-    color: #ef4444;
+    color: #ef4444; /* Red icon color */
 }
+
 
 @keyframes slideInRight {
     from { transform: translateX(100%); opacity: 0; }
@@ -1048,74 +1045,66 @@ th{
         </div>
             <!-- ===== ACCESS REQUEST ===== -->
         <div id="shops" class="content-section">
-            <div class="dashboard-section">
-                <h2 class="section-titles">
-                    <i class="fas fa-store"></i> Manage Shops
-                </h2>
-
-                {% if shops %}
-                <div class="shops-grid">
-                    {% for shop in shops %}
-                    <div class="shop-card">
-
-                        <h3>{{ shop.name }}</h3>
-                        <p><i class="fas fa-code-branch"></i> {{ shop.branches.count }} Branches</p>
-                        <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
-                        <p><i class="fas fa-phone"></i> {{ shop.phone }}</p>
-
-                        <span class="status {% if shop.is_open %}status-open{% else %}status-closed{% endif %}">
-                            {% if shop.is_open %}
-                                <i class="fas fa-door-open"></i> Open
-                            {% else %}
-                                <i class="fas fa-door-closed"></i> Closed
-                            {% endif %}
-                        </span>
-
-                        <div class="approval-status">
-                            <span class="status {% if shop.is_approved %}status-approved{% else %}status-pending-approval{% endif %}">
-                                {% if shop.is_approved %}
-                                    <i class="fas fa-check"></i> Approved
-                                {% else %}
-                                    <i class="fas fa-clock"></i> Pending Approval
-                                {% endif %}
-                            </span>
-                        </div>
-
-                        <div class="actions">
+            <div class="dashboard-section" style="background: none; box-shadow: none; padding: 0; color: blue">
+                
+                {% if pending_approvals > 0 %}
+                <div class="pending-requests-zone">
+                    <h2 class="section-title" style="color: var(--sidebar);">
+                        <i class="fas fa-clock"></i> Action Required: New Shop Requests
+                    </h2>
+                    <div class="shops-grid">
+                        {% for shop in shops %}
                             {% if not shop.is_approved %}
-                            <button onclick="approveShop({{ shop.id }})"
-                                    class="btn btn-primary"
-                                    style="font-size:12px">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-
-                            <button onclick="rejectShop({{ shop.id }})"
-                                    class="btn btn-secondary"
-                                    style="font-size:12px">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
+                            <div class="shop-card pending-card">
+                                <div class="pending-badge" style="color: var(--sidebar);font-size:20px;font-weight:600;">New Request</div>
+                                <h3>{{ shop.name }}</h3>
+                                <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
+                                <p><i class="fas fa-phone"></i> {{ shop.phone }}</p>
+                                
+                                <div class="actions">
+                                    <button onclick="approveShop({{ shop.id }})" class="btn btn-primary">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button onclick="rejectShop({{ shop.id }})" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
                             {% endif %}
-
-                            <a href="{% url 'admin_edit_shop' shop.id %}"
-                            class="btn btn-secondary"
-                            style="font-size:12px">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </div>
-
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-store"></i>
-                    <p>No shops found</p>
-                </div>
+                <hr style="margin: 40px 0; border: 0; border-top: 2px dashed #cbd5cf;">
                 {% endif %}
 
+                <div class="approved-shops-zone">
+                    <h2 class="section-title" style="color::#0f334b;"><i class="fas fa-store"></i> Active Shops</h2>
+                    <div class="shops-grid">
+                        {% for shop in shops %}
+                            {% if shop.is_approved %}
+                            <div class="shop-card">
+                                <h3>{{ shop.name }}</h3>
+                                <p><i class="fas fa-code-branch"></i> {{ shop.branches.count }} Branches</p>
+                                <p><i class="fas fa-map-marker-alt"></i> {{ shop.address }}</p>
+                                
+                                <span class="status {% if shop.is_open %}status-open{% else %}status-closed{% endif %}">
+                                    {% if shop.is_open %}Open{% else %}Closed{% endif %}
+                                </span>
+
+                                <div class="actions">
+                                    <a href="{% url 'admin_edit_shop' shop.id %}" class="btn btn-secondary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    
     <div id="customModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-icon"><i class="fas fa-question-circle"></i></div>
@@ -1309,15 +1298,27 @@ th{
         }
 
         function rejectShop(shopId) {
-            showConfirm("Reject Shop", "Do you want to decline this shop's registration?", () => {
+            // Show the centered custom confirmation modal
+            showConfirm("Reject Shop Request", "Are you sure you want to decline this registration? This action cannot be undone.", () => {
                 fetch(`/admin-panel/shop/${shopId}/reject/`, {
                     method: "POST",
-                    headers: { "X-CSRFToken": getCookie("csrftoken") },
+                    headers: { 
+                        "X-CSRFToken": getCookie("csrftoken"),
+                        "Content-Type": "application/json"
+                    },
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) location.reload();
-                    else alert(data.message);
+                    if (data.success) {
+                        // Show a red toast for rejection instead of a simple alert
+                        showToast("Shop request has been rejected.", "error"); 
+                    } else {
+                        showToast(data.message || "An error occurred during rejection.", "error");
+                    }
+                })
+                .catch(err => {
+                    console.error("Rejection error:", err);
+                    showToast("Server communication failed.", "error");
                 });
             });
         }
