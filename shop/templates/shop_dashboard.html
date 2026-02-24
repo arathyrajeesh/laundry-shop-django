@@ -1313,17 +1313,33 @@
                 </div>
             </div>
         </div>
-
+        {% if shop_ratings %}
         <div class="dashboard-section">
-            <div class="section-header">
-                <h2><i class="fas fa-star"></i> Customer Satisfaction</h2>
+
+            <div class="section-header"
+                {% if shop_ratings|length > 1 %}
+                style="cursor:pointer;"
+                onclick="toggleReviews()"
+                {% endif %}>
+                <h2>
+                    <i class="fas fa-star"></i> Customer Satisfaction
+                    {% if shop_ratings|length > 1 %}
+                    ({{ shop_ratings|length }} Reviews)
+                    {% endif %}
+                </h2>
+
+                {% if shop_ratings|length > 1 %}
+                <i class="fas fa-chevron-down"
+                    id="reviews-chevron"
+                    style="transition: transform 0.3s;"></i>
+                {% endif %}
             </div>
 
-            {% if shop_ratings %}
-            <div class="dashboard-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-star"></i> Customer Satisfaction</h2>
-                </div>
+            <!-- 🔽 THIS WAS MISSING -->
+            <div id="reviews-body"
+                {% if shop_ratings|length > 1 %}
+                style="display:none;"
+                {% endif %}>
 
                 <div class="rating-summary-container">
                     <div class="rating-big-number">
@@ -1352,7 +1368,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
                 <div class="reviews-container">
                     {% for rating in shop_ratings %}
                     <div class="review-card">
@@ -1384,8 +1399,9 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
         </div>
+        {% endif %}
+
         {% if delayed_orders_count > 0 %}
         <div class="dashboard-section delayed-section">
             <div class="section-header">
@@ -2104,6 +2120,20 @@
                 }, index * 150); // stagger animation
             });
         });
+        function toggleReviews() {
+            const body = document.getElementById("reviews-body");
+            const chevron = document.getElementById("reviews-chevron");
+
+            if (!body) return;
+
+            if (body.style.display === "none") {
+                body.style.display = "block";
+                if (chevron) chevron.style.transform = "rotate(180deg)";
+            } else {
+                body.style.display = "none";
+                if (chevron) chevron.style.transform = "rotate(0deg)";
+            }
+        }
     </script>
 </body>
 </html>
