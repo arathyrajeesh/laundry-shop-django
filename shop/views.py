@@ -2182,6 +2182,8 @@ def shop_notifications(request):
     db_notifs = Notification.objects.filter(shop=shop).order_by("-created_at")
     for n in db_notifs:
         notifications.append({
+            'id': n.id,               # 🔥 ADD THIS
+            'is_db': True,  
             'title': n.title,
             'message': n.message,
             'time': n.created_at,
@@ -3400,3 +3402,18 @@ Shine & Bright System
             status=500
         )
 
+@shop_login_required
+@require_POST
+def delete_notification(request, pk):
+    shop_id = request.session.get("shop_id")
+    shop = get_object_or_404(LaundryShop, id=shop_id)
+
+    notification = get_object_or_404(
+        Notification,
+        id=pk,
+        shop=shop
+    )
+
+    notification.delete()
+    messages.success(request, "Notification deleted successfully.")
+    return redirect("shop_notifications")
