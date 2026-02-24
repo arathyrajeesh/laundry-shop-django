@@ -4,7 +4,7 @@ from .models import (
     ServiceClothPrice, BranchCloth,
     Order, OrderItem,
     Notification,
-    ShopRating, ServiceRating, BranchRating,
+    ServiceRating,
     EmailVerificationToken, ShopPasswordResetToken,
     NewsletterSubscriber
 )
@@ -158,12 +158,6 @@ class NotificationAdmin(admin.ModelAdmin):
 # -----------------------------
 # RATINGS
 # -----------------------------
-@admin.register(ShopRating)
-class ShopRatingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'shop', 'rating', 'created_at')
-    list_filter = ('rating', 'created_at')
-    search_fields = ('user__username', 'shop__name')
-
 
 @admin.register(ServiceRating)
 class ServiceRatingAdmin(admin.ModelAdmin):
@@ -171,12 +165,6 @@ class ServiceRatingAdmin(admin.ModelAdmin):
     list_filter = ('rating',)
     search_fields = ('user__username', 'service__name')
 
-
-@admin.register(BranchRating)
-class BranchRatingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'branch', 'rating', 'created_at')
-    list_filter = ('rating',)
-    search_fields = ('user__username', 'branch__name')
 
 
 # -----------------------------

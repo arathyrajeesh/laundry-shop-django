@@ -223,45 +223,18 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
-class ShopRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE)
-    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
-    comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        unique_together = ('user', 'shop')
-
-    def __str__(self):
-        return f"{self.user.username} rated {self.shop.name}: {self.rating}"
-
 class ServiceRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+
+    shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, blank=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True)
+
+    rating = models.IntegerField()
     comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
 
-    class Meta:
-        unique_together = ('user', 'service')
-
-    def __str__(self):
-        return f"{self.user.username} rated {self.service.name}: {self.rating}"
-
-class BranchRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
-    comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        unique_together = ('user', 'branch')
-
-    def __str__(self):
-        return f"{self.user.username} rated {self.branch.name}: {self.rating}"
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    
 class EmailVerificationToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=100, unique=True)

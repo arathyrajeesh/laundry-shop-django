@@ -33,7 +33,6 @@ from .forms import (
 from .models import (
     Branch,
     BranchCloth,
-    BranchRating,
     Cloth,
     LaundryShop,
     NewsletterSubscriber,
@@ -46,7 +45,6 @@ from .models import (
     ServiceClothPrice,
     ServiceRating,
     ShopPasswordResetToken,
-    ShopRating,
     WashRecommendation,
 )
 from shop.utils.delivery_ai import predict_delivery_hours
@@ -241,7 +239,7 @@ def get_cloth_status(user):
     orders = Order.objects.filter(user=user, payment_status="Completed").select_related('shop').order_by('-created_at')
     result = []
     for order in orders:
-        rating_obj = ShopRating.objects.filter(user=user, shop=order.shop).first()
+        rating_obj = ServiceRating.objects.filter(user=user, shop=order.shop).first()
         result.append({
             'order_id': order.id,
             'cloth_name': f"Order #{order.id}",
@@ -609,8 +607,8 @@ def user_dashboard(request):
 
     # 4. ⭐ ANNOTATE: Use "shop_avg_rating" consistently to match your template
     services_qs = services_qs.annotate(
-        shop_avg_rating=Avg("branch__shop__shoprating__rating"),
-        shop_total_reviews=Count("branch__shop__shoprating", distinct=True)
+        shop_avg_rating=Avg("branch__shop__servicerating__rating"),
+        shop_total_reviews=Count("branch__shop__servicerating", distinct=True)
     )
 
     # 5. ⭐ APPLY RATING FILTER: Use the annotated name "shop_avg_rating"
@@ -890,7 +888,7 @@ def my_orders(request):
     for order in user_orders:
         # Attach branch rating (if exists)
         if order.branch:
-            order.branch_rating = BranchRating.objects.filter(
+            order.branch_rating = ServiceRating.objects.filter(
                 user=request.user,
                 branch=order.branch
             ).first()
@@ -926,7 +924,7 @@ def shop_detail(request, shop_id):
 
     # Add rating data to each branch
     for branch in branches:
-        branch_ratings = BranchRating.objects.filter(branch=branch)
+        branch_ratings = ServiceRating.objects.filter(branch=branch)
         branch.average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
         branch.branch_ratings = branch_ratings
 
@@ -938,8 +936,8 @@ def shop_detail(request, shop_id):
     all_services = Service.objects.filter(branch__shop=shop).select_related('branch')
 
     # Get shop ratings
-    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
-    user_rating = ShopRating.objects.filter(shop=shop, user=request.user).first()
+    shop_ratings = ServiceRating.objects.filter(shop=shop).select_related('user')
+    user_rating = ServiceRating.objects.filter(shop=shop, user=request.user).first()
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
     context = {
@@ -967,8 +965,8 @@ def branch_detail(request, branch_id):
         service.user_rating = ServiceRating.objects.filter(service=service, user=request.user).first()
 
     # Get branch ratings
-    branch_ratings = BranchRating.objects.filter(branch=branch).select_related('user')
-    user_rating = BranchRating.objects.filter(branch=branch, user=request.user).first()
+    branch_ratings = ServiceRating.objects.filter(branch=branch).select_related('user')
+    user_rating = ServiceRating.objects.filter(branch=branch, user=request.user).first()
     average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
     context = {
@@ -992,7 +990,7 @@ def select_branch_for_order(request, shop_id):
 
     # Add rating data to each branch
     for branch in branches:
-        branch_ratings = BranchRating.objects.filter(branch=branch)
+        branch_ratings = ServiceRating.objects.filter(branch=branch)
         branch.average_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
         branch.branch_ratings = branch_ratings
 
@@ -1976,7 +1974,7 @@ def admin_shop_detail(request, shop_id):
     total_revenue = Order.objects.filter(shop=shop).aggregate(total=Sum('amount'))['total'] or 0
 
     # Shop ratings
-    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
+    shop_ratings = ServiceRating.objects.filter(shop=shop).select_related('user')
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
     context = {
@@ -2249,7 +2247,7 @@ def shop_dashboard(request):
 
     recent_orders = paid_orders.select_related('user', 'branch').order_by('-created_at')[:10]
     rating_counts = (
-        ShopRating.objects
+        ServiceRating.objects
         .filter(shop=shop)
         .values("rating")
         .annotate(count=Count("id"))
@@ -2266,7 +2264,7 @@ def shop_dashboard(request):
     branch_stats = []
     for branch in branches:
         branch_paid = paid_orders.filter(branch=branch)
-        branch_ratings = BranchRating.objects.filter(branch=branch)
+        branch_ratings = ServiceRating.objects.filter(branch=branch)
         avg_rating = branch_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
 
         branch_stats.append({
@@ -2362,7 +2360,7 @@ def shop_dashboard(request):
     final_notifications = shop_notifications[:5]
 
     # Ratings
-    shop_ratings = ShopRating.objects.filter(shop=shop).select_related('user')
+    shop_ratings = ServiceRating.objects.filter(shop=shop).select_related('user')
     average_rating = shop_ratings.aggregate(avg=Avg('rating'))['avg'] or 0
     limited_notifications = shop_notifications[:3]
     context = {
@@ -2924,7 +2922,7 @@ def rate_shop(request, shop_id):
 
         # ✅ Use update_or_create to allow users to update their review 
         # instead of creating multiple entries for the same shop
-        ShopRating.objects.update_or_create(
+        ServiceRating.objects.update_or_create(
             user=request.user,
             shop=shop,
             defaults={
@@ -2995,14 +2993,14 @@ def rate_branch(request, branch_id):
     rating = int(rating)
 
     # Check if user already rated this branch
-    existing_rating = BranchRating.objects.filter(user=request.user, branch=branch).first()
+    existing_rating = ServiceRating.objects.filter(user=request.user, branch=branch).first()
     if existing_rating:
         existing_rating.rating = rating
         existing_rating.comment = comment
         existing_rating.save()
         message = 'Your rating has been updated successfully!'
     else:
-        BranchRating.objects.create(
+        ServiceRating.objects.create(
             user=request.user,
             branch=branch,
             rating=rating,
