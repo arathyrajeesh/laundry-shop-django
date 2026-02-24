@@ -1202,36 +1202,6 @@
                     .find(row => row.startsWith('csrftoken='))
                     ?.split('=')[1];
         }
-        function sendReminder(btn, orderId) {
-            if (!confirm("Send reminder to shop for this delayed order?")) return;
-
-            // ✅ Safe: btn is guaranteed to exist
-            btn.disabled = true;
-            btn.innerHTML = " Sending...";
-
-            fetch(`/send-order-reminder/${orderId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": getCSRFToken(),
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    btn.innerHTML = "Reminder Sent";
-                } else {
-                    btn.innerHTML = " Send Reminder";
-                    btn.disabled = false;
-                    alert(data.message || "Failed to send reminder");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                btn.innerHTML = " Send Reminder";
-                btn.disabled = false;
-                alert("Something went wrong");
-            });
-        }
         const services = document.querySelectorAll("#servicesGrid .shop-card");
         const toggleBtn = document.getElementById("toggleServicesBtn");
         let expanded = false;
@@ -1294,7 +1264,7 @@
             const orderId = pendingOrderId;
 
             btn.disabled = true;
-            btn.innerHTML = " Sending...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending';
 
             fetch(`/send-order-reminder/${orderId}/`, {
                 method: "POST",

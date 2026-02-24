@@ -2115,8 +2115,6 @@ def shop_login(request):
             request.session["shop_id"] = shop.id
             request.session["shop_name"] = shop.name
 
-            # ✅ IMPORTANT: NO EMAIL ON LOGIN (Render will kill worker)
-            messages.success(request, f"Welcome back, {shop.name}!")
             return redirect("shop_dashboard")
 
         except LaundryShop.DoesNotExist:
@@ -3330,78 +3328,35 @@ def mark_notifications_read(request):
         
     return JsonResponse({"status": "invalid"}, status=400)
 
-
 @login_required
-@require_POST
 def send_order_reminder(request, order_id):
-    try:
-        order = get_object_or_404(Order, id=order_id)
+    if request.method == "POST":
+        try:
+            order = Order.objects.get(id=order_id)
 
-        # 🔒 Ensure order belongs to logged-in user
-        if order.user != request.user:
-            return JsonResponse(
-                {"success": False, "message": "Unauthorized"},
-                status=403
-            )
-
-        # ⏳ Cooldown: 1 hour
-        if order.last_reminder_sent:
-            seconds = (timezone.now() - order.last_reminder_sent).total_seconds()
-            if seconds < 3600:
+            if not order.shop:
                 return JsonResponse({
                     "success": False,
-                    "message": "Reminder already sent recently. Please wait."
+                    "message": "Shop not found for this order"
                 })
 
-        # 📧 SEND EMAIL TO SHOP
-        subject = f"⏰ Delayed Order Reminder – Order #{order.id}"
-        message = f"""
-Hello {order.shop.name},
+            Notification.objects.create(
+                shop=order.shop,
+                user=request.user,
+                title="Delayed Order Reminder",
+                message=f"Order #{order.id} is delayed. Customer sent reminder.",
+                notification_type="shop_order_reminder"
+            )
 
-This is a reminder that the following order is delayed:
+            return JsonResponse({"success": True})
 
-Order ID: #{order.id}
-Customer: {order.user.username}
-Current Status: {order.cloth_status}
-Expected Delivery: {order.delivery_date}
-
-Please update the order status as soon as possible.
-
-Thank you,
-Shine & Bright System
-"""
-
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[order.shop.email],
-            fail_silently=False,   # IMPORTANT for debugging
-        )
-
-        # 🔔 OPTIONAL: CREATE SHOP NOTIFICATION
-        Notification.objects.create(
-            shop=order.shop,
-            title="⏰ Delayed Order Reminder",
-            message=f"Order #{order.id} for branch [{order.branch.name}] is delayed. Customer sent a reminder.",
-            notification_type="shop_order_reminder",
-            icon="fas fa-exclamation-triangle",
-            color="#e74c3c"
-        )
-
-        # 🕒 Update reminder timestamp
-        order.last_reminder_sent = timezone.now()
-        order.save(update_fields=["last_reminder_sent"])
-
-        return JsonResponse({"success": True})
-
-    except Exception as e:
-        print("REMINDER ERROR:", e)
-        return JsonResponse(
-            {"success": False, "message": "Server error"},
-            status=500
-        )
-
+        except Exception as e:
+            print("REMINDER ERROR:", e)
+            return JsonResponse({
+                "success": False,
+                "message": "Server error"
+            })
+            
 @shop_login_required
 @require_POST
 def delete_notification(request, pk):
