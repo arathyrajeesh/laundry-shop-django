@@ -20,7 +20,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
 from .forms import (
     BranchForm,
     CustomPasswordChangeForm,
@@ -50,7 +49,7 @@ from .models import (
     ShopRating,
     WashRecommendation,
 )
-
+from shop.utils.delivery_ai import predict_delivery_hours
 from .payment_utils import (
     calculate_commission,
     capture_payment_and_transfer,
@@ -58,7 +57,8 @@ from .payment_utils import (
     get_razorpay_client,
     verify_payment_signature,
 )
-
+import pickle
+import os
 
 def splash(request):
     return render(request, 'splash.html')
@@ -1136,7 +1136,29 @@ def create_order(request, shop_id, branch_id):
     gst_amount = 0  # or calculate GST if needed
 
     final_amount = base_amount + platform_fee + delivery_fee + gst_amount
+    
+    # ---------------- AI DELIVERY PREDICTION ----------------
 
+    total_items = sum(item["quantity"] for item in order_items_data)
+
+    branch_load = Order.objects.filter(
+        branch=branch,
+        cloth_status__in=["Pending", "Washing", "Drying", "Ironing"]
+    ).count()
+
+    # Use first cloth/service for prediction (can improve later)
+    sample_cloth = order_items_data[0]["cloth"].name
+    sample_service = order_items_data[0]["service"].name
+
+    predicted_hours = predict_delivery_hours(
+        cloth=sample_cloth,
+        service=sample_service,
+        branch_load=branch_load,
+        items=total_items
+    )
+
+    predicted_delivery_time = timezone.now() + timedelta(hours=predicted_hours)
+    
     # ---------- CREATE ORDER ----------
     order = Order.objects.create(
         user=request.user,
@@ -1149,9 +1171,8 @@ def create_order(request, shop_id, branch_id):
         amount=final_amount,   # ✅ MUST BE final_amount
         cloth_status="Pending",
         payment_status="Pending",
+        predicted_delivery=predicted_delivery_time
     )
-
-
 
     session_items = []
 
