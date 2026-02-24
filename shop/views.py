@@ -876,33 +876,30 @@ def help_view(request):
 
 @login_required
 def my_orders(request):
-    """Renders the My Orders page."""
 
-    user_orders = (
-        Order.objects
-        .filter(user=request.user)
-        .select_related('shop', 'branch')
+    user_orders = Order.objects.filter(user=request.user)\
+        .select_related('shop', 'branch')\
+        .prefetch_related('order_items__service')\
         .order_by('-created_at')
-    )
 
     for order in user_orders:
-        # Attach branch rating (if exists)
-        if order.branch:
-            order.branch_rating = ServiceRating.objects.filter(
+
+        for item in order.order_items.all():
+
+            item.service_rating = ServiceRating.objects.filter(
                 user=request.user,
-                branch=order.branch
+                service_id=item.service_id
             ).first()
 
-        # ✅ Display logic for payment
+        # Status display
         if order.payment_status != "Completed":
             order.display_status = "Payment Incomplete"
         else:
             order.display_status = order.cloth_status
 
-    return render(request, 'orders.html', {
-        'orders': user_orders
+    return render(request, "orders.html", {
+        "orders": user_orders
     })
-
 
 @login_required
 def billing_payments(request):
@@ -2948,36 +2945,26 @@ def rate_shop(request, shop_id):
         )
 
 @login_required
-@require_POST
 def rate_service(request, service_id):
-    """Handle service rating submission."""
     service = get_object_or_404(Service, id=service_id)
-    rating = request.POST.get('rating')
-    comment = request.POST.get('comment', '').strip()
 
-    if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
-        return JsonResponse({'success': False, 'message': 'Invalid rating. Please select a rating between 1 and 5.'}, status=400)
+    if request.method == "POST":
+        rating = request.POST.get("rating")
+        comment = request.POST.get("comment", "")
 
-    rating = int(rating)
-
-    # Check if user already rated this service
-    existing_rating = ServiceRating.objects.filter(user=request.user, service=service).first()
-    if existing_rating:
-        existing_rating.rating = rating
-        existing_rating.comment = comment
-        existing_rating.save()
-        message = 'Your rating has been updated successfully!'
-    else:
-        ServiceRating.objects.create(
+        ServiceRating.objects.update_or_create(
             user=request.user,
             service=service,
-            rating=rating,
-            comment=comment
+            defaults={
+                "rating": rating,
+                "comment": comment
+            }
         )
-        message = 'Thank you for rating this service!'
 
-    return JsonResponse({'success': True, 'message': message})
+        messages.success(request, "Service rated successfully!")
+        return redirect("orders")
 
+    return redirect("orders")
 
 @login_required
 @require_POST

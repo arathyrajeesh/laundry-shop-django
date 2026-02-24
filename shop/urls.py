@@ -83,6 +83,7 @@ urlpatterns = [
         path("notification/<int:pk>/delete/", views.delete_notification, name="delete_notification"),
         # Shop status toggle
         path('shop/toggle-shop-status/', views.toggle_shop_status, name='toggle_shop_status'),
+        path("service/<int:service_id>/rate/", views.rate_service, name="rate_service"),
 
         # Ratings
         path("service/<int:service_id>/rate/", views.rate_service, name="rate_service"),

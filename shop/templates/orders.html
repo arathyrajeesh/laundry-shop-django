@@ -310,32 +310,53 @@
                 </div>
                 {% endif %}
 
-                {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' and order.branch %}
+                {% if order.cloth_status == 'Completed' and order.payment_status == 'Completed' %}
                 <div class="rating-section">
-                    <h5 style="margin: 0 0 10px 0; font-size: 14px;">Rate your experience</h5>
-                    {% if order.branch_rating %}
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="color: #ecc94b;">
-                                {% for i in "12345"|make_list %}
-                                    <i class="{% if forloop.counter <= order.branch_rating.rating %}fas{% else %}far{% endif %} fa-star"></i>
-                                {% endfor %}
-                            </div>
-                            <span style="font-size: 14px; color: var(--text-muted);">{{ order.branch_rating.comment }}</span>
+                    <h5 style="margin-bottom:10px;">Rate Services</h5>
+
+                    {% for item in order.order_items.all %}
+                        <div style="margin-bottom:15px; padding:10px; background:#f8fafc; border-radius:10px;">
+                            
+                            <strong>{{ item.service.name }}</strong>
+
+                            {% if item.service_rating %}
+                                <div style="color:#ecc94b; margin-top:6px;">
+                                    {% for i in "12345"|make_list %}
+                                        <i class="{% if forloop.counter <= item.service_rating.rating %}fas{% else %}far{% endif %} fa-star"></i>
+                                    {% endfor %}
+                                    <span style="color:#718096; font-size:13px;">
+                                        {{ item.service_rating.comment }}
+                                    </span>
+                                </div>
+                            {% else %}
+                                <form method="post" action="{% url 'rate_service' item.service.id %}" style="margin-top:8px;">
+                                    {% csrf_token %}
+
+                                    <div class="star-rating">
+                                        {% for i in "54321"|make_list %}
+                                            <input type="radio"
+                                                id="star{{ i }}_{{ item.id }}"
+                                                name="rating"
+                                                value="{{ i }}"
+                                                required>
+                                            <label for="star{{ i }}_{{ item.id }}">
+                                                <i class="fas fa-star"></i>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+
+                                    <input type="text"
+                                        name="comment"
+                                        placeholder="Any feedback?"
+                                        class="rating-comment">
+
+                                    <button type="submit" class="btn-submit-rating">
+                                        Submit
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
-                    {% else %}
-                        <form class="rating-form" method="post" action="{% url 'rate_branch' order.branch.id %}">
-                            {% csrf_token %}
-                            <div class="star-rating">
-                                <input type="radio" id="star5_{{ order.id }}" name="rating" value="5" required/><label for="star5_{{ order.id }}"><i class="fas fa-star"></i></label>
-                                <input type="radio" id="star4_{{ order.id }}" name="rating" value="4"/><label for="star4_{{ order.id }}"><i class="fas fa-star"></i></label>
-                                <input type="radio" id="star3_{{ order.id }}" name="rating" value="3"/><label for="star3_{{ order.id }}"><i class="fas fa-star"></i></label>
-                                <input type="radio" id="star2_{{ order.id }}" name="rating" value="2"/><label for="star2_{{ order.id }}"><i class="fas fa-star"></i></label>
-                                <input type="radio" id="star1_{{ order.id }}" name="rating" value="1"/><label for="star1_{{ order.id }}"><i class="fas fa-star"></i></label>
-                            </div>
-                            <input type="text" class="rating-comment" name="comment" placeholder="Any feedback?">
-                            <button type="submit" class="btn-submit-rating">Submit</button>
-                        </form>
-                    {% endif %}
+                    {% endfor %}
                 </div>
                 {% endif %}
                 {% if order.payment_status != "Completed" %}
