@@ -111,13 +111,13 @@
         .schedule-btn:hover { background: var(--accent-hover); }
 
         /* --- HERO SECTION --- */
-        /* --- UPDATED HERO LAYOUT --- */
         .hero {
             min-height: 85vh;
             display: flex;
             align-items: center;
             justify-content: center;
             background: radial-gradient(circle, #ffffff 0%, #f0f7ff 100%);
+            padding: 60px 0;
         }
 
         .hero-content {
@@ -167,10 +167,10 @@
         .hero-visual img {
             width: 100%;
             max-width: 550px;
-            height: 400px;
+            aspect-ratio: 4 / 3;
+            height: auto;
             object-fit: cover;
             border-radius: 44% 56% 40% 60% / 54% 43% 57% 46%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
         /* Floating Animated Badge */
@@ -212,70 +212,36 @@
 
         /* --- CONSOLIDATED RESPONSIVE RULES --- */
         @media (max-width: 992px) {
-            .hero {
+            .hero-container {
                 flex-direction: column;
                 text-align: center;
-                padding: 50px 16px 30px;
-                height: auto;
-                min-height: 100vh;
-                gap: 18px;
-                justify-content: flex-start;
             }
 
             .hero-content {
-                max-width: 100%;
-                order: 1; /* Text first */
+                order: 1;
             }
 
-            .hero-content h1 {
-                font-size: clamp(2rem, 8vw, 2.5rem); /* Responsive scaling */
-                font-weight: 800;
-                line-height: 1.2;
-                margin-bottom: 14px;
-            }
-
-            .hero-content p {
-                font-size: 14.5px;
-                line-height: 1.6;
-                margin-bottom: 22px;
-                color: #64748b;
+            .hero-btn-container {
+                order: 2;
+                justify-content: center;
             }
 
             .hero-visual {
-                order: 2; /* Image second */
-                margin-top: 26px;
+                order: 3;  /* IMAGE GOES LAST */
+                margin-top: 30px;
                 width: 100%;
                 display: flex;
                 justify-content: center;
-                position: relative;
             }
 
             .hero-visual img {
                 width: 280px;
-                height: 320px;
-                object-fit: cover;
-                /* Matches your organic oval desktop look */
-                border-radius: 44% 56% 40% 60% / 54% 43% 57% 46%;
+                height: auto;
             }
 
             .badge-floating {
-                position: absolute;
-                top: 10px;        /* Moves it to the top */
-                left: 10px;       /* Aligns to the left side */
-                right: auto;
-                bottom: auto;
-                padding: 8px 12px;
-                border-radius: 12px;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(4px);
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                z-index: 10;
-                
-                /* Keeps the animation active on mobile */
-                animation: floatUpDown 3.5s ease-in-out infinite; 
-            }
-            .hero-btn-container {
-                justify-content: center;
+                top: 10px;
+                left: 10px;
             }
         }
 
@@ -1630,6 +1596,64 @@
             align-items: center;
             gap: 40px;
             padding: 0 40px;
+        }
+        /* ===== GLOBAL RESPONSIVE FIX ===== */
+        @media (max-width: 1200px) {
+            .nav-container,
+            .hero-container {
+                padding: 0 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container,
+            .hero-container {
+                padding: 0 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container,
+            .hero-container {
+                padding: 0 14px;
+            }
+        }
+        @media (max-width: 992px) {
+            .about-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .about-content {
+                text-align: center;
+            }
+
+            .about-content h2 {
+                text-align: center;
+            }
+
+            .about-list li {
+                text-align: center;
+            }
+        }
+        @media (max-width: 768px) {
+            .pricing-card {
+                width: 100%;
+            }
+
+            .service-card {
+                height: 320px;
+            }
+        }
+        @media (max-width: 480px) {
+            .brand-name {
+                font-size: 16px;
+            }
+
+            .schedule-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
