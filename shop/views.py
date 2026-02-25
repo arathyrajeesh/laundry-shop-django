@@ -722,7 +722,8 @@ def user_dashboard(request):
 
     # 3️⃣ Get services already rated by user
     rated_services = ServiceRating.objects.filter(
-        user=request.user
+        user=request.user,
+        service__isnull=False   # IMPORTANT: only service ratings
     ).values_list("service_id", flat=True)
 
     # 4️⃣ Count services not yet rated
