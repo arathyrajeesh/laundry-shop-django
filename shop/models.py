@@ -225,15 +225,25 @@ class Notification(models.Model):
 
 class ServiceRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
     shop = models.ForeignKey(LaundryShop, on_delete=models.CASCADE, null=True, blank=True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True)
 
     rating = models.IntegerField()
     comment = models.TextField(blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'shop'],
+                name='unique_user_shop_rating'
+            ),
+            models.UniqueConstraint(
+                fields=['user', 'service'],
+                name='unique_user_service_rating'
+            ),
+        ]
     
 class EmailVerificationToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

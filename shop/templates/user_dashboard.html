@@ -900,7 +900,23 @@
 
 
         <div class="section-header">
-            <h2>Track Your Items</h2>
+            <h2>
+                Track Your Items
+
+                {% if pending_reviews_count > 0 %}
+                    <span style="
+                        background:#ef4444;
+                        color:white;
+                        font-size:0.7rem;
+                        padding:4px 10px;
+                        border-radius:999px;
+                        margin-left:10px;
+                        font-weight:700;
+                    ">
+                        {{ pending_reviews_count }} Pending Review
+                    </span>
+                {% endif %}
+            </h2>
         </div>
         
         <div class="table-container">

@@ -607,13 +607,27 @@ def user_dashboard(request):
 
     # 4. ⭐ ANNOTATE: Use "shop_avg_rating" consistently to match your template
     services_qs = services_qs.annotate(
-        # ⭐ Service Rating
-        avg_rating=Avg("servicerating__rating"),
-        total_reviews=Count("servicerating", distinct=True),
+        # ⭐ Only service ratings (exclude shop/branch ratings)
+        avg_rating=Avg(
+            "servicerating__rating",
+            filter=Q(servicerating__service__isnull=False)
+        ),
+        total_reviews=Count(
+            "servicerating",
+            filter=Q(servicerating__service__isnull=False),
+            distinct=True
+        ),
 
-        # 🏪 Shop Rating
-        shop_avg_rating=Avg("branch__shop__servicerating__rating"),
-        shop_total_reviews=Count("branch__shop__servicerating", distinct=True),
+        # 🏪 Only shop ratings
+        shop_avg_rating=Avg(
+            "branch__shop__servicerating__rating",
+            filter=Q(branch__shop__servicerating__shop__isnull=False)
+        ),
+        shop_total_reviews=Count(
+            "branch__shop__servicerating",
+            filter=Q(branch__shop__servicerating__shop__isnull=False),
+            distinct=True
+        ),
     )
 
     # 5. ⭐ APPLY RATING FILTER: Use the annotated name "shop_avg_rating"
@@ -672,7 +686,31 @@ def user_dashboard(request):
         )
         .distinct()
     )
+    # ===============================
+    # PENDING RATING COUNT (FIXED)
+    # ===============================
 
+    # 1️⃣ Get completed orders
+    completed_orders = Order.objects.filter(
+        user=request.user,
+        cloth_status="Completed",
+        payment_status="Completed"
+    )
+
+    # 2️⃣ Get services used in those orders
+    completed_services = Service.objects.filter(
+        orderitem__order__in=completed_orders
+    ).distinct()
+
+    # 3️⃣ Get services already rated by user
+    rated_services = ServiceRating.objects.filter(
+        user=request.user
+    ).values_list("service_id", flat=True)
+
+    # 4️⃣ Count services not yet rated
+    pending_reviews_count = completed_services.exclude(
+        id__in=rated_services
+    ).count()
     # ===============================
     # RENDER
     # ===============================
@@ -694,6 +732,7 @@ def user_dashboard(request):
             "unread_count": unread_count,
             "previous_shops": previous_shops,
             "rating_filter": rating_filter,
+            "pending_reviews_count": pending_reviews_count,
         },
     )
 # --- NEW DROPDOWN VIEWS ---
