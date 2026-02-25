@@ -236,24 +236,42 @@ def generate_payment_receipt_pdf(order, order_items):
 # NOTE: The dashboard template expects a 'cloth_status' list. 
 # We'll use the user's last 5 orders as a stand-in.
 def get_cloth_status(user):
-    orders = Order.objects.filter(user=user, payment_status="Completed").select_related('shop').order_by('-created_at')
-    result = []
-    for order in orders:
-        rating_obj = ServiceRating.objects.filter(user=user, shop=order.shop).first()
-        result.append({
-            'order_id': order.id,
-            'cloth_name': f"Order #{order.id}",
-            'status': order.cloth_status,
-            'delivery_date': order.delivery_date or order.predicted_delivery,
-            'shop_name': order.shop.name,
-            'shop_id': order.shop.id,
-            'already_rated': rating_obj is not None,
-            # ADD THESE TWO LINES:
-            'existing_rating': rating_obj.rating if rating_obj else 0,
-            'existing_comment': rating_obj.comment if rating_obj else "",
-        })
-    return result
+    orders = (
+        Order.objects
+        .filter(user=user, payment_status="Completed")
+        .select_related("shop")
+        .order_by("-created_at")
+    )
 
+    # ✅ Get all ratings of this user at once
+    user_ratings = ServiceRating.objects.filter(
+        user=user
+    ).select_related("shop")
+
+    # Create dictionary {shop_id: rating_obj}
+    ratings_dict = {
+        rating.shop_id: rating
+        for rating in user_ratings
+    }
+
+    result = []
+
+    for order in orders:
+        rating_obj = ratings_dict.get(order.shop_id)
+
+        result.append({
+            "order_id": order.id,
+            "cloth_name": f"Order #{order.id}",
+            "status": order.cloth_status,
+            "delivery_date": order.delivery_date or order.predicted_delivery,
+            "shop_name": order.shop.name,
+            "shop_id": order.shop.id,
+            "already_rated": rating_obj is not None,
+            "existing_rating": rating_obj.rating if rating_obj else 0,
+            "existing_comment": rating_obj.comment if rating_obj else "",
+        })
+
+    return result
 
 # --- Notification Helper Functions ---
 
