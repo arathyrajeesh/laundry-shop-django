@@ -75,15 +75,10 @@
         /* --- NAVBAR --- */
         nav {
             width: 100%;
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background: white;
             position: sticky;
             top: 0;
             box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
             z-index: 100;
         }
 
@@ -118,13 +113,11 @@
         /* --- HERO SECTION --- */
         /* --- UPDATED HERO LAYOUT --- */
         .hero {
-            height: 85vh;
+            min-height: 85vh;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 80px;
+            justify-content: center;
             background: radial-gradient(circle, #ffffff 0%, #f0f7ff 100%);
-            gap: 40px;
         }
 
         .hero-content {
@@ -1620,69 +1613,91 @@
                 box-shadow: none;
             }
         }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hero-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            padding: 0 40px;
+        }
     </style>
 </head>
 
 <body>
 
     <nav>
-        <div class="brand">
-            <img src="{% static 'images/Shine.png' %}" alt="Logo" class="logo">
-            <span class="brand-name">Shine & Bright</span>
-        </div>
+        <div class="nav-container">
+            <div class="brand">
+                <img src="{% static 'images/Shine.png' %}" alt="Logo" class="logo">
+                <span class="brand-name">Shine & Bright</span>
+            </div>
 
-        <div class="menu-toggle" id="mobile-menu">
-            <i class="fas fa-bars"></i>
-        </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
 
-        <ul class="nav-links" id="nav-list">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            
-            {% if not user.is_authenticated %}
-                <li><a href="{% url 'login' %}">Login</a></li>
-                <li class="mobile-only"><a href="{% url 'signup' %}" class="schedule-btn">Get Started</a></li>
-            {% else %}
-                <li class="mobile-only"><a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a></li>
-            {% endif %}
-        </ul>
+            <ul class="nav-links" id="nav-list">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                
+                {% if not user.is_authenticated %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li class="mobile-only"><a href="{% url 'signup' %}" class="schedule-btn">Get Started</a></li>
+                {% else %}
+                    <li class="mobile-only"><a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a></li>
+                {% endif %}
+            </ul>
 
-        <div class="nav-actions desktop-only">
-            {% if not user.is_authenticated %}
-                <a href="{% url 'signup' %}" class="schedule-btn">Get Started</a>
-            {% else %}
-                <a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a>
-            {% endif %}
+            <div class="nav-actions desktop-only">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'signup' %}" class="schedule-btn">Get Started</a>
+                {% else %}
+                    <a href="{% url 'dashboard' %}" class="schedule-btn">Dashboard</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 
     <section class="hero" id="home">
-        <div class="hero-content" data-aos="fade-right">
-            <span class="section-tag">Premium Laundry Care</span>
-            <h1>Clean Clothes, <br><span style="color: var(--accent-color);">Zero Effort.</span></h1>
-            <p>Experience the most professional laundry and dry cleaning service in Kerala. We pick up, clean, and deliver to your doorstep within 24 hours.</p>
-            <div class="hero-btn-container" style="display: flex; gap: 1rem;">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
-                        Book a Pickup Now
-                    </a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
-                        Book a Pickup Now
-                    </a>
-                {% endif %}
+        <div class="hero-container">
+            <div class="hero-content" data-aos="fade-right">
+                <span class="section-tag">Premium Laundry Care</span>
+                <h1>Clean Clothes, <br><span style="color: var(--accent-color);">Zero Effort.</span></h1>
+                <p>Experience the most professional laundry and dry cleaning service in Kerala. We pick up, clean, and deliver to your doorstep within 24 hours.</p>
+                <div class="hero-btn-container" style="display: flex; gap: 1rem;">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
+                            Book a Pickup Now
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="schedule-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">
+                            Book a Pickup Now
+                        </a>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-        
-        <div class="hero-visual" data-aos="fade-left" data-aos-delay="200">
-            <img src="{% static 'images/hero.jpg' %}" alt="Laundry Hero">
-            <div class="badge-floating">
-                <i class="fas fa-star" style="color: #f59e0b; font-size: 24px;"></i>
-                <div>
-                    <strong style="display: block; color: var(--primary-color);">25 Years</strong>
-                    <small style="color: #777;">Trusted Expertise</small>
+            
+            <div class="hero-visual" data-aos="fade-left" data-aos-delay="200">
+                <img src="{% static 'images/hero.jpg' %}" alt="Laundry Hero">
+                <div class="badge-floating">
+                    <i class="fas fa-star" style="color: #f59e0b; font-size: 24px;"></i>
+                    <div>
+                        <strong style="display: block; color: var(--primary-color);">25 Years</strong>
+                        <small style="color: #777;">Trusted Expertise</small>
+                    </div>
                 </div>
             </div>
         </div>
