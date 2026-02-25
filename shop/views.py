@@ -2405,57 +2405,74 @@ def select_branch(request):
 @shop_login_required
 def branch_orders(request, branch_id):
     """View orders for a specific branch."""
+
     shop_id = request.session.get('shop_id')
     shop = get_object_or_404(LaundryShop, id=shop_id)
     branch = get_object_or_404(Branch, id=branch_id, shop=shop)
 
-    # Get orders for this branch
-    branch_orders = Order.objects.filter(branch=branch).order_by('-created_at')
+    # ==========================
+    # 📦 ORDERS QUERY
+    # ==========================
+    branch_orders_qs = Order.objects.filter(branch=branch).order_by('-created_at')
 
-    # Statistics for this branch
-    total_orders = branch_orders.count()
-    recent_orders = Order.objects.filter(branch=branch)
-    pending_orders = branch_orders.filter(cloth_status="Pending").count()
-    washing_orders = branch_orders.filter(cloth_status="Washing").count()
-    drying_orders = branch_orders.filter(cloth_status="Drying").count()
-    ironing_orders = branch_orders.filter(cloth_status="Ironing").count()
-    ready_orders = branch_orders.filter(cloth_status="Ready").count()
-    completed_orders = branch_orders.filter(cloth_status="Completed").count()
-    total_revenue = branch_orders.aggregate(total=Sum('amount'))['total'] or 0
-    active_orders = Order.objects.filter(
-        branch=branch,
+    total_orders = branch_orders_qs.count()
+
+    pending_orders = branch_orders_qs.filter(cloth_status="Pending").count()
+    washing_orders = branch_orders_qs.filter(cloth_status="Washing").count()
+    drying_orders = branch_orders_qs.filter(cloth_status="Drying").count()
+    ironing_orders = branch_orders_qs.filter(cloth_status="Ironing").count()
+    ready_orders = branch_orders_qs.filter(cloth_status="Ready").count()
+    completed_orders = branch_orders_qs.filter(cloth_status="Completed").count()
+
+    total_revenue = branch_orders_qs.aggregate(total=Sum('amount'))['total'] or 0
+
+    today_revenue = branch_orders_qs.filter(
+        created_at__date=datetime.now().date()
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    active_orders = branch_orders_qs.filter(
         payment_status="Completed"
     ).exclude(
         cloth_status="Pending"
     ).order_by("-created_at")
 
-    # Today's revenue for this branch
-    today_revenue = branch_orders.filter(
-        created_at__date=datetime.now().date()
-    ).aggregate(total=Sum('amount'))['total'] or 0
+    # ==========================
+    # 🧾 RECENT ORDERS (WITH DETAILS)
+    # ==========================
+    recent_orders = branch_orders_qs.select_related('user').prefetch_related(
+        'order_items__service__cloth_prices',
+        'order_items__cloth'
+    )[:20]
 
-    # Recent orders for this branch with cloth pricing details
-    recent_orders = branch_orders.select_related('user').prefetch_related('order_items__service__cloth_prices', 'order_items__cloth')[:20]  # Show more orders on branch page
+    # ==========================
+    # 🧵 SERVICES & CLOTH PRICES
+    # ==========================
+    services = branch.services.prefetch_related(
+        'cloths',
+        'cloth_prices'
+    ).all()
 
-    # Get services with cloth prices for display
-    services = branch.services.prefetch_related('cloths', 'cloth_prices').all()
-
-    # Attach prices directly to cloth objects for easy template access
     for service in services:
-        cloth_prices_dict = {}
-        for cloth_price in service.cloth_prices.all():
-            cloth_prices_dict[cloth_price.cloth.id] = cloth_price.price
+        cloth_prices_dict = {
+            cp.cloth.id: cp.price
+            for cp in service.cloth_prices.all()
+        }
 
-        # Attach price to each cloth object
         for cloth in service.cloths.all():
-            cloth.price = cloth_prices_dict.get(cloth.id)
+            cloth.price = cloth_prices_dict.get(cloth.id, 0)
 
-    # Add cloth pricing details to each order
+    # ==========================
+    # 🧾 ADD CLOTH PRICING DETAILS TO ORDERS
+    # ==========================
     for order in recent_orders:
         order.cloth_pricing_details = []
+
         for item in order.order_items.all():
-            # Get the specific price for this cloth in this service
-            cloth_price_obj = ServiceClothPrice.objects.filter(service=item.service, cloth=item.cloth).first()
+            cloth_price_obj = ServiceClothPrice.objects.filter(
+                service=item.service,
+                cloth=item.cloth
+            ).first()
+
             cloth_price = cloth_price_obj.price if cloth_price_obj else 0
 
             order.cloth_pricing_details.append({
@@ -2466,6 +2483,33 @@ def branch_orders(request, branch_id):
                 'total_price': cloth_price * item.quantity
             })
 
+    # ==========================
+    # ⭐ SERVICE RATINGS (FIXED PROPERLY)
+    # ==========================
+    service_ratings_data = []
+    branch_avg_rating = 0
+
+    branch_services = Service.objects.filter(branch=branch)
+
+    for service in branch_services:
+        ratings = ServiceRating.objects.filter(service=service)
+
+        avg_rating = ratings.aggregate(avg=Avg("rating"))["avg"] or 0
+        total_reviews = ratings.count()
+
+        service_ratings_data.append({
+            "service": service,
+            "average_rating": round(avg_rating, 1),
+            "total_reviews": total_reviews,
+        })
+
+    branch_avg_rating = ServiceRating.objects.filter(
+        service__branch=branch
+    ).aggregate(avg=Avg("rating"))["avg"] or 0
+
+    # ==========================
+    # 📤 CONTEXT
+    # ==========================
     context = {
         'shop': shop,
         'branch': branch,
@@ -2480,11 +2524,12 @@ def branch_orders(request, branch_id):
         'today_revenue': today_revenue,
         'recent_orders': recent_orders,
         'services': services,
-        "active_orders": active_orders,
+        'active_orders': active_orders,
+        'service_ratings_data': service_ratings_data,
+        'branch_avg_rating': round(branch_avg_rating, 1),
     }
 
     return render(request, 'branch_orders.html', context)
-
 
 @shop_login_required
 def shop_update_order_status(request, order_id):

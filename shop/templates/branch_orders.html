@@ -165,6 +165,41 @@
                 </table>
             </div>
         </div>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3>
+                    ⭐ Service Ratings (Avg: {{ branch_avg_rating }}/5)
+                </h3>
+            </div>
+
+            <div style="padding:20px;">
+                {% if service_ratings_data %}
+                    {% for item in service_ratings_data %}
+                        <div style="margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid #eee;">
+                            
+                            <strong>{{ item.service.name }}</strong><br>
+
+                            <div style="color:#f59e0b; margin:5px 0;">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= item.average_rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span style="color:#64748b; margin-left:8px;">
+                                    {{ item.average_rating }} / 5
+                                    ({{ item.total_reviews }} reviews)
+                                </span>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color:#64748b;">No ratings yet for this branch.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <script>
